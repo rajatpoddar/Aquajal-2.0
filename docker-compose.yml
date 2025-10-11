@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: aquajal_app
+    restart: unless-stopped
+    ports:
+      - "2942:2942"
+    environment:
+      - SECRET_KEY=your_very_secret_key_change_me
+      # Use this for SQLite if you want to keep it simple
+      - DATABASE_URL=sqlite:////app/data/app.db
+    volumes:
+      # This will persist your SQLite database and uploads on your Synology NAS
+      - ./data:/app/data
+      - ./app/static/uploads:/app/app/static/uploads
+    command: gunicorn --bind 0.0.0.0:2942 --workers 4 "app:create_app()"

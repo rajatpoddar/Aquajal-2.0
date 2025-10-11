@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Login
+Flask-WTF
+Flask-APScheduler
+psycopg2-binary
+gunicorn
+python-dotenv
+alembic
+sqlalchemy
+werkzeug
