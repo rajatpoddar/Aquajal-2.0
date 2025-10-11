@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Manager Dashboard</h2>
+    <div>
+        <a href="{{ url_for('manager.stock_management') }}" class="btn btn-warning me-2">
+            <i class="bi bi-box-seam"></i> Manage Stock
+        </a>
+        <a href="{{ url_for('manager.settings') }}" class="btn btn-secondary me-2">
+            <i class="bi bi-gear"></i> Price Settings
+        </a>
+        <a href="{{ url_for('manager.reports') }}" class="btn btn-info">
+            <i class="bi bi-file-earmark-text"></i> View Daily Reports
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center text-white bg-primary shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Cash Held By Staff</h5>
+                <p class="card-text display-4">₹{{ "%.2f"|format(total_staff_balance) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center text-white bg-info shadow">
+            <div class="card-body">
+                <h5 class="card-title">Available Jar Stock</h5>
+                <p class="card-text display-4">{{ current_user.business.jar_stock if current_user.business else 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center text-dark bg-light shadow">
+            <div class="card-body">
+                <h5 class="card-title">Available Dispenser Stock</h5>
+                <p class="card-text display-4">{{ current_user.business.dispenser_stock if current_user.business else 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Individual Staff Balances</h4>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Staff Username</th>
+                        <th class="text-end">Cash on Hand</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in staff_members %}
+                    <tr>
+                        <td>{{ staff.username }}</td>
+                        <td class="text-end">
+                            <span class="badge fs-6 {% if staff.cash_balance and staff.cash_balance > 0 %}bg-success{% else %}bg-secondary{% endif %}">
+                                ₹{{ "%.2f"|format(staff.cash_balance if staff.cash_balance is not none else 0.0) }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {% if staff.cash_balance and staff.cash_balance > 0 %}
+                            <form action="{{ url_for('manager.receive_cash', staff_id=staff.id) }}" method="post" onsubmit="return confirm('Are you sure you received this amount from {{ staff.username }}? This will reset their balance to zero.');">
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-cash-stack"></i> Receive Cash
+                                </button>
+                            </form>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center">No staff members found for your business.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-5">Pending Event Bookings</h4>
+<div class="list-group">
+    {% for booking in pending_bookings %}
+    <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+            <div>
+                <h5 class="mb-1">{{ booking.customer.name }} - {{ booking.customer.mobile_number }}</h5>
+                <p class="mb-1"><strong>{{ booking.quantity }} Jars</strong> for event on <strong>{{ booking.event_date.strftime('%d-%b-%Y') }}</strong></p>
+                <small>Location: {{ booking.customer.area }}, {{ booking.customer.village }}</small>
+            </div>
+            <div class="my-auto">
+                <a href="{{ url_for('manager.confirm_booking', booking_id=booking.id) }}" class="btn btn-success">Confirm</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="list-group-item">No pending event bookings.</div>
+    {% endfor %}
+</div>
+{% endblock %}

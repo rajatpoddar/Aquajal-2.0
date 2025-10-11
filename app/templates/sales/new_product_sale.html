@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<div class="alert alert-info">
+    Current Prices: New Jar - ₹{{ "%.2f"|format(business.new_jar_price) }}, Dispenser - ₹{{ "%.2f"|format(business.new_dispenser_price) }}
+</div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.product_name.label(class="form-label") }}
+                {{ form.product_name(class="form-select") }}
+            </div>
+            <div class="mb-3">
+                {{ form.quantity.label(class="form-label") }}
+                {{ form.quantity(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.customer_name.label(class="form-label") }}
+                {{ form.customer_name(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.customer_mobile.label(class="form-label") }}
+                {{ form.customer_mobile(class="form-control") }}
+            </div>
+            <div>
+                {{ form.submit(class="btn btn-success") }}
+                <a href="{{ url_for('delivery.dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

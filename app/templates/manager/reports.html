@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Daily Report for {{ report_date.strftime('%d %B, %Y') }}</h2>
+    <form class="d-flex align-items-center">
+        <label for="report_date" class="form-label me-2 mb-0">Select Date:</label>
+        <input type="date" id="report_date" name="report_date" class="form-control" value="{{ report_date.isoformat() }}" onchange="this.form.submit()">
+    </form>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Sales</h5>
+                <p class="card-text fs-4">₹{{ "%.2f"|format(total_sales) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Expenses</h5>
+                <p class="card-text fs-4">₹{{ "%.2f"|format(total_expenses) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body">
+                <h5 class="card-title">Net Income</h5>
+                <p class="card-text fs-4">₹{{ "%.2f"|format(total_sales - total_expenses) }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mt-5">Attendance</h3>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Staff</th><th>Jars Sold</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for item in attendance %}
+                <tr>
+                    <td>{{ item.username }}</td>
+                    <td>{{ item.jars_sold }}</td>
+                    <td>
+                        {% if item.status == 'Full Day' %}<span class="badge bg-success">{{ item.status }}</span>
+                        {% elif item.status == 'Half Day' %}<span class="badge bg-warning text-dark">{{ item.status }}</span>
+                        {% else %}<span class="badge bg-secondary">{{ item.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Daily Deliveries Log</h3>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Time</th><th>Staff</th><th>Customer</th><th>Jars</th><th>Amount</th></tr></thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                            <td>{{ sale.staff.username | default('N/A') }}</td>
+                            <td>{{ sale.customer.name | default('N/A') }}</td>
+                            <td>{{ sale.jars_delivered }}</td>
+                            <td>₹{{ "%.2f"|format(sale.amount_collected) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center">No deliveries recorded for this day.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h3>New Product Sales & Expenses</h3>
+         <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Time</th><th>Staff</th><th>Description</th><th>Amount</th></tr></thead>
+                    <tbody>
+                        {% for sale in product_sales %}
+                        <tr class="table-success">
+                            <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                            <td>{{ sale.staff.username | default('N/A') }}</td>
+                            <td>Sale: {{ sale.quantity }} {{ sale.product_name }}(s)</td>
+                            <td>+ ₹{{ "%.2f"|format(sale.total_amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for expense in expenses %}
+                        <tr class="table-danger">
+                            <td>{{ (expense.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                            <td>{{ expense.staff.username | default('N/A') }}</td>
+                            <td>{{ expense.description }}</td>
+                            <td>- ₹{{ "%.2f"|format(expense.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not product_sales and not expenses %}
+                        <tr><td colspan="4" class="text-center">No product sales or expenses for this day.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

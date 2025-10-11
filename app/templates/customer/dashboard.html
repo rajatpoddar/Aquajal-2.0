@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome, {{ current_user.name }}!</h2>
+<hr>
+<div class="row">
+    <div class="col-md-4">
+        <h4>Quick Actions</h4>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Request Daily Jars</h5>
+                <form action="{{ url_for('customer.request_jar') }}" method="post">
+                    {{ jar_form.hidden_tag() }}
+                    <div class="mb-2">{{ jar_form.quantity.label }} {{ jar_form.quantity(class="form-control") }}</div>
+                    <div>{{ jar_form.submit(class="btn btn-success") }}</div>
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Book for an Event</h5>
+                <form action="{{ url_for('customer.book_event') }}" method="post">
+                    {{ event_form.hidden_tag() }}
+                    <div class="mb-2">{{ event_form.quantity.label }} {{ event_form.quantity(class="form-control") }}</div>
+                    <div class="mb-2">{{ event_form.event_date.label }} {{ event_form.event_date(class="form-control") }}</div>
+                    <div>{{ event_form.submit(class="btn btn-info") }}</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4>My Recent Activity</h4>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation"><button class="nav-link active" id="deliveries-tab" data-bs-toggle="tab" data-bs-target="#deliveries" type="button">Deliveries</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button">Jar Requests</button></li>
+            <li class="nav-item" role="presentation"><button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button">Event Bookings</button></li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="deliveries" role="tabpanel">
+                <ul class="list-group list-group-flush">
+                    {% for report in reports %}
+                    <li class="list-group-item">
+                        Delivered <strong>{{ report.jars_delivered }} jar(s)</strong> on {{(report.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
+                        <span class="float-end">Amount: ₹{{ "%.2f"|format(report.amount_collected) }}</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item">No delivery history found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="requests" role="tabpanel">
+                <ul class="list-group list-group-flush">
+                    {% for req in requests %}
+                    <li class="list-group-item">
+                        Requested <strong>{{ req.quantity }} jar(s)</strong> on {{(req.request_timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
+                        <span class="float-end badge bg-info">{{ req.status }}</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item">No recent jar requests.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="bookings" role="tabpanel">
+                <ul class="list-group list-group-flush">
+                    {% for book in bookings %}
+                    <li class="list-group-item">
+                        Booked <strong>{{ book.quantity }} jar(s)</strong> for {{ book.event_date.strftime('%d-%b-%Y') }}
+                        <span class="float-end badge bg-warning">{{ book.status }}</span>
+                        {% if book.amount %}<small class="d-block">Confirmed Amount: ₹{{ "%.2f"|format(book.amount) }}</small>{% endif %}
+                    </li>
+                    {% else %}
+                    <li class="list-group-item">No event bookings found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

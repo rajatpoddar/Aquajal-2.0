@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control", size=32) }}
+                </div>
+                <div class="mb-3">
+                    {{ form.role.label(class="form-label") }}
+                    {{ form.role(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.daily_wage.label(class="form-label") }}
+                    {{ form.daily_wage(class="form-control") }}
+                </div>
+                
+                {% if not user %}
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control", size=32) }}
+                </div>
+                <div class="mb-3">
+                    {{ form.password2.label(class="form-label") }}
+                    {{ form.password2(class="form-control", size=32) }}
+                </div>
+                {% endif %}
+
+                <div>
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('admin.list_staff') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
