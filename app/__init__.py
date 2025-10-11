@@ -1,6 +1,6 @@
 # /water_supply_app/app/__init__.py
 
-from flask import Flask, redirect, url_for, request # <-- Add request
+from flask import Flask, redirect, url_for
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -10,6 +10,7 @@ from sqlalchemy import MetaData
 from zoneinfo import ZoneInfo
 import os
 
+# --- Naming convention for database constraints ---
 metadata = MetaData(naming_convention={
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -18,15 +19,14 @@ metadata = MetaData(naming_convention={
     "pk": "pk_%(table_name)s"
 })
 
+# --- Initialize extensions ---
 db = SQLAlchemy(metadata=metadata)
 migrate = Migrate()
 login = LoginManager()
 scheduler = APScheduler()
 
-# --- REVERT TO THE SIMPLE LOGIN VIEW ---
+# --- Set the single, unified login view ---
 login.login_view = 'auth.login'
-
-# --- REMOVED this line: login.login_view = 'auth.login' ---
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -47,7 +47,7 @@ def create_app(config_class=Config):
         scheduler.add_job(id='deduct-wages', func=deduct_daily_wages, args=[app], trigger='cron', hour=20, minute=0)
     scheduler.start()
 
-    # Register Blueprints
+    # --- Register Blueprints ---
     from app.auth.routes import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
     from app.customers.routes import bp as customers_bp
@@ -63,18 +63,24 @@ def create_app(config_class=Config):
     from app.customer.routes import bp as customer_bp
     app.register_blueprint(customer_bp, url_prefix='/customer')
 
+    # --- DEFINITIVE, CORRECTED INDEX ROUTE ---
     @app.route('/')
     def index():
-        if current_user.is_authenticated:
-            if hasattr(current_user, 'role'):
-                if current_user.role == 'admin':
-                    return redirect(url_for('admin.dashboard'))
-                elif current_user.role == 'manager':
-                    return redirect(url_for('manager.dashboard'))
-                elif current_user.role == 'customer':
-                    return redirect(url_for('customer.dashboard'))
-                else: # Staff
-                    return redirect(url_for('delivery.dashboard'))
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
+            
+        # This hasattr check is crucial for the login process
+        if hasattr(current_user, 'role'):
+            if current_user.role == 'admin':
+                return redirect(url_for('admin.dashboard'))
+            elif current_user.role == 'manager':
+                return redirect(url_for('manager.dashboard'))
+            elif current_user.role == 'customer':
+                return redirect(url_for('customer.dashboard'))
+            elif current_user.role == 'staff':
+                return redirect(url_for('delivery.dashboard'))
+
+        # Fallback in case of an undefined role
         return redirect(url_for('auth.login'))
 
     from . import seeder

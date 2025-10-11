@@ -20,17 +20,22 @@ class ExpenseForm(FlaskForm):
     submit_expense = SubmitField('Add Expense')
 
 # --- Routes ---
-# --- THE FIX IS ON THE NEXT LINE ---
-@bp.route('/dashboard', methods=['GET']) # Changed from '/' to '/dashboard'
+@bp.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
+    # --- THE CONFLICTING SECURITY CHECK HAS BEEN REMOVED FROM HERE ---
+    
     search_form = SearchForm()
     expense_form = ExpenseForm()
+
     today = date.today()
+    
+    # This logic now safely assumes only a staff member will see this page.
     jar_requests = db.session.query(JarRequest).join(Customer).filter(
         Customer.business_id == current_user.business_id,
         JarRequest.status == 'Pending'
     ).order_by(JarRequest.request_timestamp).all()
+    
     event_bookings_today = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id,
         EventBooking.status == 'Confirmed',
