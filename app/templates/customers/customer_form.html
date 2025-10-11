@@ -1,4 +1,3 @@
-<!-- /water_supply_app/app/templates/customers/customer_form.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -7,14 +6,19 @@
         <div class="card-body">
             <form action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
-                <!-- ... (all form fields are the same) ... -->
                 <div class="mb-3">
                     {{ form.name.label(class="form-label") }}
                     {{ form.name(class="form-control") }}
                 </div>
-                <div class="mb-3">
-                    {{ form.mobile_number.label(class="form-label") }}
-                    {{ form.mobile_number(class="form-control") }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.mobile_number.label(class="form-label") }}
+                        {{ form.mobile_number(class="form-control") }}
+                    </div>
                 </div>
                 <div class="mb-3">
                     {{ form.password.label(class="form-label") }}

@@ -62,6 +62,8 @@ def create_app(config_class=Config):
     app.register_blueprint(sales_bp, url_prefix='/sales')
     from app.customer.routes import bp as customer_bp
     app.register_blueprint(customer_bp, url_prefix='/customer')
+    
+    from app.models import User, Customer
 
     # --- DEFINITIVE, CORRECTED INDEX ROUTE ---
     @app.route('/')
@@ -69,18 +71,20 @@ def create_app(config_class=Config):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login'))
             
-        # This hasattr check is crucial for the login process
-        if hasattr(current_user, 'role'):
+        # If the logged-in user is a Customer, always send to customer dashboard
+        if isinstance(current_user, Customer):
+            return redirect(url_for('customer.dashboard'))
+
+        # Handle different roles for administrative Users
+        if isinstance(current_user, User):
             if current_user.role == 'admin':
                 return redirect(url_for('admin.dashboard'))
             elif current_user.role == 'manager':
                 return redirect(url_for('manager.dashboard'))
-            elif current_user.role == 'customer':
-                return redirect(url_for('customer.dashboard'))
             elif current_user.role == 'staff':
                 return redirect(url_for('delivery.dashboard'))
 
-        # Fallback in case of an undefined role
+        # Fallback for any other case (logs the user out)
         return redirect(url_for('auth.login'))
 
     from . import seeder

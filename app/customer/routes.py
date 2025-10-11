@@ -26,8 +26,8 @@ class EventBookingForm(FlaskForm):
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    if not hasattr(current_user, 'role') or current_user.role != 'customer':
-        return redirect(url_for('index'))
+    # This check was causing the redirect loop and has been removed.
+    # The @login_required decorator and the main index routing handle access control.
     jar_request_form = JarRequestForm()
     event_booking_form = EventBookingForm()
     reports = DailyLog.query.filter_by(customer_id=current_user.id).order_by(DailyLog.timestamp.desc()).limit(10).all()
