@@ -15,12 +15,18 @@
                         {{ form.password.label(class="form-label") }}
                         {{ form.password(class="form-control", size=32) }}
                     </div>
-                    <div class="mb-3 form-check">
-                        {{ form.remember_me(class="form-check-input") }}
-                        {{ form.remember_me.label(class="form-check-label") }}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            {{ form.remember_me(class="form-check-input") }}
+                            {{ form.remember_me.label(class="form-check-label") }}
+                        </div>
+                        <a href="{{ url_for('public.reset_password_request') }}">Forgot Password?</a>
                     </div>
                     <div>{{ form.submit(class="btn btn-primary w-100") }}</div>
                 </form>
+                <div class="text-center mt-3">
+                    <p>New Supplier? <a href="{{ url_for('public.register') }}">Start your trial here!</a></p>
+                </div>
             </div>
         </div>
     </div>

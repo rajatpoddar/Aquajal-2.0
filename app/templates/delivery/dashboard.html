@@ -10,6 +10,19 @@
             <i class="bi bi-plus-circle-fill"></i> Sell New Jar / Dispenser
         </a>
     </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Supply Jar</h5>
+            <div class="input-group">
+                {{ search_form.search_term(id="customer-search-input", class="form-control form-control-lg", placeholder="Start typing a name or mobile number...") }}
+            </div>
+        </div>
+    </div>
+
+    <div id="customer-results-container" class="list-group mb-4">
+    </div>
+
     <div class="row mb-4">
         <div class="col-md-6 mb-3">
             <div class="card text-center text-white bg-success shadow">
@@ -118,7 +131,7 @@
                             <h5 class="mb-1">{{ event.customer.name }}</h5>
                             <a href="tel:{{ event.customer.mobile_number }}" class="text-decoration-none text-dark">{{ event.customer.mobile_number }}</a>
                             <p class="mb-1">
-                                <strong>{{ event.quantity }} Jars</strong> 
+                                <strong>{{ event.quantity }} Jars</strong>
                                 {# FIX: Check if dispensers_booked is not None #}
                                 {% if event.dispensers_booked and event.dispensers_booked > 0 %}+ <strong>{{ event.dispensers_booked }} Dispenser(s)</strong>{% endif %}
                                 for event. Amount: ₹{{ "%.2f"|format(event.amount) }}
@@ -139,18 +152,6 @@
             </div>
         </div>
     </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Find a Customer</h5>
-            <div class="input-group">
-                {{ search_form.search_term(id="customer-search-input", class="form-control form-control-lg", placeholder="Start typing a name or mobile number...") }}
-            </div>
-        </div>
-    </div>
-
-    <div id="customer-results-container" class="list-group">
-        </div>
 </div>
 
 <script>
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         debounceTimer = setTimeout(() => {
             if (query.length < 2) {
-                resultsContainer.innerHTML = ''; 
+                resultsContainer.innerHTML = '';
                 return;
             }
 
@@ -207,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     resultsContainer.innerHTML = html;
                 })
                 .catch(error => console.error('Error:', error));
-        }, 300); 
+        }, 300);
     });
 });
 </script>

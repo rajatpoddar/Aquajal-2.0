@@ -19,7 +19,7 @@ class LoginForm(FlaskForm):
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -46,7 +46,10 @@ def login():
         # If we found a user or customer, log them in
         if user_to_login:
             login_user(user_to_login, remember=form.remember_me.data)
-            return redirect(url_for('index'))
+            next_page = request.args.get('next')
+            if not next_page:
+                next_page = url_for('home')
+            return redirect(next_page)
         else:
             flash('Invalid username/mobile or password')
             return redirect(url_for('auth.login'))
@@ -56,4 +59,4 @@ def login():
 @bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('public.index'))

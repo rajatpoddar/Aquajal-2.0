@@ -4,13 +4,13 @@ from flask import Flask, redirect, url_for
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager, current_user, login_required
 from flask_apscheduler import APScheduler
 from sqlalchemy import MetaData
 from zoneinfo import ZoneInfo
 import os
 import calendar
- # <-- Import the calendar module
+from flask_mail import Mail
 
 # --- Naming convention for database constraints ---
 metadata = MetaData(naming_convention={
@@ -26,6 +26,7 @@ db = SQLAlchemy(metadata=metadata)
 migrate = Migrate()
 login = LoginManager()
 scheduler = APScheduler()
+mail = Mail()
 
 # --- Set the single, unified login view ---
 login.login_view = 'auth.login'
@@ -37,6 +38,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+    mail.init_app(app)
 
     with app.app_context():
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -66,6 +68,8 @@ def create_app(config_class=Config):
     app.register_blueprint(customer_bp, url_prefix='/customer')
     from app.billing.routes import bp as billing_bp
     app.register_blueprint(billing_bp, url_prefix='/billing')
+    from app.public.routes import bp as public_bp
+    app.register_blueprint(public_bp)
     
     from app.models import User, Customer
     from datetime import datetime
@@ -74,12 +78,9 @@ def create_app(config_class=Config):
     def inject_now():
         return {'now': datetime.utcnow()}
 
-    # --- DEFINITIVE, CORRECTED INDEX ROUTE ---
-    @app.route('/')
-    def index():
-        if not current_user.is_authenticated:
-            return redirect(url_for('auth.login'))
-            
+    @app.route('/home')
+    @login_required
+    def home():
         if isinstance(current_user, Customer):
             return redirect(url_for('customer.dashboard'))
 
@@ -103,7 +104,6 @@ def create_app(config_class=Config):
             return ''
         return utc_dt.replace(tzinfo=ZoneInfo("UTC")).astimezone(ZoneInfo("Asia/Kolkata"))
 
-    # FIX: Define and register the 'month_name' filter
     @app.template_filter('month_name')
     def month_name_filter(month_number):
         try:

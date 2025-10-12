@@ -13,6 +13,14 @@
                         {{ form.name(class="form-control") }}
                     </div>
                     <div class="mb-3">
+                        {{ form.owner_name.label(class="form-label") }}
+                        {{ form.owner_name(class="form-control") }}
+                    </div>
+                     <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
                         {{ form.location.label(class="form-label") }}
                         {{ form.location(class="form-control") }}
                     </div>
@@ -34,13 +42,14 @@
             </div>
         </div>
     </div>
+    {% if business %}
     <div class="col-lg-5">
         <h2>Subscription Control</h2>
         <div class="card shadow-sm">
              <div class="card-header">Manage Subscription</div>
             <div class="card-body">
                 <p>
-                    <strong>Current Status:</strong> 
+                    <strong>Current Status:</strong>
                     <span class="badge bg-info">{{ business.subscription_status|capitalize }}</span>
                     {% if business.subscription_ends_at %}
                         <br><small>Ends on: {{ business.subscription_ends_at.strftime('%d-%b-%Y') }}</small>
@@ -65,5 +74,6 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

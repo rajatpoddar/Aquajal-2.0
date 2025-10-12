@@ -4,13 +4,17 @@ from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime, timedelta
+from time import time
+from flask import current_app
+import jwt
+
 
 class SubscriptionPlan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)  # e.g., 'monthly', 'yearly'
+    name = db.Column(db.String(50), unique=True, nullable=False)
     regular_price = db.Column(db.Float, nullable=False)
     sale_price = db.Column(db.Float, nullable=False)
-    duration_days = db.Column(db.Integer, nullable=False)  # e.g., 30, 182, 365
+    duration_days = db.Column(db.Integer, nullable=False)
 
 class Coupon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -22,37 +26,63 @@ class Coupon(db.Model):
 class Business(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
+    owner_name = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(120), nullable=True, index=True)
     location = db.Column(db.String(200), nullable=True)
     new_jar_price = db.Column(db.Float, default=150.0)
     new_dispenser_price = db.Column(db.Float, default=150.0)
     jar_stock = db.Column(db.Integer, default=0)
     dispenser_stock = db.Column(db.Integer, default=0)
-    employees = db.relationship('User', backref='business', lazy='dynamic')
-    customers = db.relationship('Customer', backref='business', lazy='dynamic')
-    subscription_status = db.Column(db.String(20), default='trial') # trial, active, expired
+    
+    employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
+    customers = db.relationship('Customer', backref='business', lazy='dynamic', cascade="all, delete-orphan")
+    product_sales = db.relationship('ProductSale', backref='business', lazy='dynamic', cascade="all, delete-orphan")
+    # Removed the conflicting backref from this relationship
+    payments = db.relationship('Payment', lazy='dynamic', cascade="all, delete-orphan")
+
+    subscription_status = db.Column(db.String(20), default='trial')
     trial_ends_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=40))
     subscription_plan_id = db.Column(db.Integer, db.ForeignKey('subscription_plan.id'), nullable=True)
     subscription_plan = db.relationship('SubscriptionPlan')
     subscription_ends_at = db.Column(db.DateTime, nullable=True)
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(10), index=True, default='staff') # admin, manager, staff
+    role = db.Column(db.String(10), index=True, default='staff')
     daily_wage = db.Column(db.Float, nullable=True)
     cash_balance = db.Column(db.Float, default=0.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=True)
     mobile_number = db.Column(db.String(15), nullable=True, unique=True)
     address = db.Column(db.String(200), nullable=True)
     id_proof_filename = db.Column(db.String(100), nullable=True)
-    logs = db.relationship('DailyLog', backref='staff', lazy='dynamic')
-    expenses = db.relationship('Expense', backref='staff', lazy='dynamic')
-    handovers = db.relationship('CashHandover', foreign_keys='CashHandover.user_id', backref='staff', lazy='dynamic')
-    product_sales = db.relationship('ProductSale', backref='staff', lazy='dynamic')
+    
+    logs = db.relationship('DailyLog', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
+    expenses = db.relationship('Expense', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
+    handovers = db.relationship('CashHandover', foreign_keys='CashHandover.user_id', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
+    product_sales = db.relationship('ProductSale', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
+
     def get_id(self): return f'user-{self.id}'
     def set_password(self, password): self.password_hash = generate_password_hash(password)
     def check_password(self, password): return check_password_hash(self.password_hash, password)
+    
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'], algorithm='HS256')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return None
+        return User.query.get(id)
+
 
 class Customer(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -67,10 +97,11 @@ class Customer(UserMixin, db.Model):
     daily_jars = db.Column(db.Integer, default=1)
     price_per_jar = db.Column(db.Float, nullable=False, default=20.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
-    logs = db.relationship('DailyLog', backref='customer', lazy='dynamic')
-    requests = db.relationship('JarRequest', backref='customer', lazy='dynamic')
-    bookings = db.relationship('EventBooking', backref='customer', lazy='dynamic')
+    logs = db.relationship('DailyLog', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
+    requests = db.relationship('JarRequest', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
+    bookings = db.relationship('EventBooking', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     __table_args__ = (db.UniqueConstraint('mobile_number', 'business_id', name='uq_customer_mobile_business'),)
+
     def get_id(self): return f'customer-{self.id}'
     def set_password(self, password): self.password_hash = generate_password_hash(password)
     def check_password(self, password): return check_password_hash(self.password_hash, password)

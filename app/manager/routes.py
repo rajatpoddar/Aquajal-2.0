@@ -15,13 +15,31 @@ from werkzeug.utils import secure_filename
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, FloatField, SubmitField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, FloatField, SubmitField, IntegerField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo
 
 # Import the form from the delivery blueprint
 from app.delivery.routes import EventBookingByStaffForm
 
 # --- Forms ---
+class AddStaffForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=200)])
+    daily_wage = FloatField('Daily Wage (₹)', validators=[Optional()])
+    id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+    ])
+    submit = SubmitField('Create Staff Member')
+
+    def validate_username(self, username):
+        # Check if username exists in either User or Customer table to prevent login conflicts
+        if User.query.filter_by(username=username.data).first() or Customer.query.filter_by(username=username.data).first():
+            raise ValidationError('This username is already taken. Please choose a different one.')
+
 class ChangePasswordForm(FlaskForm):
     password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
     password2 = PasswordField('Repeat New Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
@@ -375,6 +393,36 @@ def staff_list():
         role='staff', business_id=current_user.business_id
     ).order_by(User.username).all()
     return render_template('manager/list_staff.html', title="Manage Staff", staff_members=staff_members)
+
+@bp.route('/staff/add', methods=['GET', 'POST'])
+@login_required
+@manager_required
+@subscription_required
+def add_staff():
+    form = AddStaffForm()
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            role='staff',
+            business_id=current_user.business_id,
+            mobile_number=form.mobile_number.data,
+            address=form.address.data,
+            daily_wage=form.daily_wage.data
+        )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit() # Commit to get user.id for the filename
+
+        if form.id_proof.data:
+            f = form.id_proof.data
+            filename = secure_filename(f"{user.id}_{user.username}_{f.filename}")
+            f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            user.id_proof_filename = filename
+            db.session.commit()
+
+        flash(f'Staff member "{user.username}" has been created.', 'success')
+        return redirect(url_for('manager.staff_list'))
+    return render_template('manager/add_staff_form.html', title="Add New Staff", form=form)
 
 @bp.route('/staff/edit/<int:staff_id>', methods=['GET', 'POST'])
 @login_required

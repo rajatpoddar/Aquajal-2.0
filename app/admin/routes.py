@@ -7,8 +7,8 @@ from app.admin import bp
 from app.models import User, Business, SubscriptionPlan, Coupon
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, IntegerField, BooleanField, DateField
-from wtforms.validators import DataRequired, Length, EqualTo, Optional, ValidationError, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, IntegerField, BooleanField, DateField, TextAreaField
+from wtforms.validators import DataRequired, Length, EqualTo, Optional, ValidationError, NumberRange, Email
 from wtforms.fields import DateField as WTDateField
 
 from functools import wraps
@@ -64,6 +64,8 @@ class BusinessSubscriptionForm(FlaskForm):
 
 class BusinessForm(FlaskForm):
     name = StringField('Business Name (e.g., Plant Location)', validators=[DataRequired()])
+    owner_name = StringField('Owner Name', validators=[Optional()])
+    email = StringField('Business Email', validators=[Optional(), Email()])
     location = StringField('Location / Address', validators=[Optional()])
     new_jar_price = FloatField('Default New Jar Price (₹)', default=150.0, validators=[DataRequired()])
     new_dispenser_price = FloatField('Default New Dispenser Price (₹)', default=1500.0, validators=[DataRequired()])
@@ -88,11 +90,17 @@ class AdminProfileForm(FlaskForm):
 
 class UserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
+    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=200)])
     role = SelectField('Role', choices=[('staff', 'Staff'), ('manager', 'Manager')], validators=[DataRequired()])
     business_id = SelectField('Assign to Business', coerce=int, validators=[DataRequired()])
     daily_wage = FloatField('Daily Wage (₹)', validators=[Optional()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+    ])
     submit = SubmitField('Create User')
 
     def __init__(self, *args, **kwargs):
@@ -169,7 +177,7 @@ def add_business():
         db.session.commit()
         flash(f'Business "{business.name}" created successfully.')
         return redirect(url_for('admin.dashboard'))
-    return render_template('admin/business_form.html', form=form, title="Create New Business")
+    return render_template('admin/business_form.html', form=form, title="Create New Business", business=None)
 
 @bp.route('/business/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -181,6 +189,8 @@ def edit_business(id):
 
     if form.submit.data and form.validate_on_submit():
         business.name = form.name.data
+        business.owner_name = form.owner_name.data
+        business.email = form.email.data
         business.location = form.location.data
         business.new_jar_price = form.new_jar_price.data
         business.new_dispenser_price = form.new_dispenser_price.data
@@ -236,7 +246,9 @@ def add_user():
         user = User(
             username=form.username.data,
             role=form.role.data,
-            business_id=form.business_id.data
+            business_id=form.business_id.data,
+            mobile_number=form.mobile_number.data,
+            address=form.address.data
         )
         if form.role.data == 'staff':
             user.daily_wage = form.daily_wage.data
@@ -245,7 +257,7 @@ def add_user():
         db.session.commit()
         flash(f'User "{user.username}" has been created.')
         return redirect(url_for('admin.dashboard'))
-    return render_template('admin/user_form.html', form=form, title="Add New User")
+    return render_template('admin/user_form.html', form=form, title="Add New User", user=None)
 
 @bp.route('/user/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -403,3 +415,19 @@ def delete_coupon(id):
     db.session.commit()
     flash(f'Coupon "{coupon.code}" has been deleted.', 'success')
     return redirect(url_for('admin.list_coupons'))
+
+@bp.route('/business/delete/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_business(id):
+    business = Business.query.get_or_404(id)
+    try:
+        # Due to the cascade settings in the model, deleting the business
+        # will automatically delete all related employees, customers, sales, etc.
+        db.session.delete(business)
+        db.session.commit()
+        flash(f'Business "{business.name}" and all of its associated data have been permanently deleted.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting business: {e}', 'danger')
+    return redirect(url_for('admin.dashboard'))

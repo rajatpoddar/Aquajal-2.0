@@ -11,3 +11,7 @@ alembic
 sqlalchemy
 werkzeug
 razorpay
+Flask-Mail
+itsdangerous
+PyJWT
+email-validator

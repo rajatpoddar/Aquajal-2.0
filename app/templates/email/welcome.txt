@@ -1,0 +1,10 @@
+Dear {{ user.username }},
+
+Welcome to Aquajal!
+
+We are excited to have you on board. Your account has been created successfully, and your free trial has begun.
+
+You can now log in and start managing your water supply business with ease.
+
+Sincerely,
+The Aquajal Team
