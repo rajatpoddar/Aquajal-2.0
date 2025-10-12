@@ -1,33 +1,69 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{{ title }}</h2>
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form method="post">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-                {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control") }}
+<div class="row">
+    <div class="col-lg-7">
+        <h2>{{ title }}</h2>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">Business Details</div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.location.label(class="form-label") }}
+                        {{ form.location(class="form-control") }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.new_jar_price.label(class="form-label") }}
+                            {{ form.new_jar_price(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.new_dispenser_price.label(class="form-label") }}
+                            {{ form.new_dispenser_price(class="form-control") }}
+                        </div>
+                    </div>
+                    <div>
+                        {{ form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                {{ form.location.label(class="form-label") }}
-                {{ form.location(class="form-control") }}
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <h2>Subscription Control</h2>
+        <div class="card shadow-sm">
+             <div class="card-header">Manage Subscription</div>
+            <div class="card-body">
+                <p>
+                    <strong>Current Status:</strong> 
+                    <span class="badge bg-info">{{ business.subscription_status|capitalize }}</span>
+                    {% if business.subscription_ends_at %}
+                        <br><small>Ends on: {{ business.subscription_ends_at.strftime('%d-%b-%Y') }}</small>
+                    {% endif %}
+                </p>
+                <hr>
+                <form method="post">
+                    {{ sub_form.hidden_tag() }}
+                     <div class="mb-3">
+                        {{ sub_form.subscription_plan_id.label(class="form-label") }}
+                        {{ sub_form.subscription_plan_id(class="form-select") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ sub_form.subscription_ends_at.label(class="form-label") }}
+                        {{ sub_form.subscription_ends_at(class="form-control") }}
+                        <div class="form-text">Leave blank to auto-calculate based on plan duration.</div>
+                    </div>
+                    <div>
+                        {{ sub_form.submit_subscription(class="btn btn-success") }}
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    {{ form.new_jar_price.label(class="form-label") }}
-                    {{ form.new_jar_price(class="form-control") }}
-                </div>
-                <div class="col-md-6 mb-3">
-                    {{ form.new_dispenser_price.label(class="form-label") }}
-                    {{ form.new_dispenser_price(class="form-control") }}
-                </div>
-            </div>
-            <div>
-                {{ form.submit(class="btn btn-primary") }}
-                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}

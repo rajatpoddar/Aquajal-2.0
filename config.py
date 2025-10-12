@@ -12,3 +12,7 @@ class Config:
     
     # --- ADD THIS LINE ---
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')
+    
+    # Razorpay API Keys
+    RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID')
+    RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET')

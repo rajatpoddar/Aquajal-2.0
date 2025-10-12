@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center">
+        <h2>Choose Your Plan</h2>
+        <p class="lead">Select the plan that best fits your needs.</p>
+    </div>
+
+    <div class="row">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 fw-normal">{{ plan.name|capitalize }}</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">₹{{ "%.2f"|format(plan.sale_price) }} <small class="text-muted fw-light">/ {{ plan.name }}</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Regular Price: <del>₹{{ "%.2f"|format(plan.regular_price) }}</del></li>
+                        <li>All features included</li>
+                        <li>24/7 support</li>
+                    </ul>
+                    <a href="{{ url_for('billing.checkout', plan_id=plan.id) }}" class="w-100 btn btn-lg btn-outline-primary">Get Started</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

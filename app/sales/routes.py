@@ -8,6 +8,7 @@ from app.models import ProductSale, User, Business
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError, NumberRange
+from app.manager.routes import subscription_required
 
 
 class NewProductSaleForm(FlaskForm):
@@ -37,6 +38,7 @@ class NewProductSaleForm(FlaskForm):
 
 @bp.route('/new_product', methods=['GET', 'POST'])
 @login_required
+@subscription_required
 def new_product_sale():
     if current_user.role not in ['manager', 'staff'] or not current_user.business_id:
         flash("You are not assigned to a business and cannot perform this action.", "warning")

@@ -3,6 +3,9 @@
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('delivery.book_event') }}" class="btn btn-info me-2">
+            <i class="bi bi-calendar-plus-fill"></i> Book Jars for Event
+        </a>
         <a href="{{ url_for('sales.new_product_sale') }}" class="btn btn-success">
             <i class="bi bi-plus-circle-fill"></i> Sell New Jar / Dispenser
         </a>
@@ -37,6 +40,50 @@
         </div>
     </div>
 
+    <h4 class="mt-5">Event Jars to Collect</h4>
+    <div class="list-group mb-4">
+        {% for booking in bookings_to_collect %}
+        <div class="list-group-item list-group-item-action">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <h5 class="mb-1">{{ booking.customer.name }}</h5>
+                    <p class="mb-1">
+                        <i class="bi bi-box-seam"></i> <strong>{{ booking.quantity }} Jars</strong>
+                        {# FIX: Check if dispensers_booked is not None #}
+                        {% if booking.dispensers_booked and booking.dispensers_booked > 0 %}
+                        + <strong>{{ booking.dispensers_booked }} Dispenser(s)</strong>
+                        {% endif %}
+                    </p>
+                    <small><i class="bi bi-geo-alt-fill"></i> {{ booking.customer.area }}, {{ booking.customer.village }}</small>
+                </div>
+                <div class="col-md-7">
+                    <form action="{{ url_for('delivery.collect_event_jars', booking_id=booking.id) }}" method="post" class="row g-2 align-items-center justify-content-end">
+                        <div class="col-auto">
+                            <label for="jars_returned-{{ booking.id }}" class="col-form-label">Jars Ret:</label>
+                            <input type="number" name="jars_returned" id="jars_returned-{{ booking.id }}" class="form-control" value="{{ booking.quantity }}" min="0" max="{{ booking.quantity }}" style="width: 80px;">
+                        </div>
+                        {# FIX: Check if dispensers_booked is not None #}
+                        {% if booking.dispensers_booked and booking.dispensers_booked > 0 %}
+                        <div class="col-auto">
+                            <label for="dispensers_returned-{{ booking.id }}" class="col-form-label">Dispen Ret:</label>
+                            <input type="number" name="dispensers_returned" id="dispensers_returned-{{ booking.id }}" class="form-control" value="{{ booking.dispensers_booked }}" min="0" max="{{ booking.dispensers_booked }}" style="width: 80px;">
+                        </div>
+                        {% else %}
+                            <input type="hidden" name="dispensers_returned" value="0">
+                        {% endif %}
+                        <div class="col-auto">
+                             <button type="submit" class="btn btn-primary"><i class="bi bi-check-all"></i> Collect</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="list-group-item">No event items pending collection.</div>
+        {% endfor %}
+    </div>
+
+
     <div class="row mt-4 mb-4">
         <div class="col-md-6 mb-3">
             <h4>Pending Jar Requests</h4>
@@ -69,7 +116,13 @@
                     <div class="d-flex w-100 justify-content-between">
                         <div>
                             <h5 class="mb-1">{{ event.customer.name }}</h5>
-                            <p class="mb-1"><strong>{{ event.quantity }} Jars</strong> for event. Amount: ₹{{ "%.2f"|format(event.amount) }}</p>
+                            <a href="tel:{{ event.customer.mobile_number }}" class="text-decoration-none text-dark">{{ event.customer.mobile_number }}</a>
+                            <p class="mb-1">
+                                <strong>{{ event.quantity }} Jars</strong> 
+                                {# FIX: Check if dispensers_booked is not None #}
+                                {% if event.dispensers_booked and event.dispensers_booked > 0 %}+ <strong>{{ event.dispensers_booked }} Dispenser(s)</strong>{% endif %}
+                                for event. Amount: ₹{{ "%.2f"|format(event.amount) }}
+                            </p>
                             <small>{{ event.customer.area }}, {{ event.customer.village }}</small><br>
                             {% if event.paid_to_manager %}<span class="badge bg-secondary">Pre-Paid to Manager</span>{% else %}<span class="badge bg-danger">Collect Payment</span>{% endif %}
                         </div>
@@ -110,24 +163,19 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(debounceTimer);
         const query = searchInput.value;
 
-        // Use a debounce timer to avoid sending too many requests while typing
         debounceTimer = setTimeout(() => {
             if (query.length < 2) {
-                resultsContainer.innerHTML = ''; // Clear results if query is too short
+                resultsContainer.innerHTML = ''; 
                 return;
             }
 
-            // Fetch results from our new API endpoint
             fetch(`{{ url_for('delivery.search_customers') }}?q=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     let html = '';
                     if (data.length > 0) {
                         data.forEach(customer => {
-                            // Format the price to two decimal places
                             const price = customer.price_per_jar.toFixed(2);
-
-                            // Build the HTML for each customer
                             html += `
                                 <div class="list-group-item">
                                     <div class="row align-items-center">
@@ -159,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     resultsContainer.innerHTML = html;
                 })
                 .catch(error => console.error('Error:', error));
-        }, 300); // Wait 300ms after the user stops typing
+        }, 300); 
     });
 });
 </script>

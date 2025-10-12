@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Subscription Details</h5>
+            </div>
+            <div class="card-body">
+                {% if business %}
+                    <p><strong>Current Status:</strong>
+                        {% if business.subscription_status == 'trial' %}
+                            <span class="badge bg-warning text-dark">Trial Period</span>
+                        {% elif business.subscription_status == 'active' %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Expired</span>
+                        {% endif %}
+                    </p>
+
+                    {% if business.subscription_status == 'trial' and business.trial_ends_at %}
+                        {% set days_left = (business.trial_ends_at.date() - now.date()).days %}
+                        <p>Your trial expires in <strong>{{ days_left }} day(s)</strong>.</p>
+                    {% elif business.subscription_status == 'active' and business.subscription_ends_at %}
+                        {% set days_left = (business.subscription_ends_at.date() - now.date()).days %}
+                        <p>Your subscription expires in <strong>{{ days_left }} day(s)</strong>.</p>
+                    {% endif %}
+
+                    <a href="{{ url_for('billing.subscribe') }}" class="btn btn-primary mt-2">
+                        <i class="bi bi-arrow-repeat"></i> Renew / Upgrade Plan
+                    </a>
+                {% else %}
+                    <p>No business associated with this account.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ password_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ password_form.password.label(class="form-label") }}
+                        {{ password_form.password(class="form-control") }}
+                         {% for error in password_form.password.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                     <div class="mb-3">
+                        {{ password_form.password2.label(class="form-label") }}
+                        {{ password_form.password2(class="form-control") }}
+                         {% for error in password_form.password2.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div>
+                        {{ password_form.submit_password(class="btn btn-warning") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

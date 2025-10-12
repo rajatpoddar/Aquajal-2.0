@@ -5,6 +5,9 @@
     <div class="card-body">
         <p><strong>Customer:</strong> {{ booking.customer.name }} ({{ booking.customer.mobile_number }})</p>
         <p><strong>Quantity:</strong> {{ booking.quantity }} Jars</p>
+        {% if booking.dispensers_booked > 0 %}
+        <p><strong>Dispensers:</strong> {{ booking.dispensers_booked }}</p>
+        {% endif %}
         <p><strong>Event Date:</strong> {{ booking.event_date.strftime('%A, %d %B %Y') }}</p>
         <hr>
         <form method="post">

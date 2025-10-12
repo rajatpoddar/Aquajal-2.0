@@ -6,12 +6,35 @@ from app import db
 from app.delivery import bp
 from app.models import Customer, DailyLog, Expense, User, JarRequest, EventBooking, Business
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, FloatField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, IntegerField, FloatField, DateField
+from wtforms.validators import DataRequired, NumberRange, ValidationError, Optional
 from sqlalchemy import or_
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
-# --- Forms (unchanged) ---
+# --- Forms ---
+class EventBookingByStaffForm(FlaskForm):
+    customer_id = IntegerField('Customer', validators=[DataRequired()])
+    quantity = IntegerField('Number of Jars', validators=[DataRequired(), NumberRange(min=0)])
+    dispensers_booked = IntegerField('Number of Dispensers', validators=[Optional(), NumberRange(min=0)], default=0)
+    event_date = DateField('Date of Event', validators=[DataRequired()])
+    submit = SubmitField('Create Booking')
+
+    def validate_event_date(self, event_date):
+        if event_date.data < date.today():
+            raise ValidationError('Event booking must be for today or a future date.')
+
+    def validate(self, **kwargs):
+        if not super().validate(**kwargs):
+            return False
+        # Use .data to access the value, defaulting to 0 if None
+        jars = self.quantity.data or 0
+        dispensers = self.dispensers_booked.data or 0
+        if jars <= 0 and dispensers <= 0:
+            self.quantity.errors.append('You must book at least one jar or one dispenser.')
+            return False
+        return True
+
+
 class SearchForm(FlaskForm):
     search_term = StringField('Search by Name or Mobile')
 class ExpenseForm(FlaskForm):
@@ -28,20 +51,17 @@ def dashboard():
 
     today = date.today()
     
-    # Get pending jar requests for daily delivery
     jar_requests = db.session.query(JarRequest).join(Customer).filter(
         Customer.business_id == current_user.business_id,
         JarRequest.status == 'Pending'
     ).order_by(JarRequest.request_timestamp).all()
     
-    # Get confirmed event bookings scheduled for delivery today
     event_bookings_today = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id,
         EventBooking.status == 'Confirmed',
         EventBooking.event_date == today
     ).order_by(EventBooking.request_timestamp).all()
 
-    # Get delivered event bookings that now require empty jar collection
     bookings_to_collect = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id,
         EventBooking.status == 'Delivered'
@@ -57,6 +77,36 @@ def dashboard():
         bookings_to_collect=bookings_to_collect,
         today=today
     )
+
+@bp.route('/book_event', methods=['GET', 'POST'])
+@login_required
+def book_event():
+    form = EventBookingByStaffForm()
+
+    if form.validate_on_submit():
+        customer = Customer.query.filter_by(id=form.customer_id.data, business_id=current_user.business_id).first()
+        if not customer:
+            flash('Invalid customer selected.', 'danger')
+            return render_template('delivery/book_event.html', title="Book Event for Customer", form=form)
+
+        booking = EventBooking(
+            customer_id=form.customer_id.data,
+            quantity=form.quantity.data,
+            dispensers_booked=form.dispensers_booked.data,
+            event_date=form.event_date.data
+        )
+        db.session.add(booking)
+        db.session.commit()
+        
+        flash(f'Event booking created successfully for {customer.name}. The manager must now confirm it.', 'success')
+        
+        if current_user.role == 'manager':
+             return redirect(url_for('manager.dashboard'))
+        return redirect(url_for('delivery.dashboard'))
+
+    return render_template('delivery/book_event.html', title="Book Event for Customer", form=form)
+
+
 
 @bp.route('/log_delivery/<int:customer_id>', methods=['POST'])
 @login_required
@@ -128,10 +178,13 @@ def search_customers():
         return jsonify([])
 
     term = f"%{query}%"
-    customers = Customer.query.filter(or_(
-        Customer.name.ilike(term),
-        Customer.mobile_number.ilike(term)
-    )).limit(10).all()
+    customers = Customer.query.filter(
+        Customer.business_id == current_user.business_id,
+        or_(
+            Customer.name.ilike(term),
+            Customer.mobile_number.ilike(term)
+        )
+    ).limit(10).all()
 
     results = [
         {'id': c.id, 'name': c.name, 'area': c.area, 'village': c.village,
@@ -191,19 +244,22 @@ def confirm_event_delivery(booking_id):
     
     return redirect(url_for('delivery.dashboard'))
 
-# --- NEW: Route to handle jar collection and settlement ---
 @bp.route('/collect_event_jars/<int:booking_id>', methods=['POST'])
 @login_required
 def collect_event_jars(booking_id):
     booking = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id,
-        EventBooking.id == booking_id
+        EventBooking.id == booking_id,
+        EventBooking.status == 'Delivered'
     ).first_or_404()
 
     try:
         jars_returned = int(request.form.get('jars_returned'))
-        if jars_returned < 0 or jars_returned > booking.quantity:
+        dispensers_returned = int(request.form.get('dispensers_returned'))
+        if not (0 <= jars_returned <= booking.quantity):
             raise ValueError("Invalid number of jars returned.")
+        if not (0 <= dispensers_returned <= booking.dispensers_booked):
+            raise ValueError("Invalid number of dispensers returned.")
     except (TypeError, ValueError) as e:
         flash(str(e), 'danger')
         return redirect(url_for('delivery.dashboard'))
@@ -211,42 +267,32 @@ def collect_event_jars(booking_id):
     business = Business.query.get(current_user.business_id)
     staff_member = User.query.get(current_user.id)
 
-    # Add returned jars back to the business stock
     business.jar_stock += jars_returned
+    business.dispenser_stock += dispensers_returned
 
-    # Calculate final amount and any dues for missing jars
     missing_jars = booking.quantity - jars_returned
-    final_amount = booking.amount
+    missing_dispensers = booking.dispensers_booked - dispensers_returned
     amount_to_collect = 0
 
     if missing_jars > 0:
-        price_per_event_jar = booking.amount / booking.quantity
-        missing_jars_cost = missing_jars * business.new_jar_price
-        final_amount = (jars_returned * price_per_event_jar) + missing_jars_cost
+        amount_to_collect += missing_jars * business.new_jar_price
+    if missing_dispensers > 0:
+        amount_to_collect += missing_dispensers * business.new_dispenser_price
+    
+    if amount_to_collect > 0:
+        flash(f"Please collect an additional ₹{amount_to_collect:.2f} for missing items.", "warning")
 
-    if booking.paid_to_manager:
-        # If pre-paid, staff only collects the extra cost of any missing jars
-        amount_to_collect = final_amount - booking.amount
-        if amount_to_collect > 0:
-            flash(f"Payment was pre-paid, but you must collect an additional ₹{amount_to_collect:.2f} for {missing_jars} missing jar(s).", "warning")
-    else:
-        # If not pre-paid, staff collects the full final amount
-        amount_to_collect = final_amount
-        flash(f"Please collect the final settlement amount of ₹{final_amount:.2f}.", "info")
+    if amount_to_collect > 0:
+        if staff_member.cash_balance is None: staff_member.cash_balance = 0.0
+        staff_member.cash_balance += amount_to_collect
 
-    # Update staff's cash balance
-    if staff_member.cash_balance is None:
-        staff_member.cash_balance = 0.0
-    staff_member.cash_balance += amount_to_collect
-
-    # Update the booking record to mark it as 'Completed'
     booking.status = 'Completed'
     booking.jars_returned = jars_returned
-    booking.final_amount = final_amount
+    booking.dispensers_returned = dispensers_returned
+    booking.final_amount = (booking.amount or 0) + amount_to_collect
     booking.collection_timestamp = datetime.utcnow()
     booking.collected_by_id = current_user.id
     
     db.session.commit()
-    flash(f"Collection from {booking.customer.name} completed. {jars_returned}/{booking.quantity} jars returned. Stock updated.", "success")
+    flash(f"Collection from {booking.customer.name} completed. Stock and balance updated.", "success")
     return redirect(url_for('delivery.dashboard'))
-

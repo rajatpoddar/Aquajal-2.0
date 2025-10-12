@@ -3,7 +3,21 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta
+
+class SubscriptionPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)  # e.g., 'monthly', 'yearly'
+    regular_price = db.Column(db.Float, nullable=False)
+    sale_price = db.Column(db.Float, nullable=False)
+    duration_days = db.Column(db.Integer, nullable=False)  # e.g., 30, 182, 365
+
+class Coupon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(50), unique=True, nullable=False)
+    discount_percentage = db.Column(db.Integer, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    expiry_date = db.Column(db.DateTime, nullable=True)
 
 class Business(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,12 +29,17 @@ class Business(db.Model):
     dispenser_stock = db.Column(db.Integer, default=0)
     employees = db.relationship('User', backref='business', lazy='dynamic')
     customers = db.relationship('Customer', backref='business', lazy='dynamic')
+    subscription_status = db.Column(db.String(20), default='trial') # trial, active, expired
+    trial_ends_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=40))
+    subscription_plan_id = db.Column(db.Integer, db.ForeignKey('subscription_plan.id'), nullable=True)
+    subscription_plan = db.relationship('SubscriptionPlan')
+    subscription_ends_at = db.Column(db.DateTime, nullable=True)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(10), index=True, default='staff')
+    role = db.Column(db.String(10), index=True, default='staff') # admin, manager, staff
     daily_wage = db.Column(db.Float, nullable=True)
     cash_balance = db.Column(db.Float, default=0.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=True)
@@ -55,6 +74,18 @@ class Customer(UserMixin, db.Model):
     def get_id(self): return f'customer-{self.id}'
     def set_password(self, password): self.password_hash = generate_password_hash(password)
     def check_password(self, password): return check_password_hash(self.password_hash, password)
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    business = db.relationship('Business')
+    razorpay_order_id = db.Column(db.String(100))
+    razorpay_payment_id = db.Column(db.String(100))
+    razorpay_signature = db.Column(db.String(200))
+    amount = db.Column(db.Float)
+    status = db.Column(db.String(20)) # created, successful, failed
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    subscription_plan_id = db.Column(db.Integer, db.ForeignKey('subscription_plan.id'))
 
 class DailyLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,6 +129,7 @@ class JarRequest(db.Model):
 class EventBooking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
+    dispensers_booked = db.Column(db.Integer, default=0)
     event_date = db.Column(db.Date, nullable=False, index=True)
     amount = db.Column(db.Float, nullable=True)
     paid_to_manager = db.Column(db.Boolean, default=False)
@@ -106,11 +138,17 @@ class EventBooking(db.Model):
     delivery_timestamp = db.Column(db.DateTime, nullable=True)
     collection_timestamp = db.Column(db.DateTime, nullable=True) # New: When jars were collected
     jars_returned = db.Column(db.Integer, nullable=True) # New: How many jars were collected back
+    dispensers_returned = db.Column(db.Integer, nullable=True)
     final_amount = db.Column(db.Float, nullable=True) # New: The final settled amount
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     confirmed_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     delivered_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     collected_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+    # --- Relationships to easily access user objects ---
+    confirmed_by = db.relationship("User", foreign_keys=[confirmed_by_id])
+    delivered_by = db.relationship("User", foreign_keys=[delivered_by_id])
+    collected_by = db.relationship("User", foreign_keys=[collected_by_id])
 
 @login.user_loader
 def load_user(user_id_string):

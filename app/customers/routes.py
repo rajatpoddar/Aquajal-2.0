@@ -9,8 +9,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, FloatField, PasswordField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
-# This decorator ensures only managers and admins can access these routes
-from app.manager.routes import manager_required
+# Import the new decorator
+from app.manager.routes import manager_required, subscription_required
 
 class CustomerForm(FlaskForm):
     name = StringField('Customer Name', validators=[DataRequired(), Length(min=3, max=120)])
@@ -42,6 +42,7 @@ class CustomerForm(FlaskForm):
 @bp.route('/list')
 @login_required
 @manager_required
+@subscription_required
 def index():
     customers = Customer.query.filter_by(business_id=current_user.business_id).order_by(Customer.name).all()
     return render_template('customers/list_customers.html', customers=customers, title='All Customers')
@@ -49,6 +50,7 @@ def index():
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
 @manager_required
+@subscription_required
 def add_customer():
     form = CustomerForm()
     if form.validate_on_submit():
@@ -79,6 +81,7 @@ def add_customer():
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 @manager_required
+@subscription_required
 def edit_customer(id):
     customer = Customer.query.filter_by(id=id, business_id=current_user.business_id).first_or_404()
     form = CustomerForm(original_username=customer.username, obj=customer)
@@ -104,6 +107,7 @@ def edit_customer(id):
 @bp.route('/delete/<int:id>', methods=['POST'])
 @login_required
 @manager_required
+@subscription_required
 def delete_customer(id):
     customer = Customer.query.filter_by(id=id, business_id=current_user.business_id).first_or_404()
     # To maintain data integrity, you might want to handle related logs/requests here

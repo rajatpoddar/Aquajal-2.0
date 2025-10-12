@@ -4,14 +4,18 @@ from flask import render_template, flash, redirect, url_for, abort, current_app
 from flask_login import login_required, current_user, login_user
 from app import db
 from app.admin import bp
-from app.models import User, Business
+from app.models import User, Business, SubscriptionPlan, Coupon
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField
-from wtforms.validators import DataRequired, Length, EqualTo, Optional, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, IntegerField, BooleanField, DateField
+from wtforms.validators import DataRequired, Length, EqualTo, Optional, ValidationError, NumberRange
+from wtforms.fields import DateField as WTDateField
+
 from functools import wraps
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
+
 
 # --- Custom Decorator for Admin Access ---
 def admin_required(f):
@@ -23,6 +27,41 @@ def admin_required(f):
     return decorated_function
 
 # --- Forms ---
+class PlanForm(FlaskForm):
+    name = StringField('Plan Name', validators=[DataRequired()])
+    regular_price = FloatField('Regular Price (₹)', validators=[DataRequired(), NumberRange(min=0)])
+    sale_price = FloatField('Sale Price (₹)', validators=[DataRequired(), NumberRange(min=0)])
+    duration_days = IntegerField('Duration (in days)', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Save Plan')
+
+class CouponForm(FlaskForm):
+    code = StringField('Coupon Code', validators=[DataRequired()])
+    discount_percentage = IntegerField('Discount Percentage (%)', validators=[DataRequired(), NumberRange(min=1, max=100)])
+    is_active = BooleanField('Active', default=True)
+    expiry_date = DateField('Expiry Date (Optional)', validators=[Optional()])
+    submit = SubmitField('Save Coupon')
+
+    def __init__(self, original_code=None, *args, **kwargs):
+        super(CouponForm, self).__init__(*args, **kwargs)
+        self.original_code = original_code
+
+    def validate_code(self, code):
+        if code.data.upper() != self.original_code:
+            coupon = Coupon.query.filter(Coupon.code == code.data.upper()).first()
+            if coupon:
+                raise ValidationError('This coupon code already exists.')
+
+class BusinessSubscriptionForm(FlaskForm):
+    subscription_plan_id = SelectField('Assign Plan', coerce=int, validators=[Optional()])
+    subscription_ends_at = WTDateField('Subscription Ends On', format='%Y-%m-%d', validators=[Optional()])
+    submit_subscription = SubmitField('Update Subscription')
+
+    def __init__(self, *args, **kwargs):
+        super(BusinessSubscriptionForm, self).__init__(*args, **kwargs)
+        self.subscription_plan_id.choices = [(0, '--- No Plan (Trial/Expired) ---')] + \
+                                            [(p.id, f"{p.name} ({p.duration_days} days)") for p in SubscriptionPlan.query.order_by('name').all()]
+
+
 class BusinessForm(FlaskForm):
     name = StringField('Business Name (e.g., Plant Location)', validators=[DataRequired()])
     location = StringField('Location / Address', validators=[Optional()])
@@ -138,15 +177,43 @@ def add_business():
 def edit_business(id):
     business = Business.query.get_or_404(id)
     form = BusinessForm(obj=business)
-    if form.validate_on_submit():
+    sub_form = BusinessSubscriptionForm(obj=business)
+
+    if form.submit.data and form.validate_on_submit():
         business.name = form.name.data
         business.location = form.location.data
         business.new_jar_price = form.new_jar_price.data
         business.new_dispenser_price = form.new_dispenser_price.data
         db.session.commit()
-        flash(f'Business "{business.name}" has been updated.')
-        return redirect(url_for('admin.dashboard'))
-    return render_template('admin/business_form.html', form=form, title="Edit Business")
+        flash(f'Business "{business.name}" details have been updated.', 'success')
+        return redirect(url_for('admin.edit_business', id=id))
+
+    if sub_form.submit_subscription.data and sub_form.validate_on_submit():
+        plan_id = sub_form.subscription_plan_id.data
+        ends_at = sub_form.subscription_ends_at.data
+
+        if plan_id: # A plan is selected
+            business.subscription_plan_id = plan_id
+            business.subscription_status = 'active'
+            if ends_at:
+                # Set specific end date, converting date to datetime
+                business.subscription_ends_at = datetime.combine(ends_at, datetime.min.time())
+            else:
+                # Calculate end date based on plan duration
+                plan = SubscriptionPlan.query.get(plan_id)
+                business.subscription_ends_at = datetime.utcnow() + timedelta(days=plan.duration_days)
+            flash(f'Subscription updated for "{business.name}".', 'success')
+        else: # No plan is selected
+            business.subscription_plan_id = None
+            business.subscription_status = 'expired'
+            business.subscription_ends_at = None
+            flash(f'Subscription removed for "{business.name}". Status set to expired.', 'warning')
+        
+        db.session.commit()
+        return redirect(url_for('admin.edit_business', id=id))
+
+    return render_template('admin/business_form.html', form=form, sub_form=sub_form, business=business, title="Edit Business")
+
 
 @bp.route('/business/reset_stock/<int:id>', methods=['POST'])
 @login_required
@@ -233,3 +300,106 @@ def delete_user(id):
     db.session.delete(user)
     db.session.commit()
     return redirect(url_for('admin.dashboard'))
+
+
+# --- SaaS Management Routes ---
+
+# Subscription Plans
+@bp.route('/plans')
+@login_required
+@admin_required
+def list_plans():
+    plans = SubscriptionPlan.query.all()
+    return render_template('admin/subscription_plans.html', plans=plans, title="Subscription Plans")
+
+@bp.route('/plans/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_plan():
+    form = PlanForm()
+    if form.validate_on_submit():
+        plan = SubscriptionPlan(name=form.name.data, regular_price=form.regular_price.data,
+                                sale_price=form.sale_price.data, duration_days=form.duration_days.data)
+        db.session.add(plan)
+        db.session.commit()
+        flash('New subscription plan has been created.', 'success')
+        return redirect(url_for('admin.list_plans'))
+    return render_template('admin/plan_form.html', form=form, title="Add New Plan")
+
+@bp.route('/plans/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_plan(id):
+    plan = SubscriptionPlan.query.get_or_404(id)
+    form = PlanForm(obj=plan)
+    if form.validate_on_submit():
+        plan.name = form.name.data
+        plan.regular_price = form.regular_price.data
+        plan.sale_price = form.sale_price.data
+        plan.duration_days = form.duration_days.data
+        db.session.commit()
+        flash('Subscription plan has been updated.', 'success')
+        return redirect(url_for('admin.list_plans'))
+    return render_template('admin/plan_form.html', form=form, title="Edit Plan")
+
+@bp.route('/plans/delete/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_plan(id):
+    plan = SubscriptionPlan.query.get_or_404(id)
+    if Business.query.filter_by(subscription_plan_id=id).first():
+        flash('Cannot delete plan. It is currently assigned to one or more businesses.', 'danger')
+    else:
+        db.session.delete(plan)
+        db.session.commit()
+        flash(f'Plan "{plan.name}" has been deleted.', 'success')
+    return redirect(url_for('admin.list_plans'))
+
+
+# Coupons
+@bp.route('/coupons')
+@login_required
+@admin_required
+def list_coupons():
+    coupons = Coupon.query.all()
+    return render_template('admin/coupons.html', coupons=coupons, title="Manage Coupons")
+
+@bp.route('/coupons/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_coupon():
+    form = CouponForm()
+    if form.validate_on_submit():
+        coupon = Coupon(code=form.code.data.upper(), discount_percentage=form.discount_percentage.data,
+                        is_active=form.is_active.data, expiry_date=form.expiry_date.data)
+        db.session.add(coupon)
+        db.session.commit()
+        flash('New coupon has been created.', 'success')
+        return redirect(url_for('admin.list_coupons'))
+    return render_template('admin/coupon_form.html', form=form, title="Add New Coupon")
+
+@bp.route('/coupons/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_coupon(id):
+    coupon = Coupon.query.get_or_404(id)
+    form = CouponForm(obj=coupon, original_code=coupon.code)
+    if form.validate_on_submit():
+        coupon.code = form.code.data.upper()
+        coupon.discount_percentage = form.discount_percentage.data
+        coupon.is_active = form.is_active.data
+        coupon.expiry_date = form.expiry_date.data
+        db.session.commit()
+        flash('Coupon has been updated.', 'success')
+        return redirect(url_for('admin.list_coupons'))
+    return render_template('admin/coupon_form.html', form=form, title="Edit Coupon")
+
+@bp.route('/coupons/delete/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_coupon(id):
+    coupon = Coupon.query.get_or_404(id)
+    db.session.delete(coupon)
+    db.session.commit()
+    flash(f'Coupon "{coupon.code}" has been deleted.', 'success')
+    return redirect(url_for('admin.list_coupons'))

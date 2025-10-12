@@ -9,7 +9,8 @@ from flask_apscheduler import APScheduler
 from sqlalchemy import MetaData
 from zoneinfo import ZoneInfo
 import os
-import calendar # <-- Import the calendar module
+import calendar
+ # <-- Import the calendar module
 
 # --- Naming convention for database constraints ---
 metadata = MetaData(naming_convention={
@@ -63,8 +64,15 @@ def create_app(config_class=Config):
     app.register_blueprint(sales_bp, url_prefix='/sales')
     from app.customer.routes import bp as customer_bp
     app.register_blueprint(customer_bp, url_prefix='/customer')
+    from app.billing.routes import bp as billing_bp
+    app.register_blueprint(billing_bp, url_prefix='/billing')
     
     from app.models import User, Customer
+    from datetime import datetime
+
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.utcnow()}
 
     # --- DEFINITIVE, CORRECTED INDEX ROUTE ---
     @app.route('/')

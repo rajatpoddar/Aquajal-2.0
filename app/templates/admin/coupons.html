@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ title }}</h2>
+    <a href="{{ url_for('admin.add_coupon') }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle"></i> Add Coupon</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Discount</th>
+                    <th>Status</th>
+                    <th>Expires On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr>
+                    <td><code>{{ coupon.code }}</code></td>
+                    <td>{{ coupon.discount_percentage }}%</td>
+                    <td>
+                        {% if coupon.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ coupon.expiry_date.strftime('%d-%b-%Y') if coupon.expiry_date else 'N/A' }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_coupon', id=coupon.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                        <form action="{{ url_for('admin.delete_coupon', id=coupon.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No coupons found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

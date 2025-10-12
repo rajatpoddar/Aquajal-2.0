@@ -9,7 +9,7 @@
         <div class="alert alert-light border">Current Dispenser Stock: <strong>{{ business.dispenser_stock }}</strong></div>
     </div>
 </div>
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
         <h5 class="card-title">Add to Stock</h5>
         <p class="card-text text-muted">Enter the quantity of new items being added to the inventory.</p>
@@ -30,6 +30,41 @@
                 <a href="{{ url_for('manager.dashboard') }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
+    </div>
+</div>
+
+{# --- NEW: Outstanding Jars Report --- #}
+<h4 class="mt-5">Outstanding Event Items</h4>
+<div class="card shadow-sm">
+    <div class="card-body">
+         <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th class="text-center">Jars Out</th>
+                        <th class="text-center">Dispensers Out</th>
+                        <th>Event Date</th>
+                        <th>Delivered By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in outstanding_bookings %}
+                    <tr>
+                        <td>{{ booking.customer.name }}</td>
+                        <td class="text-center"><span class="badge bg-primary">{{ booking.quantity }}</span></td>
+                        <td class="text-center"><span class="badge bg-secondary">{{ booking.dispensers_booked or 0 }}</span></td>
+                        <td>{{ booking.event_date.strftime('%d-%b-%Y') }}</td>
+                        <td>{{ booking.delivered_by.username if booking.delivered_by else 'N/A' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No event items are currently pending collection.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

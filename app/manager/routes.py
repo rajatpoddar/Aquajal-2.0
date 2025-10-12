@@ -16,10 +16,17 @@ from werkzeug.utils import secure_filename
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, FloatField, SubmitField, IntegerField, BooleanField
-from wtforms.validators import DataRequired, Optional, Length, ValidationError
+from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo
 
+# Import the form from the delivery blueprint
+from app.delivery.routes import EventBookingByStaffForm
 
 # --- Forms ---
+class ChangePasswordForm(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
+    password2 = PasswordField('Repeat New Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    submit_password = SubmitField('Change Password')
+
 class BusinessSettingsForm(FlaskForm):
     new_jar_price = FloatField('New Jar Price (₹)', validators=[DataRequired()])
     new_dispenser_price = FloatField('New Dispenser Price (₹)', validators=[DataRequired()])
@@ -58,7 +65,7 @@ class EventConfirmationForm(FlaskForm):
     submit = SubmitField('Confirm Booking')
 
 
-# --- Custom Decorator for Manager/Admin Access ---
+# --- Custom Decorators ---
 def manager_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -67,11 +74,49 @@ def manager_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def subscription_required(f):
+    """
+    Ensures the manager's business has an active subscription or is in a trial period.
+    This decorator should be placed AFTER @login_required and @manager_required.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Admins are not subject to subscription checks
+        if current_user.role == 'admin':
+            return f(*args, **kwargs)
+
+        business = Business.query.get(current_user.business_id)
+        if not business:
+            flash("You are not associated with a business.", "danger")
+            return redirect(url_for('auth.logout'))
+
+        is_active = False
+        now = datetime.utcnow()
+
+        # Check 1: Is there an active subscription?
+        if business.subscription_status == 'active' and business.subscription_ends_at and business.subscription_ends_at > now:
+            is_active = True
+        # Check 2: Are they still in the trial period?
+        elif business.subscription_status == 'trial' and business.trial_ends_at and business.trial_ends_at > now:
+            is_active = True
+
+        if not is_active:
+            # If trial has ended and status hasn't been updated, update it now
+            if business.subscription_status == 'trial':
+                business.subscription_status = 'expired'
+                db.session.commit()
+            # Redirect to a page that tells them to subscribe
+            return redirect(url_for('billing.expired'))
+            
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 # --- Routes ---
 @bp.route('/dashboard')
 @login_required
 @manager_required
+@subscription_required
 def dashboard():
     staff_members = []
     total_staff_balance = 0.0
@@ -99,6 +144,7 @@ def dashboard():
 @bp.route('/receive_cash/<int:staff_id>', methods=['POST'])
 @login_required
 @manager_required
+@subscription_required
 def receive_cash(staff_id):
     staff = User.query.get_or_404(staff_id)
     if not current_user.business_id or staff.business_id != current_user.business_id:
@@ -124,6 +170,7 @@ def receive_cash(staff_id):
 @bp.route('/reports')
 @login_required
 @manager_required
+@subscription_required
 def reports():
     if not current_user.business_id:
         flash("You are not assigned to a business to view reports.", "warning")
@@ -146,6 +193,7 @@ def reports():
     start_utc_month = start_of_month.replace(tzinfo=IST).astimezone(ZoneInfo("UTC"))
     end_utc_month = end_of_month.replace(tzinfo=IST).astimezone(ZoneInfo("UTC"))
 
+    # --- Monthly Sales Calculations ---
     monthly_jar_sales = db.session.query(func.sum(DailyLog.amount_collected)).join(Customer).filter(
         Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_month, end_utc_month)
     ).scalar() or 0.0
@@ -153,24 +201,39 @@ def reports():
     monthly_product_sales_total = db.session.query(func.sum(ProductSale.total_amount)).filter(
         ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_month, end_utc_month)
     ).scalar() or 0.0
+
+    monthly_event_sales = db.session.query(func.sum(EventBooking.final_amount)).join(Customer).filter(
+        Customer.business_id == business_id,
+        EventBooking.status == 'Completed',
+        EventBooking.collection_timestamp.between(start_utc_month, end_utc_month)
+    ).scalar() or 0.0
     
+    total_monthly_sales = monthly_jar_sales + monthly_product_sales_total + monthly_event_sales
+
+    # --- Monthly Expense & Wage Calculation ---
     monthly_expenses_total = db.session.query(func.sum(Expense.amount)).join(User).filter(
         User.business_id == business_id, Expense.timestamp.between(start_utc_month, end_utc_month)
     ).scalar() or 0.0
-
-    total_monthly_sales = monthly_jar_sales + monthly_product_sales_total
     
+    # --- Monthly Summaries ---
     customer_summary = db.session.query(
         Customer.name, func.sum(DailyLog.jars_delivered).label('total_jars'), func.sum(DailyLog.amount_collected).label('total_amount')
     ).join(DailyLog).filter(
         Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_month, end_utc_month)
-    ).group_by(Customer.name).order_by(Customer.name).all()
+    ).group_by(Customer.name).order_by(func.sum(DailyLog.amount_collected).desc()).all()
 
     monthly_product_summary = db.session.query(
         ProductSale.product_name, func.sum(ProductSale.quantity).label('total_quantity'), func.sum(ProductSale.total_amount).label('total_amount')
     ).filter(
         ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_month, end_utc_month)
     ).group_by(ProductSale.product_name).all()
+
+    booking_logs = db.session.query(EventBooking).join(Customer).filter(
+        Customer.business_id == business_id,
+        EventBooking.status == 'Completed',
+        EventBooking.collection_timestamp.between(start_utc_month, end_utc_month)
+    ).order_by(EventBooking.collection_timestamp.desc()).all()
+    total_jars_lost = sum((booking.quantity - booking.jars_returned) for booking in booking_logs if booking.jars_returned is not None)
 
     staff_members = User.query.filter_by(role='staff', business_id=business_id).all()
     staff_monthly_summary = []
@@ -213,7 +276,13 @@ def reports():
     daily_product_sales = db.session.query(ProductSale).filter(
         ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_day, end_utc_day)).all()
     
-    total_daily_sales = sum(s.amount_collected for s in daily_sales) + sum(p.total_amount for p in daily_product_sales)
+    daily_event_sales = db.session.query(EventBooking).join(Customer).filter(
+        Customer.business_id == business_id,
+        EventBooking.status == 'Completed',
+        EventBooking.collection_timestamp.between(start_utc_day, end_utc_day)
+    ).all()
+    
+    total_daily_sales = sum(s.amount_collected for s in daily_sales) + sum(p.total_amount for p in daily_product_sales) + sum(e.final_amount for e in daily_event_sales if e.final_amount)
     total_daily_expenses = sum(e.amount for e in daily_expenses)
     
     attendance = []
@@ -230,8 +299,12 @@ def reports():
         total_monthly_sales=total_monthly_sales, total_monthly_expenses=monthly_expenses_total,
         customer_summary=customer_summary, monthly_product_summary=monthly_product_summary,
         staff_monthly_summary=staff_monthly_summary,
+        booking_logs=booking_logs,
+        total_jars_lost=total_jars_lost,
         report_date=report_date, daily_sales=daily_sales, daily_expenses=daily_expenses,
-        daily_product_sales=daily_product_sales, attendance=attendance,
+        daily_product_sales=daily_product_sales,
+        daily_event_sales=daily_event_sales,
+        attendance=attendance,
         total_daily_sales=total_daily_sales, total_daily_expenses=total_daily_expenses,
         current_year=today.year)
 
@@ -239,6 +312,7 @@ def reports():
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 @manager_required
+@subscription_required
 def settings():
     business = Business.query.filter_by(id=current_user.business_id).first_or_404()
     form = BusinessSettingsForm(obj=business)
@@ -254,9 +328,17 @@ def settings():
 @bp.route('/stock', methods=['GET', 'POST'])
 @login_required
 @manager_required
+@subscription_required
 def stock_management():
     business = Business.query.filter_by(id=current_user.business_id).first_or_404()
     form = StockForm()
+
+    # Query for jars that are out with customers for events
+    outstanding_bookings = db.session.query(EventBooking).join(Customer).filter(
+        Customer.business_id == current_user.business_id,
+        EventBooking.status == 'Delivered'
+    ).order_by(EventBooking.event_date).all()
+
     if form.validate_on_submit():
         jars_added = form.jars_added.data or 0
         dispensers_added = form.dispensers_added.data or 0
@@ -273,13 +355,21 @@ def stock_management():
         db.session.commit()
         flash(f'Stock updated. Added {jars_added} jars and {dispensers_added} dispensers.', 'success')
         return redirect(url_for('manager.stock_management'))
-    return render_template('manager/stock_management.html', title="Stock Management", form=form, business=business)
+
+    return render_template(
+        'manager/stock_management.html', 
+        title="Stock Management", 
+        form=form, 
+        business=business,
+        outstanding_bookings=outstanding_bookings
+    )
 
 
 # --- STAFF MANAGEMENT ROUTES ---
 @bp.route('/staff')
 @login_required
 @manager_required
+@subscription_required
 def staff_list():
     staff_members = User.query.filter_by(
         role='staff', business_id=current_user.business_id
@@ -289,6 +379,7 @@ def staff_list():
 @bp.route('/staff/edit/<int:staff_id>', methods=['GET', 'POST'])
 @login_required
 @manager_required
+@subscription_required
 def edit_staff(staff_id):
     staff = User.query.get_or_404(staff_id)
     if staff.business_id != current_user.business_id or staff.role != 'staff':
@@ -323,6 +414,7 @@ def edit_staff(staff_id):
 @bp.route('/confirm_booking/<int:booking_id>', methods=['GET', 'POST'])
 @login_required
 @manager_required
+@subscription_required
 def confirm_booking(booking_id):
     booking = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id, EventBooking.id == booking_id
@@ -332,11 +424,18 @@ def confirm_booking(booking_id):
     if form.validate_on_submit():
         business = Business.query.get(current_user.business_id)
         
+        # Check stock for both jars and dispensers
         if business.jar_stock < booking.quantity:
-            flash(f'Not enough stock to confirm. Only {business.jar_stock} jars available.', 'danger')
+            flash(f'Not enough jar stock to confirm. Only {business.jar_stock} jars available.', 'danger')
+            return redirect(url_for('manager.dashboard'))
+        if business.dispenser_stock < (booking.dispensers_booked or 0):
+            flash(f'Not enough dispenser stock to confirm. Only {business.dispenser_stock} dispensers available.', 'danger')
             return redirect(url_for('manager.dashboard'))
             
+        # Deduct stock for both
         business.jar_stock -= booking.quantity
+        business.dispenser_stock -= (booking.dispensers_booked or 0)
+        
         booking.amount = form.amount.data
         booking.paid_to_manager = form.paid_to_manager.data
         booking.status = 'Confirmed'
@@ -347,3 +446,28 @@ def confirm_booking(booking_id):
         
     return render_template('manager/confirm_booking.html', title='Confirm Event Booking', form=form, booking=booking)
 
+
+# --- ACCOUNT MANAGEMENT ROUTE ---
+@bp.route('/account', methods=['GET', 'POST'])
+@login_required
+@manager_required
+def account():
+    password_form = ChangePasswordForm()
+    if password_form.submit_password.data and password_form.validate_on_submit():
+        user = User.query.get(current_user.id)
+        user.set_password(password_form.password.data)
+        db.session.commit()
+        flash('Your password has been changed successfully.', 'success')
+        return redirect(url_for('manager.account'))
+        
+    business = Business.query.get(current_user.business_id)
+    return render_template('manager/account.html', title="My Account", password_form=password_form, business=business)
+
+# --- EVENT BOOKING FOR MANAGERS ---
+# This route reuses the logic and template from the delivery blueprint
+@bp.route('/book_event', methods=['GET', 'POST'])
+@login_required
+@manager_required
+@subscription_required
+def book_event():
+    return redirect(url_for('delivery.book_event'))
