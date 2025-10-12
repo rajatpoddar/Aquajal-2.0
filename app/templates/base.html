@@ -21,10 +21,16 @@
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
                         
-                        {% if current_user.role == 'admin' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
-                        </li>
+                    {% if current_user.role == 'admin' %}
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Admin Menu
+                      </a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.profile') }}">My Profile</a></li>
+                      </ul>
+                    </li>
                         
                         {% elif current_user.role == 'manager' %}
                         <li class="nav-item dropdown">

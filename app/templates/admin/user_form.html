@@ -1,49 +1,96 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>{{ title }}</h2>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <form method="post" novalidate>
-                {{ form.hidden_tag() }}
-                <div class="mb-3">
+<h2>{{ title }} {% if user %}: <span class="text-primary">{{ user.username }}</span>{% endif %}</h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
                     {{ form.username.label(class="form-label") }}
                     {{ form.username(class="form-control") }}
                     {% for error in form.username.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form.role.label(class="form-label") }}
-                        {{ form.role(class="form-select") }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form.business_id.label(class="form-label") }}
-                        {{ form.business_id(class="form-select") }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.mobile_number.label(class="form-label") }}
+                    {{ form.mobile_number(class="form-control") }}
                 </div>
-                <div class="mb-3">
-                    {{ form.daily_wage.label(class="form-label") }}
-                    {{ form.daily_wage(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.address.label(class="form-label") }}
+                {{ form.address(class="form-control", rows=2) }}
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.role.label(class="form-label") }}
+                    {{ form.role(class="form-select") }}
                 </div>
-                
-                {% if not form.original_username %}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form.password2.label(class="form-label") }}
-                        {{ form.password2(class="form-control") }}
-                    </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.business_id.label(class="form-label") }}
+                    {{ form.business_id(class="form-select") }}
+                </div>
+            </div>
+
+            {% if (user and user.role == 'staff') or not user %}
+            <div class="mb-3" id="daily-wage-field" {% if user and user.role != 'staff' %}style="display:none;"{% endif %}>
+                {{ form.daily_wage.label(class="form-label") }}
+                {{ form.daily_wage(class="form-control") }}
+            </div>
+            {% endif %}
+
+            <div class="mb-3">
+                {{ form.id_proof.label(class="form-label") }}
+                {{ form.id_proof(class="form-control") }}
+                {% for error in form.id_proof.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            </div>
+            {% if user and user.id_proof_filename %}
+            <div class="mb-3">
+                <p><strong>Current ID Proof:</strong></p>
+                <img src="{{ url_for('static', filename='uploads/' + user.id_proof_filename) }}" alt="ID Proof" class="img-fluid rounded" style="max-height: 200px;">
+            </div>
+            {% endif %}
+            <hr>
+            
+            <p class="text-muted">{% if user %}Update password (optional){% else %}Set initial password{% endif %}</p>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control") }}
+                    {% for error in form.password.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+                {% if not user %} <div class="col-md-6 mb-3">
+                    {{ form.password2.label(class="form-label") }}
+                    {{ form.password2(class="form-control") }}
+                    {% for error in form.password2.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
                 </div>
                 {% endif %}
+            </div>
 
-                <div>
-                    {{ form.submit(class="btn btn-primary") }}
-                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
-        </div>
+            <div>
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
+</div>
+
+<script>
+// Script to hide/show the daily wage field based on the selected role
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const wageField = document.getElementById('daily-wage-field');
+    
+    if (roleSelect && wageField) {
+        roleSelect.addEventListener('change', function() {
+            if (this.value === 'staff') {
+                wageField.style.display = 'block';
+            } else {
+                wageField.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

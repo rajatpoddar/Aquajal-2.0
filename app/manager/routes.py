@@ -6,10 +6,11 @@ from app import db
 from app.manager import bp
 from app.models import User, DailyLog, Expense, CashHandover, ProductSale, Customer, Business, JarRequest, EventBooking
 from functools import wraps
-from datetime import date, datetime
-from sqlalchemy import func
+from datetime import date, datetime, timedelta
+from sqlalchemy import func, cast, Date
 from zoneinfo import ZoneInfo
 import os
+import calendar
 from werkzeug.utils import secure_filename
 
 from flask_wtf import FlaskForm
@@ -86,7 +87,6 @@ def dashboard():
             EventBooking.status == 'Pending'
         ).order_by(EventBooking.event_date).all()
 
-    # --- FIX: Pass pending_bookings to the template ---
     return render_template(
         'manager/dashboard.html',
         title="Manager Dashboard",
@@ -126,67 +126,114 @@ def receive_cash(staff_id):
 @manager_required
 def reports():
     if not current_user.business_id:
-        flash("You are not assigned to a business to view reports. Please contact the administrator.")
+        flash("You are not assigned to a business to view reports.", "warning")
         return redirect(url_for('manager.dashboard'))
 
+    today = date.today()
+    business_id = current_user.business_id
     IST = ZoneInfo("Asia/Kolkata")
-    report_date_str = request.args.get('report_date', date.today().isoformat())
+
+    # --- Monthly Report Logic ---
     try:
-        report_date = datetime.strptime(report_date_str, '%Y-%m-%d').date()
-    except ValueError:
-        report_date = date.today()
+        report_year = int(request.args.get('year', today.year))
+        report_month = int(request.args.get('month', today.month))
+    except (ValueError, TypeError):
+        report_year, report_month = today.year, today.month
 
-    start_of_day_ist = datetime.combine(report_date, datetime.min.time(), tzinfo=IST)
-    end_of_day_ist = datetime.combine(report_date, datetime.max.time(), tzinfo=IST)
+    num_days_in_month = calendar.monthrange(report_year, report_month)[1]
+    start_of_month = datetime(report_year, report_month, 1)
+    end_of_month = datetime(report_year, report_month, num_days_in_month, 23, 59, 59)
+    start_utc_month = start_of_month.replace(tzinfo=IST).astimezone(ZoneInfo("UTC"))
+    end_utc_month = end_of_month.replace(tzinfo=IST).astimezone(ZoneInfo("UTC"))
 
-    start_utc = start_of_day_ist.astimezone(ZoneInfo("UTC"))
-    end_utc = end_of_day_ist.astimezone(ZoneInfo("UTC"))
-
-    sales = db.session.query(DailyLog).join(Customer).filter(
-        Customer.business_id == current_user.business_id,
-        DailyLog.timestamp.between(start_utc, end_utc)
-    ).all()
+    monthly_jar_sales = db.session.query(func.sum(DailyLog.amount_collected)).join(Customer).filter(
+        Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_month, end_utc_month)
+    ).scalar() or 0.0
     
-    expenses = db.session.query(Expense).join(User).filter(
-        User.business_id == current_user.business_id,
-        Expense.timestamp.between(start_utc, end_utc)
-    ).all()
+    monthly_product_sales_total = db.session.query(func.sum(ProductSale.total_amount)).filter(
+        ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_month, end_utc_month)
+    ).scalar() or 0.0
+    
+    monthly_expenses_total = db.session.query(func.sum(Expense.amount)).join(User).filter(
+        User.business_id == business_id, Expense.timestamp.between(start_utc_month, end_utc_month)
+    ).scalar() or 0.0
 
-    product_sales = db.session.query(ProductSale).filter(
-        ProductSale.business_id == current_user.business_id,
-        ProductSale.timestamp.between(start_utc, end_utc)
-    ).all()
+    total_monthly_sales = monthly_jar_sales + monthly_product_sales_total
     
-    total_sales_amount = sum(s.amount_collected for s in sales) + sum(p.total_amount for p in product_sales)
-    total_expense_amount = sum(e.amount for e in expenses)
+    customer_summary = db.session.query(
+        Customer.name, func.sum(DailyLog.jars_delivered).label('total_jars'), func.sum(DailyLog.amount_collected).label('total_amount')
+    ).join(DailyLog).filter(
+        Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_month, end_utc_month)
+    ).group_by(Customer.name).order_by(Customer.name).all()
+
+    monthly_product_summary = db.session.query(
+        ProductSale.product_name, func.sum(ProductSale.quantity).label('total_quantity'), func.sum(ProductSale.total_amount).label('total_amount')
+    ).filter(
+        ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_month, end_utc_month)
+    ).group_by(ProductSale.product_name).all()
+
+    staff_members = User.query.filter_by(role='staff', business_id=business_id).all()
+    staff_monthly_summary = []
+    for staff in staff_members:
+        daily_jars_subquery = db.session.query(
+            cast(DailyLog.timestamp, Date).label('delivery_date'), func.sum(DailyLog.jars_delivered).label('jars_sum')
+        ).filter(
+            DailyLog.user_id == staff.id, DailyLog.timestamp.between(start_utc_month, end_utc_month)
+        ).group_by('delivery_date').subquery()
+
+        full_days = db.session.query(func.count(daily_jars_subquery.c.delivery_date)).filter(daily_jars_subquery.c.jars_sum >= 50).scalar()
+        half_days = db.session.query(func.count(daily_jars_subquery.c.delivery_date)).filter(
+            daily_jars_subquery.c.jars_sum > 0, daily_jars_subquery.c.jars_sum < 50
+        ).scalar()
+        
+        working_days = full_days + half_days
+        absent_days = num_days_in_month - working_days
+
+        total_wages = db.session.query(func.sum(Expense.amount)).filter(
+            Expense.user_id == staff.id, Expense.description.like('Daily Wage%'), Expense.timestamp.between(start_utc_month, end_utc_month)
+        ).scalar() or 0.0
+
+        staff_monthly_summary.append({
+            'username': staff.username, 'full_days': full_days, 'half_days': half_days, 
+            'absent_days': absent_days, 'total_wages': total_wages
+        })
+
+    # --- Daily Report Logic ---
+    report_date_str = request.args.get('report_date', today.isoformat())
+    try: report_date = datetime.strptime(report_date_str, '%Y-%m-%d').date()
+    except ValueError: report_date = today
+
+    start_utc_day = datetime.combine(report_date, datetime.min.time(), tzinfo=IST).astimezone(ZoneInfo("UTC"))
+    end_utc_day = datetime.combine(report_date, datetime.max.time(), tzinfo=IST).astimezone(ZoneInfo("UTC"))
+
+    daily_sales = db.session.query(DailyLog).join(Customer).filter(
+        Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_day, end_utc_day)).all()
+    daily_expenses = db.session.query(Expense).join(User).filter(
+        User.business_id == business_id, Expense.timestamp.between(start_utc_day, end_utc_day)).all()
+    daily_product_sales = db.session.query(ProductSale).filter(
+        ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_day, end_utc_day)).all()
     
-    staff_members = User.query.filter_by(role='staff', business_id=current_user.business_id).all()
+    total_daily_sales = sum(s.amount_collected for s in daily_sales) + sum(p.total_amount for p in daily_product_sales)
+    total_daily_expenses = sum(e.amount for e in daily_expenses)
+    
     attendance = []
     for staff in staff_members:
         jars_sold = db.session.query(func.sum(DailyLog.jars_delivered)).filter(
-            DailyLog.user_id == staff.id,
-            DailyLog.timestamp.between(start_utc, end_utc)
-        ).scalar() or 0
-
+            DailyLog.user_id == staff.id, DailyLog.timestamp.between(start_utc_day, end_utc_day)).scalar() or 0
         status = "Absent"
-        if 0 < jars_sold < 50:
-            status = "Half Day"
-        elif jars_sold >= 50:
-            status = "Full Day"
-        
+        if 0 < jars_sold < 50: status = "Half Day"
+        elif jars_sold >= 50: status = "Full Day"
         attendance.append({'username': staff.username, 'jars_sold': jars_sold, 'status': status})
 
-    return render_template(
-        'manager/reports.html',
-        title="Daily Reports",
-        report_date=report_date,
-        sales=sales,
-        expenses=expenses,
-        attendance=attendance,
-        product_sales=product_sales,
-        total_sales=total_sales_amount,
-        total_expenses=total_expense_amount
-    )
+    return render_template('manager/reports.html', title="Reports",
+        report_month=report_month, report_year=report_year,
+        total_monthly_sales=total_monthly_sales, total_monthly_expenses=monthly_expenses_total,
+        customer_summary=customer_summary, monthly_product_summary=monthly_product_summary,
+        staff_monthly_summary=staff_monthly_summary,
+        report_date=report_date, daily_sales=daily_sales, daily_expenses=daily_expenses,
+        daily_product_sales=daily_product_sales, attendance=attendance,
+        total_daily_sales=total_daily_sales, total_daily_expenses=total_daily_expenses,
+        current_year=today.year)
 
 
 @bp.route('/settings', methods=['GET', 'POST'])
@@ -218,27 +265,24 @@ def stock_management():
             flash("Cannot add negative stock values.", "danger")
             return redirect(url_for('manager.stock_management'))
 
-        if business.jar_stock is None:
-            business.jar_stock = 0
-        if business.dispenser_stock is None:
-            business.dispenser_stock = 0
+        if business.jar_stock is None: business.jar_stock = 0
+        if business.dispenser_stock is None: business.dispenser_stock = 0
 
         business.jar_stock += jars_added
         business.dispenser_stock += dispensers_added
         db.session.commit()
-        flash(f'Stock updated successfully. Added {jars_added} jars and {dispensers_added} dispensers.', 'success')
+        flash(f'Stock updated. Added {jars_added} jars and {dispensers_added} dispensers.', 'success')
         return redirect(url_for('manager.stock_management'))
     return render_template('manager/stock_management.html', title="Stock Management", form=form, business=business)
 
 
-# --- NEW STAFF MANAGEMENT ROUTES ---
+# --- STAFF MANAGEMENT ROUTES ---
 @bp.route('/staff')
 @login_required
 @manager_required
 def staff_list():
     staff_members = User.query.filter_by(
-        role='staff', 
-        business_id=current_user.business_id
+        role='staff', business_id=current_user.business_id
     ).order_by(User.username).all()
     return render_template('manager/list_staff.html', title="Manage Staff", staff_members=staff_members)
 
@@ -247,7 +291,6 @@ def staff_list():
 @manager_required
 def edit_staff(staff_id):
     staff = User.query.get_or_404(staff_id)
-    # Security check: manager can only edit staff in their own business
     if staff.business_id != current_user.business_id or staff.role != 'staff':
         abort(403)
         
@@ -262,14 +305,10 @@ def edit_staff(staff_id):
             staff.set_password(form.password.data)
             
         if form.id_proof.data:
-            # Delete old proof if it exists
             if staff.id_proof_filename:
-                try:
-                    os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], staff.id_proof_filename))
-                except OSError:
-                    pass # File didn't exist, no problem
+                try: os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], staff.id_proof_filename))
+                except OSError: pass
             
-            # Save new proof
             f = form.id_proof.data
             filename = secure_filename(f"{staff.id}_{staff.username}_{f.filename}")
             f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
@@ -286,18 +325,25 @@ def edit_staff(staff_id):
 @manager_required
 def confirm_booking(booking_id):
     booking = db.session.query(EventBooking).join(Customer).filter(
-        Customer.business_id == current_user.business_id,
-        EventBooking.id == booking_id
+        Customer.business_id == current_user.business_id, EventBooking.id == booking_id
     ).first_or_404()
     
     form = EventConfirmationForm()
     if form.validate_on_submit():
+        business = Business.query.get(current_user.business_id)
+        
+        if business.jar_stock < booking.quantity:
+            flash(f'Not enough stock to confirm. Only {business.jar_stock} jars available.', 'danger')
+            return redirect(url_for('manager.dashboard'))
+            
+        business.jar_stock -= booking.quantity
         booking.amount = form.amount.data
         booking.paid_to_manager = form.paid_to_manager.data
         booking.status = 'Confirmed'
         booking.confirmed_by_id = current_user.id
         db.session.commit()
-        flash('Event booking has been confirmed and assigned for delivery.')
+        flash('Event booking confirmed and stock updated.')
         return redirect(url_for('manager.dashboard'))
         
     return render_template('manager/confirm_booking.html', title='Confirm Event Booking', form=form, booking=booking)
+

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
+                {% for error in form.username.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.mobile_number.label(class="form-label") }}
+                {{ form.mobile_number(class="form-control") }}
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control") }}
+                    {% for error in form.password.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.password2.label(class="form-label") }}
+                    {{ form.password2(class="form-control") }}
+                    {% for error in form.password2.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+
+            <div>
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

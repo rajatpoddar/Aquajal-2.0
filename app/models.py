@@ -8,8 +8,9 @@ from datetime import datetime
 class Business(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
+    location = db.Column(db.String(200), nullable=True)
     new_jar_price = db.Column(db.Float, default=150.0)
-    new_dispenser_price = db.Column(db.Float, default=1500.0)
+    new_dispenser_price = db.Column(db.Float, default=150.0)
     jar_stock = db.Column(db.Integer, default=0)
     dispenser_stock = db.Column(db.Integer, default=0)
     employees = db.relationship('User', backref='business', lazy='dynamic')
@@ -100,12 +101,16 @@ class EventBooking(db.Model):
     event_date = db.Column(db.Date, nullable=False, index=True)
     amount = db.Column(db.Float, nullable=True)
     paid_to_manager = db.Column(db.Boolean, default=False)
-    status = db.Column(db.String(20), default='Pending', index=True)
+    status = db.Column(db.String(20), default='Pending', index=True) # Statuses: Pending, Confirmed, Delivered, Completed
     request_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_timestamp = db.Column(db.DateTime, nullable=True)
+    collection_timestamp = db.Column(db.DateTime, nullable=True) # New: When jars were collected
+    jars_returned = db.Column(db.Integer, nullable=True) # New: How many jars were collected back
+    final_amount = db.Column(db.Float, nullable=True) # New: The final settled amount
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     confirmed_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     delivered_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    collected_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
 @login.user_loader
 def load_user(user_id_string):

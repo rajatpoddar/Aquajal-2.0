@@ -9,6 +9,7 @@ from flask_apscheduler import APScheduler
 from sqlalchemy import MetaData
 from zoneinfo import ZoneInfo
 import os
+import calendar # <-- Import the calendar module
 
 # --- Naming convention for database constraints ---
 metadata = MetaData(naming_convention={
@@ -71,11 +72,9 @@ def create_app(config_class=Config):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login'))
             
-        # If the logged-in user is a Customer, always send to customer dashboard
         if isinstance(current_user, Customer):
             return redirect(url_for('customer.dashboard'))
 
-        # Handle different roles for administrative Users
         if isinstance(current_user, User):
             if current_user.role == 'admin':
                 return redirect(url_for('admin.dashboard'))
@@ -84,17 +83,25 @@ def create_app(config_class=Config):
             elif current_user.role == 'staff':
                 return redirect(url_for('delivery.dashboard'))
 
-        # Fallback for any other case (logs the user out)
         return redirect(url_for('auth.login'))
 
     from . import seeder
     seeder.init_app(app)
 
+    # --- CUSTOM TEMPLATE FILTERS ---
     @app.template_filter('to_ist')
     def to_ist_filter(utc_dt):
         if utc_dt is None:
             return ''
         return utc_dt.replace(tzinfo=ZoneInfo("UTC")).astimezone(ZoneInfo("Asia/Kolkata"))
+
+    # FIX: Define and register the 'month_name' filter
+    @app.template_filter('month_name')
+    def month_name_filter(month_number):
+        try:
+            return calendar.month_name[month_number]
+        except (IndexError, TypeError):
+            return ''
 
     return app
 
