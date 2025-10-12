@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-4 text-center mb-5">How to Use Aquajal</h1>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">For Managers</h3>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">1. Setting Up Your Business</h5>
+            <ul>
+                <li><strong>Price Settings:</strong> Go to `Manager Menu > Price Settings` to set the default prices for new jars and dispensers.</li>
+                <li><strong>Manage Staff:</strong> Use the `Manager Menu > Manage Staff` option to add, edit, or remove staff members. You can set their daily wages here.</li>
+                <li><strong>Manage Stock:</strong> In the `Manager Dashboard`, click on `Manage Stock` to add new inventory of jars and dispensers.</li>
+            </ul>
+            <h5 class="card-title mt-4">2. Daily Operations</h5>
+            <ul>
+                <li><strong>Customer Management:</strong> From the `Manager Menu`, select `Customers` to add new customers or update details of existing ones.</li>
+                <li><strong>Event Bookings:</strong> New event bookings from customers or staff will appear on your dashboard. You can confirm them, which will then deduct the stock.</li>
+                <li><strong>Receiving Cash:</strong> At the end of the day, when a staff member hands over their collected cash, you can record it from the dashboard to reset their balance.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">For Staff (Delivery Personnel)</h3>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">1. Logging Deliveries</h5>
+            <p>On your dashboard, use the search bar to find a customer by name or mobile number. Once you find them, enter the number of jars delivered and click `Deliver`.</p>
+            <h5 class="card-title mt-4">2. Managing Expenses</h5>
+            <p>If you incur any expenses, like for fuel, you can add them on your dashboard. This amount will be deducted from your cash balance.</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">For Customers</h3>
+        </div>
+        <div class="card-body">
+            <p>As a customer, you can log in to view your delivery history, request additional jars for daily use, or book jars in bulk for an event.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

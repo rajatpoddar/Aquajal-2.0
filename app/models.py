@@ -33,19 +33,21 @@ class Business(db.Model):
     new_dispenser_price = db.Column(db.Float, default=150.0)
     jar_stock = db.Column(db.Integer, default=0)
     dispenser_stock = db.Column(db.Integer, default=0)
+    full_day_jar_count = db.Column(db.Integer, default=50) # New
+    half_day_jar_count = db.Column(db.Integer, default=1) # New
+
     
     employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     customers = db.relationship('Customer', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     product_sales = db.relationship('ProductSale', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     # Removed the conflicting backref from this relationship
-    payments = db.relationship('Payment', lazy='dynamic', cascade="all, delete-orphan")
+    payments = db.relationship('Payment', back_populates='business', lazy='dynamic', cascade="all, delete-orphan")
 
     subscription_status = db.Column(db.String(20), default='trial')
     trial_ends_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=40))
     subscription_plan_id = db.Column(db.Integer, db.ForeignKey('subscription_plan.id'), nullable=True)
     subscription_plan = db.relationship('SubscriptionPlan')
     subscription_ends_at = db.Column(db.DateTime, nullable=True)
-
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,6 +91,7 @@ class Customer(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True, nullable=True)
     name = db.Column(db.String(120), nullable=False)
     mobile_number = db.Column(db.String(15), nullable=False, index=True)
+    email = db.Column(db.String(120), index=True, unique=True, nullable=True)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(10), default='customer')
     village = db.Column(db.String(100))
@@ -109,7 +112,7 @@ class Customer(UserMixin, db.Model):
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
-    business = db.relationship('Business')
+    business = db.relationship('Business', back_populates='payments')
     razorpay_order_id = db.Column(db.String(100))
     razorpay_payment_id = db.Column(db.String(100))
     razorpay_signature = db.Column(db.String(200))

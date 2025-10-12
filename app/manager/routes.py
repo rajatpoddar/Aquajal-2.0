@@ -48,6 +48,8 @@ class ChangePasswordForm(FlaskForm):
 class BusinessSettingsForm(FlaskForm):
     new_jar_price = FloatField('New Jar Price (₹)', validators=[DataRequired()])
     new_dispenser_price = FloatField('New Dispenser Price (₹)', validators=[DataRequired()])
+    full_day_jar_count = IntegerField('Jars for Full Day Wage', validators=[DataRequired()])
+    half_day_jar_count = IntegerField('Jars for Half Day Wage', validators=[DataRequired()])
     submit = SubmitField('Save Settings')
 
 class StockForm(FlaskForm):
@@ -312,6 +314,14 @@ def reports():
         elif jars_sold >= 50: status = "Full Day"
         attendance.append({'username': staff.username, 'jars_sold': jars_sold, 'status': status})
 
+    cash_handover_logs = db.session.query(CashHandover).join(
+        User, CashHandover.user_id == User.id
+    ).filter(
+        User.business_id == business_id,
+        CashHandover.manager_id == current_user.id,
+        CashHandover.timestamp.between(start_utc_month, end_utc_month)
+    ).order_by(CashHandover.timestamp.desc()).all()
+
     return render_template('manager/reports.html', title="Reports",
         report_month=report_month, report_year=report_year,
         total_monthly_sales=total_monthly_sales, total_monthly_expenses=monthly_expenses_total,
@@ -324,6 +334,7 @@ def reports():
         daily_event_sales=daily_event_sales,
         attendance=attendance,
         total_daily_sales=total_daily_sales, total_daily_expenses=total_daily_expenses,
+        cash_handover_logs=cash_handover_logs,
         current_year=today.year)
 
 
@@ -337,6 +348,8 @@ def settings():
     if form.validate_on_submit():
         business.new_jar_price = form.new_jar_price.data
         business.new_dispenser_price = form.new_dispenser_price.data
+        business.full_day_jar_count = form.full_day_jar_count.data
+        business.half_day_jar_count = form.half_day_jar_count.data
         db.session.commit()
         flash('Business settings have been updated.')
         return redirect(url_for('manager.dashboard'))

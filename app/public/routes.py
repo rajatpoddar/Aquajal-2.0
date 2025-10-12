@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, current_user
 from app import db
 from app.public import bp
-from app.models import User, Business, Customer
+from app.models import User, Business, Customer, SubscriptionPlan
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationError
@@ -51,7 +51,23 @@ class ResetPasswordForm(FlaskForm):
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    return render_template('public/index.html', title='Welcome')
+    plans = SubscriptionPlan.query.order_by(SubscriptionPlan.duration_days).all()
+    return render_template('public/index.html', title='Welcome', plans=plans)
+
+
+@bp.route('/about')
+def about():
+    return render_template('public/about.html', title='About Us')
+
+
+@bp.route('/contact')
+def contact():
+    return render_template('public/contact.html', title='Contact Us')
+
+
+@bp.route('/how-to-use')
+def how_to_use():
+    return render_template('public/how_to_use.html', title='How to Use')
 
 
 @bp.route('/register', methods=['GET', 'POST'])

@@ -1,14 +1,109 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container text-center vh-100 d-flex flex-column justify-content-center">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h1 class="display-3 fw-bold mb-3">Welcome to Aquajal</h1>
-            <p class="lead mb-4">The all-in-one solution for managing your water jar supply business. Streamline deliveries, track inventory, and manage your staff with ease.</p>
-            <div>
-                <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-lg me-2 shadow">Start Your Free Trial</a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-lg shadow">Login</a>
+<div class="container col-xxl-8 px-4 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+            <img src="{{ url_for('static', filename='images/hero-image.jpg') }}" class="d-block mx-lg-auto img-fluid rounded shadow-lg" alt="Water Jugs" width="700" height="500" loading="lazy">
+        </div>
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold lh-1 mb-3">Manage Your Water Supply Business with Ease</h1>
+            <p class="lead mb-4">Aquajal helps you automate daily tasks, track sales and inventory, and manage your staff effortlessly—all from one simple dashboard.</p>
+
+            <ul class="list-unstyled mb-4">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Automate Daily Deliveries & Bookings</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Track Sales, Stock, and Expenses</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Manage Staff Wages and Performance</li>
+            </ul>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Start Your Free Trial</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5" id="featured-3">
+    <h2 class="pb-2 border-bottom text-center display-6">Why Choose Aquajal?</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+        <div class="feature col text-center">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <h3 class="fs-4">Staff & Customer Management</h3>
+            <p>Easily add and manage your staff and customers. Set daily wages for staff and custom jar prices for each customer.</p>
+        </div>
+        <div class="feature col text-center">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <h3 class="fs-4">Stock Control</h3>
+            <p>Keep track of your jar and dispenser inventory. Stock is automatically deducted for sales and event bookings.</p>
+        </div>
+        <div class="feature col text-center">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <h3 class="fs-4">Comprehensive Reports</h3>
+            <p>Get daily and monthly reports on sales, expenses, and staff performance. Make data-driven decisions to grow your business.</p>
+        </div>
+    </div>
+</div>
+
+<div class="container py-3">
+    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+        <h1 class="display-4 fw-normal">Pricing</h1>
+        <p class="fs-5 text-muted">Choose a plan that fits your business needs. Start with a 40-day free trial.</p>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+        {% for plan in plans %}
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">{{ plan.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">₹{{ "%.2f"|format(plan.sale_price) }}<small class="text-muted fw-light">/{{ plan.duration_days }} days</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Regular Price: <del>₹{{ "%.2f"|format(plan.regular_price) }}</del></li>
+                        <li>Manage Unlimited Staff</li>
+                        <li>Manage Unlimited Customers</li>
+                        <li>Email Support</li>
+                    </ul>
+                    <a href="{{ url_for('billing.checkout', plan_id=plan.id) }}" class="w-100 btn btn-lg btn-primary">Get started</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    How are staff wages calculated?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Staff wages are automatically calculated based on their daily deliveries. The manager can set the minimum number of jars required for a full day's wage and a half day's wage from the business settings panel. This gives you complete flexibility over the attendance policy.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Can I set different prices for different customers?
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Yes, you can. When adding or editing a customer, you can set a custom price per jar for them. This price will be used for all their future deliveries.
+                </div>
             </div>
         </div>
     </div>

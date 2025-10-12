@@ -15,6 +15,20 @@
                     {{ form.new_dispenser_price(class="form-control") }}
                 </div>
             </div>
+            <hr>
+            <h5>Attendance Settings</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.half_day_jar_count.label(class="form-label") }}
+                    {{ form.half_day_jar_count(class="form-control", type="number") }}
+                    <div class="form-text">Minimum jars a staff must deliver to be marked for a half day's wage.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.full_day_jar_count.label(class="form-label") }}
+                    {{ form.full_day_jar_count(class="form-control", type="number") }}
+                    <div class="form-text">Minimum jars a staff must deliver to be marked for a full day's wage.</div>
+                </div>
+            </div>
             <div>
                 {{ form.submit(class="btn btn-primary") }}
                 <a href="{{ url_for('manager.dashboard') }}" class="btn btn-secondary">Cancel</a>

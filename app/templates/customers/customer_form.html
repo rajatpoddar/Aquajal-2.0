@@ -8,12 +8,15 @@
                 {{ form.hidden_tag() }}
                 <div class="mb-3">
                     {{ form.name.label(class="form-label") }}
-                    {{ form.name(class="form-control") }}
+                    {{ form.name(class="form-control", id="name") }}
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control") }}
+                        <div class="input-group">
+                            {{ form.username(class="form-control", id="username") }}
+                            <span class="input-group-text" id="username-status"></span>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-3">
                         {{ form.mobile_number.label(class="form-label") }}
@@ -21,8 +24,12 @@
                     </div>
                 </div>
                 <div class="mb-3">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", placeholder="Optional") }}
+                </div>
+                <div class="mb-3">
                     {{ form.password.label(class="form-label") }}
-                    {{ form.password(class="form-control", placeholder="Leave blank to keep current password") }}
+                    {{ form.password(class="form-control", placeholder="Leave blank for default password (123456)") }}
                 </div>
                 <div class="mb-3">
                     {{ form.village.label(class="form-label") }}
@@ -53,4 +60,52 @@
             </form>
         </div>
     </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('name');
+    const usernameInput = document.getElementById('username');
+    const usernameStatus = document.getElementById('username-status');
+    let debounceTimer;
+
+    // Function to generate username from name
+    function generateUsername() {
+        const nameValue = nameInput.value.toLowerCase().replace(/\s+/g, '');
+        if (nameValue && !usernameInput.value) { // Only fill if username is empty
+            usernameInput.value = nameValue;
+            checkUsername();
+        }
+    }
+
+    // Function to check username availability
+    function checkUsername() {
+        const username = usernameInput.value;
+        usernameStatus.innerHTML = ''; // Clear status
+
+        if (username.length < 3) return;
+
+        fetch(`{{ url_for('customers.check_username') }}?username=${encodeURIComponent(username)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.available) {
+                    usernameStatus.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+                } else {
+                    usernameStatus.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
+                }
+            });
+    }
+
+    // Event listeners
+    nameInput.addEventListener('blur', generateUsername);
+    usernameInput.addEventListener('keyup', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(checkUsername, 500); // Debounce for 500ms
+    });
+
+    // Initial check if username is pre-filled (on edit form)
+    if(usernameInput.value) {
+        checkUsername();
+    }
+});
+</script>
 {% endblock %}

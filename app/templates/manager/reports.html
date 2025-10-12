@@ -46,10 +46,14 @@
             Daily Log
         </button>
     </li>
-    {# --- NEW TAB --- #}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="booking-log-tab" data-bs-toggle="tab" data-bs-target="#booking-log" type="button" role="tab">
             Booking Logs
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cash-handover-log-tab" data-bs-toggle="tab" data-bs-target="#cash-handover-log" type="button" role="tab">
+            Cash Received Logs
         </button>
     </li>
 </ul>
@@ -280,6 +284,40 @@
                                 {% else %}
                                 <tr>
                                     <td colspan="6" class="text-center">No completed event bookings found for this period.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="cash-handover-log" role="tabpanel">
+        <div class="py-4">
+            <h3>Cash Received Logs for {{ report_month | month_name }}, {{ report_year }}</h3>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Staff Member</th>
+                                    <th class="text-end">Amount Received</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for handover in cash_handover_logs %}
+                                <tr>
+                                    <td>{{ (handover.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p') }}</td>
+                                    <td>{{ handover.staff.username }}</td>
+                                    <td class="text-end">₹{{ "%.2f"|format(handover.amount) }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No cash was received from staff in this period.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

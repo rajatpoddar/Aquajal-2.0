@@ -20,8 +20,8 @@ def deduct_daily_wages(app):
         print(f"--- [SCHEDULER] Running Wage Deduction for {today.isoformat()} ---")
 
         for staff in staff_members:
-            if not staff.daily_wage or staff.daily_wage <= 0:
-                print(f"Skipping {staff.username}: No wage set.")
+            if not staff.daily_wage or staff.daily_wage <= 0 or not staff.business:
+                print(f"Skipping {staff.username}: No wage set or not assigned to a business.")
                 continue
 
             jars_sold = db.session.query(func.sum(DailyLog.jars_delivered)).filter(
@@ -32,10 +32,14 @@ def deduct_daily_wages(app):
             wage_to_deduct = 0
             attendance_status = "Absent"
 
-            if jars_sold >= 50:
+            # Use the values from the business settings
+            full_day_min = staff.business.full_day_jar_count
+            half_day_min = staff.business.half_day_jar_count
+
+            if jars_sold >= full_day_min:
                 wage_to_deduct = staff.daily_wage
                 attendance_status = "Full Day"
-            elif 0 < jars_sold < 50:
+            elif jars_sold >= half_day_min:
                 wage_to_deduct = staff.daily_wage / 2
                 attendance_status = "Half Day"
 
