@@ -10,6 +10,7 @@ from wtforms import StringField, SubmitField, IntegerField, FloatField, DateFiel
 from wtforms.validators import DataRequired, NumberRange, ValidationError, Optional
 from sqlalchemy import or_
 from datetime import date, datetime, timedelta
+from app.invoices.routes import create_invoice_for_transaction
 
 # --- Forms ---
 class EventBookingByStaffForm(FlaskForm):
@@ -138,6 +139,17 @@ def log_delivery(customer_id):
     user.cash_balance += amount
     
     db.session.commit()
+
+    # --- AUTOMATIC INVOICE GENERATION ---
+    invoice_items = [{
+        'description': f"Supply of {jars_delivered} water jar(s)",
+        'quantity': jars_delivered,
+        'unit_price': customer.price_per_jar,
+        'total': amount
+    }]
+    create_invoice_for_transaction(customer, customer.business, invoice_items, issue_date=log.timestamp.date())
+    # --- END ---
+
     flash(f'Successfully delivered {jars_delivered} jar(s) to {customer.name}. Collected ₹{amount:.2f}.')
     return redirect(url_for('delivery.dashboard'))
 
@@ -292,6 +304,16 @@ def collect_event_jars(booking_id):
     booking.final_amount = (booking.amount or 0) + amount_to_collect
     booking.collection_timestamp = datetime.utcnow()
     booking.collected_by_id = current_user.id
+
+    # --- AUTOMATIC INVOICE GENERATION ---
+    invoice_items = [{
+        'description': f"Settlement for event on {booking.event_date.strftime('%d-%b-%Y')}",
+        'quantity': 1,
+        'unit_price': booking.final_amount,
+        'total': booking.final_amount
+    }]
+    create_invoice_for_transaction(booking.customer, booking.customer.business, invoice_items, issue_date=booking.collection_timestamp.date())
+    # --- END ---
     
     db.session.commit()
     flash(f"Collection from {booking.customer.name} completed. Stock and balance updated.", "success")

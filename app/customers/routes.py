@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired, Length, Optional, ValidationError, 
 from sqlalchemy import or_
 
 # Import the new decorator
-from app.manager.routes import manager_required, subscription_required
+from app.decorators import manager_required, subscription_required
 
 class CustomerForm(FlaskForm):
     name = StringField('Customer Name', validators=[DataRequired(), Length(min=3, max=120)])

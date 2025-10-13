@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, abort, cur
 from flask_login import login_required, current_user
 from app import db
 from app.manager import bp
-from app.models import User, DailyLog, Expense, CashHandover, ProductSale, Customer, Business, JarRequest, EventBooking
+from app.models import User, DailyLog, Expense, CashHandover, ProductSale, Customer, Business, JarRequest, EventBooking, Invoice, InvoiceItem
 from functools import wraps
 from datetime import date, datetime, timedelta
 from sqlalchemy import func, cast, Date
@@ -322,6 +322,12 @@ def reports():
         CashHandover.timestamp.between(start_utc_month, end_utc_month)
     ).order_by(CashHandover.timestamp.desc()).all()
 
+    # --- Monthly Leads from Product Sales ---
+    monthly_leads = db.session.query(ProductSale).filter(
+        ProductSale.business_id == business_id,
+        ProductSale.timestamp.between(start_utc_month, end_utc_month)
+    ).order_by(ProductSale.timestamp.desc()).all()
+
     return render_template('manager/reports.html', title="Reports",
         report_month=report_month, report_year=report_year,
         total_monthly_sales=total_monthly_sales, total_monthly_expenses=monthly_expenses_total,
@@ -335,6 +341,7 @@ def reports():
         attendance=attendance,
         total_daily_sales=total_daily_sales, total_daily_expenses=total_daily_expenses,
         cash_handover_logs=cash_handover_logs,
+        monthly_leads=monthly_leads,  # Add this line
         current_year=today.year)
 
 
@@ -532,3 +539,80 @@ def account():
 @subscription_required
 def book_event():
     return redirect(url_for('delivery.book_event'))
+
+# --- INVOICE MANAGEMENT ROUTES ---
+@bp.route('/invoices')
+@login_required
+@manager_required
+def list_invoices():
+    page = request.args.get('page', 1, type=int)
+    invoices = Invoice.query.filter_by(business_id=current_user.business_id).order_by(Invoice.issue_date.desc()).paginate(page=page, per_page=10)
+    return render_template('manager/list_invoices.html', invoices=invoices, title="All Invoices")
+
+@bp.route('/generate_invoice/<int:customer_id>', methods=['GET', 'POST'])
+@login_required
+@manager_required
+def generate_invoice(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    if request.method == 'POST':
+        month = int(request.form['month'])
+        year = int(request.form['year'])
+        
+        start_date = date(year, month, 1)
+        end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+        
+        # --- Gather Data for Invoice ---
+        total_amount = 0
+        invoice_items = []
+        
+        # 1. Daily Jar Deliveries
+        daily_logs = DailyLog.query.filter(
+            DailyLog.customer_id == customer.id,
+            DailyLog.timestamp >= start_date,
+            DailyLog.timestamp <= end_date
+        ).all()
+        
+        if daily_logs:
+            total_jars = sum(log.jars_delivered for log in daily_logs)
+            avg_price = sum(log.amount_collected for log in daily_logs) / total_jars if total_jars > 0 else customer.price_per_jar
+            item_total = total_jars * avg_price
+            invoice_items.append(InvoiceItem(description=f"Monthly Jar Supply ({start_date.strftime('%b %Y')})", quantity=total_jars, unit_price=avg_price, total=item_total))
+            total_amount += item_total
+
+        # 2. Event Bookings
+        event_bookings = EventBooking.query.filter(
+            EventBooking.customer_id == customer.id,
+            EventBooking.status == 'Completed',
+            EventBooking.collection_timestamp >= start_date,
+            EventBooking.collection_timestamp <= end_date
+        ).all()
+
+        for booking in event_bookings:
+            invoice_items.append(InvoiceItem(description=f"Event Booking on {booking.event_date.strftime('%d-%b')}", quantity=1, unit_price=booking.final_amount, total=booking.final_amount))
+            total_amount += booking.final_amount
+
+        # --- Create Invoice ---
+        if not invoice_items:
+            flash('No billable activity found for this customer in the selected month.', 'warning')
+            return redirect(url_for('manager.generate_invoice', customer_id=customer_id))
+
+        last_invoice_num = Invoice.query.filter_by(business_id=current_user.business_id).count()
+        new_invoice_number = f"AQUA-{current_user.business_id}-{date.today().year}-{last_invoice_num + 1:04d}"
+
+        new_invoice = Invoice(
+            invoice_number=new_invoice_number,
+            due_date=date.today() + timedelta(days=15),
+            total_amount=total_amount,
+            customer_id=customer.id,
+            business_id=current_user.business_id
+        )
+        db.session.add(new_invoice)
+        
+        for item in invoice_items:
+            new_invoice.items.append(item)
+            
+        db.session.commit()
+        flash(f'Invoice {new_invoice_number} generated successfully!', 'success')
+        return redirect(url_for('invoices.list_invoices'))
+
+    return render_template('manager/generate_invoice_form.html', customer=customer, title="Generate Invoice")

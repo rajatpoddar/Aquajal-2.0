@@ -78,15 +78,23 @@ class AdminProfileForm(FlaskForm):
     password2 = PasswordField('Repeat New Password', validators=[EqualTo('password', message='Passwords must match.')])
     submit = SubmitField('Update Profile')
 
-    def __init__(self, original_username, *args, **kwargs):
+    def __init__(self, original_username, original_mobile_number, *args, **kwargs):
         super(AdminProfileForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
+        self.original_mobile_number = original_mobile_number
 
     def validate_username(self, username):
         if username.data != self.original_username:
             user = User.query.filter_by(username=self.username.data).first()
             if user is not None:
                 raise ValidationError('This username is already taken.')
+
+    def validate_mobile_number(self, mobile_number):
+        if mobile_number.data and mobile_number.data != self.original_mobile_number:
+            user = User.query.filter_by(mobile_number=self.mobile_number.data).first()
+            if user is not None:
+                raise ValidationError('This mobile number is already registered.')
+
 
 class UserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
@@ -152,7 +160,11 @@ def dashboard():
 @login_required
 @admin_required
 def profile():
-    form = AdminProfileForm(original_username=current_user.username, obj=current_user)
+    form = AdminProfileForm(
+        original_username=current_user.username, 
+        original_mobile_number=current_user.mobile_number, 
+        obj=current_user
+    )
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.mobile_number = form.mobile_number.data

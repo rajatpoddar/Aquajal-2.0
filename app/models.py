@@ -3,7 +3,7 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from time import time
 from flask import current_app
 import jwt
@@ -160,6 +160,28 @@ class JarRequest(db.Model):
     delivery_timestamp = db.Column(db.DateTime, nullable=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     delivered_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+# --- New Models for Invoicing System ---
+class Invoice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    invoice_number = db.Column(db.String(50), unique=True, nullable=False)
+    issue_date = db.Column(db.Date, nullable=False, default=date.today)
+    due_date = db.Column(db.Date, nullable=False)
+    total_amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='Unpaid') # Unpaid, Paid, Overdue
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    
+    customer = db.relationship('Customer', backref='invoices')
+    items = db.relationship('InvoiceItem', backref='invoice', lazy='dynamic', cascade="all, delete-orphan")
+
+class InvoiceItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(200), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    unit_price = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'), nullable=False)
 class EventBooking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)

@@ -42,6 +42,7 @@
                 <div class="d-flex flex-column align-items-end">
                     <span class="badge bg-primary rounded-pill fs-6 mb-2">₹{{ "%.2f"|format(customer.price_per_jar) }}</span>
                     <div>
+                        <a href="{{ url_for('invoices.generate_invoice', customer_id=customer.id) }}" class="btn btn-sm btn-outline-success" title="Generate Invoice"><i class="bi bi-receipt"></i></a>
                         <a href="{{ url_for('customers.edit_customer', id=customer.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
                         <form action="{{ url_for('customers.delete_customer', id=customer.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
                             <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>

@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app import db
 from app.customer import bp
-from app.models import Customer, DailyLog, JarRequest, EventBooking
+from app.models import Customer, DailyLog, JarRequest, EventBooking, Invoice
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, IntegerField, DateField
 from wtforms.validators import DataRequired, NumberRange, ValidationError
@@ -33,7 +33,8 @@ def dashboard():
     reports = DailyLog.query.filter_by(customer_id=current_user.id).order_by(DailyLog.timestamp.desc()).limit(10).all()
     requests = JarRequest.query.filter_by(customer_id=current_user.id).order_by(JarRequest.request_timestamp.desc()).limit(5).all()
     bookings = EventBooking.query.filter_by(customer_id=current_user.id).order_by(EventBooking.request_timestamp.desc()).limit(5).all()
-    return render_template('customer/dashboard.html', title='My Dashboard', reports=reports, requests=requests, bookings=bookings, jar_form=jar_request_form, event_form=event_booking_form)
+    invoices = Invoice.query.filter_by(customer_id=current_user.id).order_by(Invoice.issue_date.desc()).limit(5).all() # Add this line
+    return render_template('customer/dashboard.html', title='My Dashboard', reports=reports, requests=requests, bookings=bookings, invoices=invoices, jar_form=jar_request_form, event_form=event_booking_form)
 
 @bp.route('/request_jar', methods=['POST'])
 @login_required

@@ -1,0 +1,9 @@
+<p>Dear {{ invoice.customer.name }},</p>
+<p>
+    Please find attached your invoice ({{ invoice.invoice_number }}) from {{ invoice.customer.business.name }}.
+</p>
+<p>
+    The total amount due is <strong>₹{{ "%.2f"|format(invoice.total_amount) }}</strong>.
+</p>
+<p>Thank you for your business!</p>
+<p>Sincerely,<br>The {{ invoice.customer.business.name }} Team</p>

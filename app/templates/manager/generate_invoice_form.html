@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }} for {{ customer.name }}</h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post">
+            <p>Select the month and year to generate an invoice for all billable activities within that period.</p>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="month" class="form-label">Month</label>
+                    <select name="month" id="month" class="form-select">
+                        {% for i in range(1, 13) %}
+                        <option value="{{ i }}">{{ i | month_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="year" class="form-label">Year</label>
+                    <select name="year" id="year" class="form-select">
+                        {% for i in range(now.year, now.year-3, -1) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Invoice</button>
+            <a href="{{ url_for('customers.index') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

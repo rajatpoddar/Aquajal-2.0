@@ -56,6 +56,11 @@
             Cash Received Logs
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="leads-tab" data-bs-toggle="tab" data-bs-target="#leads" type="button" role="tab">
+            Leads
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content" id="reportTabsContent">
@@ -318,6 +323,47 @@
                                 {% else %}
                                 <tr>
                                     <td colspan="3" class="text-center">No cash was received from staff in this period.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="leads" role="tabpanel">
+        <div class="py-4">
+            <h3>Leads from New Jar/Dispenser Sales for {{ report_month | month_name }}, {{ report_year }}</h3>
+            <p class="text-muted">These are one-time sales to non-registered customers. You can contact them to convert them into regular customers.</p>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                     <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer Name</th>
+                                    <th>Mobile Number</th>
+                                    <th>Product</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lead in monthly_leads %}
+                                <tr>
+                                    <td>{{ (lead.timestamp | to_ist).strftime('%d-%b-%Y') }}</td>
+                                    <td>{{ lead.customer_name }}</td>
+                                    <td><a href="tel:{{ lead.customer_mobile }}">{{ lead.customer_mobile }}</a></td>
+                                    <td>{{ lead.product_name }}</td>
+                                    <td class="text-center">{{ lead.quantity }}</td>
+                                    <td class="text-end">₹{{ "%.2f"|format(lead.total_amount) }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No new leads from product sales in this period.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

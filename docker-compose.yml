@@ -8,11 +8,14 @@ services:
     ports:
       - "2942:2942"
     environment:
-      - SECRET_KEY=your_very_secret_key_change_me
-      # Use this for SQLite if you want to keep it simple
+      # Ensure you change this in a real production environment
+      - SECRET_KEY=your_very_secret_key_change_me 
       - DATABASE_URL=sqlite:////app/data/app.db
     volumes:
-      # This will persist your SQLite database and uploads on your Synology NAS
+      # This maps the 'data' folder on your computer to /app/data in the container
+      # It will persist your SQLite database.
       - ./data:/app/data
+      # This maps the 'uploads' folder on your computer to the container's upload path
+      # It will persist all user-uploaded files.
       - ./app/static/uploads:/app/app/static/uploads
-    command: gunicorn --bind 0.0.0.0:2942 --workers 4 "app:create_app()"
+    # The command is now handled by the entrypoint script

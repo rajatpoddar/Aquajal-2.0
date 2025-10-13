@@ -70,6 +70,8 @@ def create_app(config_class=Config):
     app.register_blueprint(billing_bp, url_prefix='/billing')
     from app.public.routes import bp as public_bp
     app.register_blueprint(public_bp)
+    from app.invoices.routes import bp as invoices_bp
+    app.register_blueprint(invoices_bp, url_prefix='/invoices')
     
     from app.models import User, Customer
     from datetime import datetime
