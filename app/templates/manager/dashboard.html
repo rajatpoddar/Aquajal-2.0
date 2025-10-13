@@ -49,7 +49,7 @@
 
 
 <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
+    <div class="col-lg-3 col-md-6 mb-3">
         <div class="card text-center text-white bg-primary shadow">
             <div class="card-body">
                 <h5 class="card-title">Total Cash Held By Staff</h5>
@@ -57,7 +57,15 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-6 mb-3">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center text-white bg-danger shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Dues from Customers</h5>
+                <p class="card-text display-4">₹{{ "%.2f"|format(total_dues) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
         <div class="card text-center text-white bg-info shadow">
             <div class="card-body">
                 <h5 class="card-title">Available Jar Stock</h5>
@@ -65,7 +73,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-6 mb-3">
+    <div class="col-lg-3 col-md-6 mb-3">
         <div class="card text-center text-dark bg-light shadow">
             <div class="card-body">
                 <h5 class="card-title">Available Dispenser Stock</h5>
@@ -126,7 +134,13 @@
         <div class="d-flex w-100 justify-content-between">
             <div>
                 <h5 class="mb-1">{{ booking.customer.name }} - {{ booking.customer.mobile_number }}</h5>
-                <p class="mb-1"><strong>{{ booking.quantity }} Jars</strong> for event on <strong>{{ booking.event_date.strftime('%d-%b-%Y') }}</strong></p>
+                <p class="mb-1">
+                    <strong>{{ booking.quantity }} Jar(s)</strong>
+                    {% if booking.dispensers_booked and booking.dispensers_booked > 0 %}
+                        + <strong>{{ booking.dispensers_booked }} Dispenser(s)</strong>
+                    {% endif %}
+                    for event on <strong>{{ booking.event_date.strftime('%d-%b-%Y') }}</strong>
+                </p>
                 <small>Location: {{ booking.customer.area }}, {{ booking.customer.village }}</small>
             </div>
             <div class="my-auto">

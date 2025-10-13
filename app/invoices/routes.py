@@ -1,8 +1,10 @@
+# /water_supply_app/app/invoices/routes.py
+
 from flask import render_template, flash, redirect, url_for, request, Response, abort
 from flask_login import login_required, current_user
 from app import db
 from app.invoices import bp
-from app.models import Invoice, Customer, InvoiceItem, EventBooking, DailyLog
+from app.models import Invoice, Customer, InvoiceItem, EventBooking, DailyLog, User
 from weasyprint import HTML, CSS
 from app.email import send_invoice_email
 from app.decorators import manager_required
@@ -14,7 +16,7 @@ def generate_new_invoice_number(business_id):
     last_invoice_num = Invoice.query.filter_by(business_id=business_id).count()
     return f"AQUA-{business_id}-{date.today().year}-{last_invoice_num + 1:04d}"
 
-def create_invoice_for_transaction(customer, business, items, issue_date=None):
+def create_invoice_for_transaction(customer, business, items, issue_date=None, status='Unpaid'):
     if not issue_date:
         issue_date = date.today()
 
@@ -27,6 +29,7 @@ def create_invoice_for_transaction(customer, business, items, issue_date=None):
         issue_date=issue_date,
         due_date=issue_date + timedelta(days=15),
         total_amount=total_amount,
+        status=status,
         customer_id=customer.id,
         business_id=business.id
     )
@@ -55,7 +58,8 @@ def view_invoice(invoice_id):
     if current_user.role == 'manager' and invoice.business_id != current_user.business_id:
         abort(403)
         
-    return render_template('invoices/invoice_template.html', invoice=invoice)
+    manager = User.query.filter_by(business_id=invoice.business_id, role='manager').first()
+    return render_template('invoices/invoice_template.html', invoice=invoice, manager=manager)
 
 # Route to download an invoice as PDF
 @bp.route('/download/<int:invoice_id>')
@@ -68,7 +72,8 @@ def download_invoice(invoice_id):
     if current_user.role == 'manager' and invoice.business_id != current_user.business_id:
         abort(403)
 
-    html = render_template('invoices/invoice_template.html', invoice=invoice)
+    manager = User.query.filter_by(business_id=invoice.business_id, role='manager').first()
+    html = render_template('invoices/invoice_template.html', invoice=invoice, manager=manager)
     pdf = HTML(string=html).write_pdf()
     
     return Response(pdf,

@@ -40,7 +40,6 @@ class Business(db.Model):
     employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     customers = db.relationship('Customer', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     product_sales = db.relationship('ProductSale', backref='business', lazy='dynamic', cascade="all, delete-orphan")
-    # Removed the conflicting backref from this relationship
     payments = db.relationship('Payment', back_populates='business', lazy='dynamic', cascade="all, delete-orphan")
 
     subscription_status = db.Column(db.String(20), default='trial')
@@ -99,10 +98,14 @@ class Customer(UserMixin, db.Model):
     landmark = db.Column(db.String(200))
     daily_jars = db.Column(db.Integer, default=1)
     price_per_jar = db.Column(db.Float, nullable=False, default=20.0)
+    due_amount = db.Column(db.Float, default=0.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    
     logs = db.relationship('DailyLog', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     requests = db.relationship('JarRequest', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     bookings = db.relationship('EventBooking', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
+    invoices = db.relationship('Invoice', back_populates='customer', lazy='dynamic', cascade="all, delete-orphan")
+    
     __table_args__ = (db.UniqueConstraint('mobile_number', 'business_id', name='uq_customer_mobile_business'),)
 
     def get_id(self): return f'customer-{self.id}'
@@ -126,14 +129,18 @@ class DailyLog(db.Model):
     jars_delivered = db.Column(db.Integer, nullable=False)
     amount_collected = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    payment_status = db.Column(db.String(20), default='Paid') # Paid, Due
+    origin = db.Column(db.String(20), default='staff_log', server_default='staff_log') # staff_log, customer_request
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 class CashHandover(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
@@ -141,6 +148,7 @@ class CashHandover(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     manager_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     manager = db.relationship("User", foreign_keys=[manager_id])
+
 class ProductSale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(50), nullable=False)
@@ -150,8 +158,10 @@ class ProductSale(db.Model):
     customer_name = db.Column(db.String(120))
     customer_mobile = db.Column(db.String(15))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    payment_status = db.Column(db.String(20), default='Paid') # Paid, Due
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
+
 class JarRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
@@ -161,7 +171,6 @@ class JarRequest(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     delivered_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
-# --- New Models for Invoicing System ---
 class Invoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     invoice_number = db.Column(db.String(50), unique=True, nullable=False)
@@ -172,7 +181,7 @@ class Invoice(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     
-    customer = db.relationship('Customer', backref='invoices')
+    customer = db.relationship('Customer', back_populates='invoices')
     items = db.relationship('InvoiceItem', backref='invoice', lazy='dynamic', cascade="all, delete-orphan")
 
 class InvoiceItem(db.Model):
@@ -182,6 +191,7 @@ class InvoiceItem(db.Model):
     unit_price = db.Column(db.Float, nullable=False)
     total = db.Column(db.Float, nullable=False)
     invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'), nullable=False)
+
 class EventBooking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)

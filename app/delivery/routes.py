@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import login_required, current_user
 from app import db
 from app.delivery import bp
-from app.models import Customer, DailyLog, Expense, User, JarRequest, EventBooking, Business
+from app.models import Customer, DailyLog, Expense, User, JarRequest, EventBooking, Business, Invoice
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, FloatField, DateField
 from wtforms.validators import DataRequired, NumberRange, ValidationError, Optional
@@ -43,12 +43,17 @@ class ExpenseForm(FlaskForm):
     description = StringField('Description (e.g., Fuel)', validators=[DataRequired()], default='Fuel')
     submit_expense = SubmitField('Add Expense')
 
+class ClearDuesForm(FlaskForm):
+    customer_id = IntegerField('Customer ID', validators=[DataRequired()])
+    submit_clear_dues = SubmitField('Clear Dues')
+
 # --- Routes ---
 @bp.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     search_form = SearchForm()
     expense_form = ExpenseForm()
+    clear_dues_form = ClearDuesForm()
 
     today = date.today()
     
@@ -67,15 +72,22 @@ def dashboard():
         Customer.business_id == current_user.business_id,
         EventBooking.status == 'Delivered'
     ).order_by(EventBooking.delivery_timestamp).all()
+    
+    customers_with_dues = Customer.query.filter(
+        Customer.business_id == current_user.business_id,
+        Customer.due_amount > 0
+    ).order_by(Customer.name).all()
 
     return render_template(
         'delivery/dashboard.html', 
         title="Delivery Dashboard", 
         search_form=search_form,
         expense_form=expense_form,
+        clear_dues_form=clear_dues_form,
         jar_requests=jar_requests,
         event_bookings_today=event_bookings_today,
         bookings_to_collect=bookings_to_collect,
+        customers_with_dues=customers_with_dues,
         today=today
     )
 
@@ -124,19 +136,30 @@ def log_delivery(customer_id):
         return redirect(url_for('delivery.dashboard'))
 
     amount = jars_delivered * customer.price_per_jar
+    is_due = request.form.get('is_due')
+    payment_status = 'Due' if is_due else 'Paid'
+    invoice_status = 'Unpaid' if is_due else 'Paid'
     
     log = DailyLog(
         jars_delivered=jars_delivered,
         amount_collected=amount,
         customer_id=customer.id,
-        user_id=user.id
+        user_id=user.id,
+        payment_status=payment_status
+        # The 'origin' defaults to 'staff_log', so no change needed here
     )
     db.session.add(log)
     
     if user.cash_balance is None:
         user.cash_balance = 0.0
     
-    user.cash_balance += amount
+    # Only add to cash balance if it's not a 'Due' transaction
+    if payment_status == 'Paid':
+        user.cash_balance += amount
+    else:
+        if customer.due_amount is None:
+            customer.due_amount = 0.0
+        customer.due_amount += amount
     
     db.session.commit()
 
@@ -147,10 +170,10 @@ def log_delivery(customer_id):
         'unit_price': customer.price_per_jar,
         'total': amount
     }]
-    create_invoice_for_transaction(customer, customer.business, invoice_items, issue_date=log.timestamp.date())
+    create_invoice_for_transaction(customer, customer.business, invoice_items, issue_date=log.timestamp.date(), status=invoice_status)
     # --- END ---
 
-    flash(f'Successfully delivered {jars_delivered} jar(s) to {customer.name}. Collected ₹{amount:.2f}.')
+    flash(f'Successfully delivered {jars_delivered} jar(s) to {customer.name}. Status: {payment_status}.')
     return redirect(url_for('delivery.dashboard'))
 
 @bp.route('/add_expense', methods=['POST'])
@@ -181,6 +204,38 @@ def add_expense():
         
     return redirect(url_for('delivery.dashboard'))
 
+@bp.route('/clear_dues', methods=['POST'])
+@login_required
+def clear_dues():
+    form = ClearDuesForm()
+    if form.validate_on_submit():
+        customer = Customer.query.get_or_404(form.customer_id.data)
+        if customer.business_id != current_user.business_id:
+            abort(403)
+
+        amount_cleared = customer.due_amount
+        customer.due_amount = 0.0
+
+        # Update staff's cash balance
+        staff_member = User.query.get(current_user.id)
+        if staff_member.cash_balance is None:
+            staff_member.cash_balance = 0.0
+        staff_member.cash_balance += amount_cleared
+
+        # Mark 'Due' logs as 'Paid'
+        DailyLog.query.filter_by(customer_id=customer.id, payment_status='Due').update({'payment_status': 'Paid'})
+        
+        # Mark all 'Unpaid' invoices as 'Paid' for this customer
+        Invoice.query.filter_by(customer_id=customer.id, status='Unpaid').update({'status': 'Paid'})
+        
+        db.session.commit()
+        flash(f'Dues of ₹{amount_cleared:.2f} for {customer.name} have been cleared and added to your cash balance.', 'success')
+    else:
+        flash('Invalid request to clear dues.', 'danger')
+
+    return redirect(url_for('delivery.dashboard'))
+
+# --- API ROUTE FOR LIVE SEARCH ---
 # --- API ROUTE FOR LIVE SEARCH ---
 @bp.route('/api/search_customers')
 @login_required
@@ -199,7 +254,7 @@ def search_customers():
     ).limit(10).all()
 
     results = [
-        {'id': c.id, 'name': c.name, 'area': c.area, 'village': c.village,
+        {'id': c.id, 'name': c.name, 'mobile_number': c.mobile_number, 'area': c.area, 'village': c.village,
          'daily_jars': c.daily_jars, 'price_per_jar': c.price_per_jar}
         for c in customers
     ]
@@ -213,11 +268,15 @@ def confirm_jar_request(request_id):
         JarRequest.id == request_id
     ).first_or_404()
     
+    amount = jar_request.quantity * jar_request.customer.price_per_jar
+    
     log = DailyLog(
         jars_delivered=jar_request.quantity,
-        amount_collected=jar_request.quantity * jar_request.customer.price_per_jar,
+        amount_collected=amount,
         customer_id=jar_request.customer_id,
-        user_id=current_user.id
+        user_id=current_user.id,
+        payment_status='Paid', # Assume requested jars are paid on delivery
+        origin='customer_request' # Set the origin
     )
     db.session.add(log)
     
@@ -230,6 +289,17 @@ def confirm_jar_request(request_id):
     jar_request.delivery_timestamp = datetime.utcnow()
     
     db.session.commit()
+    
+    # --- AUTOMATIC INVOICE GENERATION FOR REQUEST ---
+    invoice_items = [{
+        'description': f"Supply of {log.jars_delivered} requested water jar(s)",
+        'quantity': log.jars_delivered,
+        'unit_price': jar_request.customer.price_per_jar,
+        'total': amount
+    }]
+    create_invoice_for_transaction(jar_request.customer, jar_request.customer.business, invoice_items, issue_date=log.timestamp.date(), status='Paid')
+    # --- END ---
+
     flash(f'Delivery to {jar_request.customer.name} confirmed.')
     return redirect(url_for('delivery.dashboard'))
 
@@ -270,7 +340,7 @@ def collect_event_jars(booking_id):
         dispensers_returned = int(request.form.get('dispensers_returned'))
         if not (0 <= jars_returned <= booking.quantity):
             raise ValueError("Invalid number of jars returned.")
-        if not (0 <= dispensers_returned <= booking.dispensers_booked):
+        if not (0 <= dispensers_returned <= (booking.dispensers_booked or 0)):
             raise ValueError("Invalid number of dispensers returned.")
     except (TypeError, ValueError) as e:
         flash(str(e), 'danger')
@@ -283,36 +353,53 @@ def collect_event_jars(booking_id):
     business.dispenser_stock += dispensers_returned
 
     missing_jars = booking.quantity - jars_returned
-    missing_dispensers = booking.dispensers_booked - dispensers_returned
-    amount_to_collect = 0
+    missing_dispensers = (booking.dispensers_booked or 0) - dispensers_returned
+    
+    amount_for_missing_jars = 0
+    amount_for_missing_dispensers = 0
 
     if missing_jars > 0:
-        amount_to_collect += missing_jars * business.new_jar_price
+        amount_for_missing_jars = missing_jars * business.new_jar_price
     if missing_dispensers > 0:
-        amount_to_collect += missing_dispensers * business.new_dispenser_price
+        amount_for_missing_dispensers = missing_dispensers * business.new_dispenser_price
     
-    if amount_to_collect > 0:
-        flash(f"Please collect an additional ₹{amount_to_collect:.2f} for missing items.", "warning")
-
-    if amount_to_collect > 0:
+    total_amount_for_missing_items = amount_for_missing_jars + amount_for_missing_dispensers
+    
+    if total_amount_for_missing_items > 0:
+        flash(f"Please collect an additional ₹{total_amount_for_missing_items:.2f} for missing items.", "warning")
         if staff_member.cash_balance is None: staff_member.cash_balance = 0.0
-        staff_member.cash_balance += amount_to_collect
+        staff_member.cash_balance += total_amount_for_missing_items
 
     booking.status = 'Completed'
     booking.jars_returned = jars_returned
     booking.dispensers_returned = dispensers_returned
-    booking.final_amount = (booking.amount or 0) + amount_to_collect
+    booking.final_amount = (booking.amount or 0) + total_amount_for_missing_items
     booking.collection_timestamp = datetime.utcnow()
     booking.collected_by_id = current_user.id
 
-    # --- AUTOMATIC INVOICE GENERATION ---
+    # --- DETAILED INVOICE GENERATION ---
     invoice_items = [{
-        'description': f"Settlement for event on {booking.event_date.strftime('%d-%b-%Y')}",
+        'description': f"Event Booking ({booking.quantity} Jars, {booking.dispensers_booked or 0} Dispensers)",
         'quantity': 1,
-        'unit_price': booking.final_amount,
-        'total': booking.final_amount
+        'unit_price': booking.amount or 0,
+        'total': booking.amount or 0
     }]
-    create_invoice_for_transaction(booking.customer, booking.customer.business, invoice_items, issue_date=booking.collection_timestamp.date())
+    if missing_jars > 0:
+        invoice_items.append({
+            'description': f"Charge for {missing_jars} missing/lost jar(s)",
+            'quantity': missing_jars,
+            'unit_price': business.new_jar_price,
+            'total': amount_for_missing_jars
+        })
+    if missing_dispensers > 0:
+        invoice_items.append({
+            'description': f"Charge for {missing_dispensers} missing/lost dispenser(s)",
+            'quantity': missing_dispensers,
+            'unit_price': business.new_dispenser_price,
+            'total': amount_for_missing_dispensers
+        })
+
+    create_invoice_for_transaction(booking.customer, booking.customer.business, invoice_items, issue_date=booking.collection_timestamp.date(), status='Paid')
     # --- END ---
     
     db.session.commit()

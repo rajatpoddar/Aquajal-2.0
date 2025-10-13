@@ -3,6 +3,14 @@
 {% block content %}
 <h2>Welcome, {{ current_user.name }}!</h2>
 <hr>
+
+{% if due_amount > 0 %}
+<div class="alert alert-danger shadow-sm">
+    <h4 class="alert-heading">Outstanding Balance</h4>
+    <p>You have a due amount of <strong>₹{{ "%.2f"|format(due_amount) }}</strong>. Please clear it with the delivery staff by the end of the month to avoid any interruptions in service.</p>
+</div>
+{% endif %}
+
 <div class="row">
     <div class="col-md-4">
         <h4>Quick Actions</h4>
@@ -30,54 +38,84 @@
     </div>
 
     <div class="col-md-8">
-        <h4>My Recent Activity</h4>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation"><button class="nav-link active" id="deliveries-tab" data-bs-toggle="tab" data-bs-target="#deliveries" type="button">Deliveries</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button">Jar Requests</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button">Event Bookings</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button">Invoices</button></li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">My Activity</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button">Invoices</button>
+            </li>
         </ul>
         <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="deliveries" role="tabpanel">
+            <div class="tab-pane fade" id="activity" role="tabpanel">
                 <ul class="list-group list-group-flush">
-                    {% for report in reports %}
-                    <li class="list-group-item">
-                        Delivered <strong>{{ report.jars_delivered }} jar(s)</strong> on {{(report.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
-                        <span class="float-end">Amount: ₹{{ "%.2f"|format(report.amount_collected) }}</span>
-                    </li>
+                    {% for activity in activity_log %}
+                        {% set item = activity.item %}
+                        <li class="list-group-item">
+                            {% if activity.type == 'Regular Delivery' or activity.type == 'Requested Delivery' %}
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        <strong>{{ item.jars_delivered }} jar(s)</strong> delivered on {{(item.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
+                                        <small class="d-block text-muted">{{ activity.type }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        Amount: ₹{{ "%.2f"|format(item.amount_collected) }}
+                                        {% if item.payment_status == 'Due' %}
+                                            <span class="badge bg-danger ms-1">Due</span>
+                                        {% else %}
+                                            <span class="badge bg-success ms-1">Paid</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% elif activity.type == 'Booking Delivery' %}
+                                <div class="d-flex w-100 justify-content-between">
+                                    <div>
+                                        Booked <strong>{{ item.quantity }} Jar(s)</strong>
+                                        {% if item.dispensers_booked > 0 %}+ <strong>{{ item.dispensers_booked }} Dispenser(s)</strong>{% endif %}
+                                        for event on {{ item.event_date.strftime('%d-%b-%Y') }}
+                                        <small class="d-block text-muted">Booking Delivery</small>
+                                    </div>
+                                    <span class="badge bg-warning my-auto">{{ item.status }}</span>
+                                </div>
+                                {% if item.status == 'Completed' %}
+                                    <hr class="my-2">
+                                    <small class="d-block">
+                                        Returned: {{ item.jars_returned }} Jars, {{ item.dispensers_returned or 0 }} Dispensers.
+                                        {% set lost_jars = item.quantity - item.jars_returned %}
+                                        {% set lost_dispensers = (item.dispensers_booked or 0) - (item.dispensers_returned or 0) %}
+                                        {% if lost_jars > 0 or lost_dispensers > 0 %}
+                                            <span class="text-danger">
+                                                Lost:
+                                                {% if lost_jars > 0 %}{{ lost_jars }} Jar(s){% endif %}
+                                                {% if lost_dispensers > 0 %}, {{ lost_dispensers }} Dispenser(s){% endif %}
+                                            </span>
+                                        {% endif %}
+                                    </small>
+                                    <small class="d-block"><strong>Final Settled Amount: ₹{{ "%.2f"|format(item.final_amount) }}</strong></small>
+                                {% elif item.amount %}
+                                    <small class="d-block">Confirmed Amount: ₹{{ "%.2f"|format(item.amount) }}</small>
+                                {% endif %}
+                            {% endif %}
+                        </li>
                     {% else %}
-                    <li class="list-group-item">No delivery history found.</li>
+                        <li class="list-group-item">No recent activity found.</li>
                     {% endfor %}
                 </ul>
-            </div>
-            <div class="tab-pane fade" id="requests" role="tabpanel">
-                <ul class="list-group list-group-flush">
-                    {% for req in requests %}
-                    <li class="list-group-item">
-                        Requested <strong>{{ req.quantity }} jar(s)</strong> on {{(req.request_timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
-                        <span class="float-end badge bg-info">{{ req.status }}</span>
-                    </li>
-                    {% else %}
-                    <li class="list-group-item">No recent jar requests.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="tab-pane fade" id="bookings" role="tabpanel">
-                <ul class="list-group list-group-flush">
-                    {% for book in bookings %}
-                    <li class="list-group-item">
-                        Booked <strong>{{ book.quantity }} jar(s)</strong> for {{ book.event_date.strftime('%d-%b-%Y') }}
-                        <span class="float-end badge bg-warning">{{ book.status }}</span>
-                        {% if book.amount %}<small class="d-block">Confirmed Amount: ₹{{ "%.2f"|format(book.amount) }}</small>{% endif %}
-                    </li>
-                    {% else %}
-                    <li class="list-group-item">No event bookings found.</li>
-                    {% endfor %}
-                </ul>
+                {% if total_activity_pages > 1 %}
+                <nav class="mt-3">
+                    <ul class="pagination">
+                        {% for p in range(1, total_activity_pages + 1) %}
+                            <li class="page-item {% if p == page_activity %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('customer.dashboard', page_activity=p, page_invoices=request.args.get('page_invoices', 1), tab='activity') }}">{{ p }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+                {% endif %}
             </div>
             <div class="tab-pane fade" id="invoices" role="tabpanel">
                 <ul class="list-group list-group-flush">
-                    {% for invoice in invoices %}
+                    {% for invoice in invoices_pagination.items %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <strong>#{{ invoice.invoice_number }}</strong> - Issued: {{ invoice.issue_date.strftime('%d-%b-%Y') }}
@@ -92,8 +130,44 @@
                     <li class="list-group-item">No invoices found.</li>
                     {% endfor %}
                 </ul>
+                {% if invoices_pagination.pages > 1 %}
+                <nav class="mt-3">
+                    <ul class="pagination">
+                        {% for page_num in invoices_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                                {% if invoices_pagination.page == page_num %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('customer.dashboard', page_invoices=page_num, page_activity=request.args.get('page_activity', 1), tab='invoices') }}">{{ page_num }}</a></li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link" href="#">…</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab) {
+        const tabEl = document.querySelector('#' + tab + '-tab');
+        if (tabEl) {
+            new bootstrap.Tab(tabEl).show();
+        }
+    } else {
+        // Show the first tab by default if no tab is specified
+        const firstTab = document.querySelector('#myTab .nav-link');
+        if (firstTab) {
+            new bootstrap.Tab(firstTab).show();
+        }
+    }
+});
+</script>
 {% endblock %}

@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, abort, current_app
 from flask_login import login_required, current_user, login_user
 from app import db
 from app.admin import bp
-from app.models import User, Business, SubscriptionPlan, Coupon
+from app.models import User, Business, SubscriptionPlan, Coupon, Customer
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, IntegerField, BooleanField, DateField, TextAreaField
@@ -134,16 +134,23 @@ class EditUserForm(FlaskForm):
     ])
     submit = SubmitField('Update User')
 
-    def __init__(self, original_username, *args, **kwargs):
+    def __init__(self, original_username, original_mobile_number, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
+        self.original_mobile_number = original_mobile_number
         self.business_id.choices = [(b.id, b.name) for b in Business.query.order_by('name').all()]
 
     def validate_username(self, username):
         if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
+            if User.query.filter_by(username=username.data).first() or \
+               Customer.query.filter_by(username=username.data).first():
+                raise ValidationError('This username is already taken.')
+
+    def validate_mobile_number(self, mobile_number):
+        if mobile_number.data and mobile_number.data != self.original_mobile_number:
+            user = User.query.filter_by(mobile_number=mobile_number.data).first()
             if user is not None:
-                raise ValidationError('Please use a different username.')
+                raise ValidationError('This mobile number is already registered.')
 
 
 # --- Routes ---
@@ -278,7 +285,7 @@ def edit_user(id):
     user = User.query.get_or_404(id)
     if user.role == 'admin':
         abort(403)
-    form = EditUserForm(original_username=user.username, obj=user)
+    form = EditUserForm(original_username=user.username, original_mobile_number=user.mobile_number, obj=user)
     if form.validate_on_submit():
         user.username = form.username.data
         user.mobile_number = form.mobile_number.data

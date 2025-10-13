@@ -26,7 +26,13 @@
                         <td>{{ invoice.customer.name }}</td>
                         <td>{{ invoice.issue_date.strftime('%d-%b-%Y') }}</td>
                         <td class="text-end">₹{{ "%.2f"|format(invoice.total_amount) }}</td>
-                        <td class="text-center"><span class="badge bg-warning">{{ invoice.status }}</span></td>
+                        <td class="text-center">
+                            {% if invoice.status == 'Paid' %}
+                                <span class="badge bg-success">{{ invoice.status }}</span>
+                            {% else %}
+                                <span class="badge bg-warning">{{ invoice.status }}</span>
+                            {% endif %}
+                        </td>
                         <td class="text-end">
                             <a href="{{ url_for('invoices.view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
                             <a href="{{ url_for('invoices.download_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary" title="Download"><i class="bi bi-download"></i></a>
@@ -41,7 +47,6 @@
                 </tbody>
             </table>
         </div>
-        <!-- Pagination -->
         <nav>
             <ul class="pagination">
                 {% for page_num in invoices.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}

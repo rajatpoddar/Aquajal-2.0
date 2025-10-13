@@ -168,54 +168,64 @@
                     <h5 class="mt-4">Daily Transactions Log</h5>
                    <div class="card shadow-sm">
                        <div class="card-body">
-                           <table class="table table-sm table-hover">
-                               <thead><tr><th>Time</th><th>Staff</th><th>Description</th><th>Amount</th></tr></thead>
-                               <tbody>
-                                   {# Daily Jar Deliveries #}
-                                   {% for sale in daily_sales %}
-                                   <tr class="table-light">
-                                       <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                       <td>{{ sale.staff.username | default('N/A') }}</td>
-                                       <td>{{ sale.jars_delivered }} jar(s) to {{ sale.customer.name }}</td>
-                                       <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(sale.amount_collected) }}</td>
-                                   </tr>
-                                   {% endfor %}
-                                   
-                                   {# Completed Event Bookings #}
-                                   {% for event in daily_event_sales %}
-                                   <tr class="table-info">
-                                       <td>{{ (event.collection_timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                       <td>{{ event.collected_by.username | default('N/A') }}</td>
-                                       <td>Event settlement for {{ event.customer.name }}</td>
-                                       <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(event.final_amount) }}</td>
-                                   </tr>
-                                   {% endfor %}
-                                   
-                                   {# New Product Sales #}
-                                   {% for sale in daily_product_sales %}
-                                   <tr class="table-success">
-                                       <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                       <td>{{ sale.staff.username | default('N/A') }}</td>
-                                       <td>Sale: {{ sale.quantity }} {{ sale.product_name }}(s)</td>
-                                       <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(sale.total_amount) }}</td>
-                                   </tr>
-                                   {% endfor %}
-                                   
-                                   {# Daily Expenses #}
-                                   {% for expense in daily_expenses %}
-                                   <tr class="table-danger">
-                                       <td>{{ (expense.timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                       <td>{{ expense.staff.username | default('N/A') }}</td>
-                                       <td>Expense: {{ expense.description }}</td>
-                                       <td class="text-danger fw-bold">- ₹{{ "%.2f"|format(expense.amount) }}</td>
-                                   </tr>
-                                   {% endfor %}
-
-                                   {% if not daily_sales and not daily_event_sales and not daily_product_sales and not daily_expenses %}
-                                   <tr><td colspan="4" class="text-center">No transactions recorded for this day.</td></tr>
-                                   {% endif %}
-                               </tbody>
-                           </table>
+                        <table class="table table-sm table-hover">
+                            <thead><tr><th>Time</th><th>Staff</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+                            <tbody>
+                                {# Daily Jar Deliveries #}
+                                {% for sale in daily_sales %}
+                                <tr class="table-light">
+                                    <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                    <td>{{ sale.staff.username | default('N/A') }}</td>
+                                    <td>{{ sale.jars_delivered }} jar(s) to {{ sale.customer.name }}</td>
+                                    <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(sale.amount_collected) }}</td>
+                                    <td>
+                                        {% if sale.payment_status == 'Paid' %}
+                                            <span class="badge bg-success">{{ sale.payment_status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ sale.payment_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                
+                                {# Completed Event Bookings #}
+                                {% for event in daily_event_sales %}
+                                <tr class="table-info">
+                                    <td>{{ (event.collection_timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                    <td>{{ event.collected_by.username | default('N/A') }}</td>
+                                    <td>Event settlement for {{ event.customer.name }}</td>
+                                    <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(event.final_amount) }}</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                </tr>
+                                {% endfor %}
+                                
+                                {# New Product Sales #}
+                                {% for sale in daily_product_sales %}
+                                <tr class="table-success">
+                                    <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                    <td>{{ sale.staff.username | default('N/A') }}</td>
+                                    <td>Sale: {{ sale.quantity }} {{ sale.product_name }}(s)</td>
+                                    <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(sale.total_amount) }}</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                </tr>
+                                {% endfor %}
+                                
+                                {# Daily Expenses #}
+                                {% for expense in daily_expenses %}
+                                <tr class="table-danger">
+                                    <td>{{ (expense.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                    <td>{{ expense.staff.username | default('N/A') }}</td>
+                                    <td>Expense: {{ expense.description }}</td>
+                                    <td class="text-danger fw-bold">- ₹{{ "%.2f"|format(expense.amount) }}</td>
+                                    <td>-</td>
+                                </tr>
+                                {% endfor %}
+                        
+                                {% if not daily_sales and not daily_event_sales and not daily_product_sales and not daily_expenses %}
+                                <tr><td colspan="5" class="text-center">No transactions recorded for this day.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
                        </div>
                    </div>
                </div>

@@ -141,6 +141,7 @@ def dashboard():
     staff_members = []
     total_staff_balance = 0.0
     pending_bookings = []
+    total_dues = 0.0
 
     if not current_user.business_id:
         flash("You are not assigned to a business. Please contact the administrator.")
@@ -151,13 +152,15 @@ def dashboard():
             Customer.business_id == current_user.business_id,
             EventBooking.status == 'Pending'
         ).order_by(EventBooking.event_date).all()
+        total_dues = db.session.query(func.sum(Customer.due_amount)).filter(Customer.business_id == current_user.business_id).scalar() or 0.0
 
     return render_template(
         'manager/dashboard.html',
         title="Manager Dashboard",
         staff_members=staff_members,
         total_staff_balance=total_staff_balance,
-        pending_bookings=pending_bookings
+        pending_bookings=pending_bookings,
+        total_dues=total_dues
     )
 
 
@@ -185,6 +188,28 @@ def receive_cash(staff_id):
         flash(f'{staff.username} has no cash balance to hand over.')
         
     return redirect(url_for('manager.dashboard'))
+
+@bp.route('/clear_dues/<int:customer_id>', methods=['POST'])
+@login_required
+@manager_required
+@subscription_required
+def clear_dues(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    if customer.business_id != current_user.business_id:
+        abort(403)
+    
+    amount_cleared = customer.due_amount
+    customer.due_amount = 0.0
+    
+    # Mark all 'Due' logs as 'Paid' for this customer
+    DailyLog.query.filter_by(customer_id=customer.id, payment_status='Due').update({'payment_status': 'Paid'})
+    
+    # Mark all 'Unpaid' invoices as 'Paid' for this customer
+    Invoice.query.filter_by(customer_id=customer.id, status='Unpaid').update({'status': 'Paid'})
+    
+    db.session.commit()
+    flash(f'Dues of ₹{amount_cleared:.2f} for {customer.name} have been cleared.', 'success')
+    return redirect(url_for('customers.index'))
 
 
 @bp.route('/reports')
@@ -549,6 +574,8 @@ def list_invoices():
     invoices = Invoice.query.filter_by(business_id=current_user.business_id).order_by(Invoice.issue_date.desc()).paginate(page=page, per_page=10)
     return render_template('manager/list_invoices.html', invoices=invoices, title="All Invoices")
 
+# /water_supply_app/app/manager/routes.py
+
 @bp.route('/generate_invoice/<int:customer_id>', methods=['GET', 'POST'])
 @login_required
 @manager_required
@@ -563,38 +590,51 @@ def generate_invoice(customer_id):
         
         # --- Gather Data for Invoice ---
         total_amount = 0
-        invoice_items = []
+        invoice_items_data = []
         
-        # 1. Daily Jar Deliveries
-        daily_logs = DailyLog.query.filter(
+        # 1. Daily Jar Deliveries (that were marked as 'Due' in the selected month)
+        due_logs = DailyLog.query.filter(
             DailyLog.customer_id == customer.id,
-            DailyLog.timestamp >= start_date,
-            DailyLog.timestamp <= end_date
+            DailyLog.payment_status == 'Due',
+            cast(DailyLog.timestamp, Date) >= start_date,
+            cast(DailyLog.timestamp, Date) <= end_date
         ).all()
-        
-        if daily_logs:
-            total_jars = sum(log.jars_delivered for log in daily_logs)
-            avg_price = sum(log.amount_collected for log in daily_logs) / total_jars if total_jars > 0 else customer.price_per_jar
-            item_total = total_jars * avg_price
-            invoice_items.append(InvoiceItem(description=f"Monthly Jar Supply ({start_date.strftime('%b %Y')})", quantity=total_jars, unit_price=avg_price, total=item_total))
-            total_amount += item_total
+
+        outstanding_balance = sum(log.amount_collected for log in due_logs)
+
+        if outstanding_balance > 0:
+            invoice_items_data.append({
+                'description': f"Outstanding Balance for {start_date.strftime('%b %Y')}",
+                'quantity': 1,
+                'unit_price': outstanding_balance,
+                'total': outstanding_balance
+            })
+            total_amount += outstanding_balance
 
         # 2. Event Bookings
         event_bookings = EventBooking.query.filter(
             EventBooking.customer_id == customer.id,
             EventBooking.status == 'Completed',
-            EventBooking.collection_timestamp >= start_date,
-            EventBooking.collection_timestamp <= end_date
+            cast(EventBooking.collection_timestamp, Date) >= start_date,
+            cast(EventBooking.collection_timestamp, Date) <= end_date
         ).all()
 
         for booking in event_bookings:
-            invoice_items.append(InvoiceItem(description=f"Event Booking on {booking.event_date.strftime('%d-%b')}", quantity=1, unit_price=booking.final_amount, total=booking.final_amount))
+            invoice_items_data.append({
+                'description': f"Event Booking on {booking.event_date.strftime('%d-%b')}",
+                'quantity': 1,
+                'unit_price': booking.final_amount,
+                'total': booking.final_amount
+            })
             total_amount += booking.final_amount
 
         # --- Create Invoice ---
-        if not invoice_items:
+        if not invoice_items_data:
             flash('No billable activity found for this customer in the selected month.', 'warning')
             return redirect(url_for('manager.generate_invoice', customer_id=customer_id))
+
+        # Determine final status
+        status = 'Unpaid' if outstanding_balance > 0 else 'Paid'
 
         last_invoice_num = Invoice.query.filter_by(business_id=current_user.business_id).count()
         new_invoice_number = f"AQUA-{current_user.business_id}-{date.today().year}-{last_invoice_num + 1:04d}"
@@ -603,14 +643,19 @@ def generate_invoice(customer_id):
             invoice_number=new_invoice_number,
             due_date=date.today() + timedelta(days=15),
             total_amount=total_amount,
+            status=status,
             customer_id=customer.id,
             business_id=current_user.business_id
         )
         db.session.add(new_invoice)
         
-        for item in invoice_items:
+        for item_data in invoice_items_data:
+            item = InvoiceItem(**item_data)
             new_invoice.items.append(item)
             
+        # If an invoice is generated, we can consider the previous 'due_amount' cleared
+        customer.due_amount = outstanding_balance if status == 'Unpaid' else 0.0
+
         db.session.commit()
         flash(f'Invoice {new_invoice_number} generated successfully!', 'success')
         return redirect(url_for('invoices.list_invoices'))

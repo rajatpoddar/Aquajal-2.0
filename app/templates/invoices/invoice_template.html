@@ -28,12 +28,13 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="{{ url_for('static', filename='images/invoice-logo.png', _external=True) }}" style="width:100%; max-width:150px;">
+                                <img src="{{ url_for('static', filename='images/invoice-logo.png', _external=True) }}" style="max-width: 150px; height: auto;">
                             </td>
                             <td class="text-end">
                                 Invoice #: {{ invoice.invoice_number }}<br>
                                 Created: {{ invoice.issue_date.strftime('%B %d, %Y') }}<br>
-                                Due: {{ invoice.due_date.strftime('%B %d, %Y') }}
+                                Due: {{ invoice.due_date.strftime('%B %d, %Y') }}<br>
+                                Status: <strong style="color: {% if invoice.status == 'Paid' %}#28a745{% else %}#dc3545{% endif %}; text-transform: uppercase;">{{ invoice.status }}</strong>
                             </td>
                         </tr>
                     </table>
@@ -46,6 +47,9 @@
                             <td>
                                 <strong>{{ invoice.customer.business.name }}</strong><br>
                                 {{ invoice.customer.business.location }}<br>
+                                {% if manager %}
+                                    Manager: {{ manager.username }} ({{ manager.mobile_number }})<br>
+                                {% endif %}
                                 {{ invoice.customer.business.email }}
                             </td>
                             <td class="text-end">

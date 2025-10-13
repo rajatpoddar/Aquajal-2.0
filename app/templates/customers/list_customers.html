@@ -40,8 +40,18 @@
                     <small><i class="bi bi-geo-alt-fill"></i> {{ customer.area }}, {{ customer.village }}</small>
                 </div>
                 <div class="d-flex flex-column align-items-end">
-                    <span class="badge bg-primary rounded-pill fs-6 mb-2">₹{{ "%.2f"|format(customer.price_per_jar) }}</span>
                     <div>
+                        {% if customer.due_amount and customer.due_amount > 0 %}
+                        <span class="badge bg-danger rounded-pill fs-6 mb-2">Due: ₹{{ "%.2f"|format(customer.due_amount) }}</span>
+                        {% endif %}
+                        <span class="badge bg-primary rounded-pill fs-6 mb-2">₹{{ "%.2f"|format(customer.price_per_jar) }}</span>
+                    </div>
+                    <div>
+                        {% if customer.due_amount and customer.due_amount > 0 %}
+                        <form action="{{ url_for('manager.clear_dues', customer_id=customer.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to clear the due amount for this customer?');">
+                            <button type="submit" class="btn btn-sm btn-success" title="Clear Dues"><i class="bi bi-check-circle-fill"></i></button>
+                        </form>
+                        {% endif %}
                         <a href="{{ url_for('invoices.generate_invoice', customer_id=customer.id) }}" class="btn btn-sm btn-outline-success" title="Generate Invoice"><i class="bi bi-receipt"></i></a>
                         <a href="{{ url_for('customers.edit_customer', id=customer.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
                         <form action="{{ url_for('customers.delete_customer', id=customer.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
