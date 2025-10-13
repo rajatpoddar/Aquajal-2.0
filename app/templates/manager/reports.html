@@ -63,17 +63,17 @@
         <div class="py-4">
             <h3 class="mb-3">Monthly Report for {{ report_month | month_name }}, {{ report_year }}</h3>
             <div class="row mb-4">
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
                     <div class="card text-white bg-primary shadow">
                         <div class="card-body"><h5 class="card-title">Total Sales</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_sales) }}</p></div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
                     <div class="card text-white bg-danger shadow">
                         <div class="card-body"><h5 class="card-title">Total Expenses</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_expenses) }}</p></div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
                     <div class="card text-white bg-success shadow">
                         <div class="card-body"><h5 class="card-title">Net Income</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_sales - total_monthly_expenses) }}</p></div>
                     </div>
@@ -153,10 +153,10 @@
         <div class="py-4">
            <h3 class="mb-3">Daily Report for {{ report_date.strftime('%d %B, %Y') }}</h3>
            <div class="row mb-4">
-               <div class="col-md-4"><div class="card text-white bg-primary shadow"><div class="card-body"><h5 class="card-title">Total Sales</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales) }}</p></div></div></div>
-               <div class="col-md-4"><div class="card text-white bg-danger shadow"><div class="card-body"><h5 class="card-title">Total Expenses</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_expenses) }}</p></div></div></div>
-               <div class="col-md-4"><div class="card text-white bg-success shadow"><div class="card-body"><h5 class="card-title">Net Income</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales - total_daily_expenses) }}</p></div></div></div>
-           </div>
+            <div class="col-md-4 mb-3"><div class="card text-white bg-primary shadow"><div class="card-body"><h5 class="card-title">Total Sales</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales) }}</p></div></div></div>
+            <div class="col-md-4 mb-3"><div class="card text-white bg-danger shadow"><div class="card-body"><h5 class="card-title">Total Expenses</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_expenses) }}</p></div></div></div>
+            <div class="col-md-4 mb-3"><div class="card text-white bg-success shadow"><div class="card-body"><h5 class="card-title">Net Income</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales - total_daily_expenses) }}</p></div></div></div>
+        </div>
 
            <div class="row">
                <div class="col-lg-8">

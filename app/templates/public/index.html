@@ -3,10 +3,10 @@
 {% block content %}
 <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-        <div class="col-10 col-sm-8 col-lg-6">
+        <div class="col-10 col-sm-8 col-lg-6" data-aos="fade-left">
             <img src="{{ url_for('static', filename='images/hero-image.webp') }}" class="d-block mx-lg-auto img-fluid rounded shadow-lg" alt="Water Jugs" width="700" height="500" loading="lazy">
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6" data-aos="fade-right">
             <h1 class="display-4 fw-bold lh-1 mb-3">Manage Your Water Supply Business with Ease</h1>
             <p class="lead mb-4">Aquajal helps you automate daily tasks, track sales and inventory, and manage your staff effortlessly—all from one simple dashboard.</p>
 
@@ -25,23 +25,23 @@
 </div>
 
 <div class="container px-4 py-5" id="featured-3">
-    <h2 class="pb-2 border-bottom text-center display-6">Why Choose Aquajal?</h2>
+    <h2 class="pb-2 border-bottom text-center display-6" data-aos="fade-up">Why Choose Aquajal?</h2>
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-        <div class="feature col text-center">
+        <div class="feature col text-center" data-aos="fade-up" data-aos-delay="100">
             <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
                 <i class="bi bi-people-fill"></i>
             </div>
             <h3 class="fs-4">Staff & Customer Management</h3>
             <p>Easily add and manage your staff and customers. Set daily wages for staff and custom jar prices for each customer.</p>
         </div>
-        <div class="feature col text-center">
+        <div class="feature col text-center" data-aos="fade-up" data-aos-delay="200">
             <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
                 <i class="bi bi-box-seam"></i>
             </div>
             <h3 class="fs-4">Stock Control</h3>
             <p>Keep track of your jar and dispenser inventory. Stock is automatically deducted for sales and event bookings.</p>
         </div>
-        <div class="feature col text-center">
+        <div class="feature col text-center" data-aos="fade-up" data-aos-delay="300">
             <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
                 <i class="bi bi-graph-up"></i>
             </div>
@@ -51,7 +51,7 @@
     </div>
 </div>
 
-<div class="container py-3">
+<div class="container py-3" data-aos="fade-up">
     <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
         <h1 class="display-4 fw-normal">Pricing</h1>
         <p class="fs-5 text-muted">Choose a plan that fits your business needs. Start with a 40-day free trial.</p>
@@ -79,9 +79,9 @@
     </div>
 </div>
 
-<div class="container my-5">
+<div class="container my-5" id="faqAccordion" data-aos="fade-up">
     <h2 class="text-center mb-4">Frequently Asked Questions</h2>
-    <div class="accordion" id="faqAccordion">
+    <div class="accordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingOne">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">

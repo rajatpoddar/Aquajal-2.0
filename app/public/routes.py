@@ -143,3 +143,7 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('auth.login'))
     return render_template('public/reset_password.html', form=form)
+
+@bp.route('/offline')
+def offline():
+    return render_template('public/offline.html', title='Offline')
