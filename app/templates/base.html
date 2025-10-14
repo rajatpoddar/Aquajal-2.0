@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ session.get('language', 'en') }}">
 
 <head>
     <meta charset="utf-8">
@@ -7,9 +7,9 @@
 
     <title>{{ title }} - Aquajal</title>
     <meta name="description"
-        content="The all-in-one solution for managing your water jar supply business. Streamline deliveries, track inventory, and manage staff with ease.">
+        content="{{ _('The all-in-one solution for managing your water jar supply business. Streamline deliveries, track inventory, and manage staff with ease.') }}">
     <meta property="og:title" content="Aquajal - Water Supply Management">
-    <meta property="og:description" content="The all-in-one solution for managing your water jar supply business.">
+    <meta property="og:description" content="{{ _('The all-in-one solution for managing your water jar supply business.') }}">
     <meta property="og:image" content="{{ url_for('static', filename='images/logo-512.png', _external=True) }}">
     <meta property="og:url" content="{{ url_for('public.index', _external=True) }}">
     <meta property="og:type" content="website">
@@ -52,19 +52,19 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     {% if current_user.is_authenticated %}
 
                     {% if current_user.role == 'admin' %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Admin Menu
+                            {{ _('Admin Menu') }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">{{ _('Admin Dashboard') }}</a>
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin.profile') }}">My Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.profile') }}">{{ _('My Profile') }}</a></li>
                         </ul>
                     </li>
 
@@ -72,50 +72,61 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Manager Menu
+                            {{ _('Manager Menu') }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('manager.dashboard') }}">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('customers.index') }}">Customers</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('manager.staff_list') }}">Manage Staff</a>
+                            <li><a class="dropdown-item" href="{{ url_for('manager.dashboard') }}">{{ _('Dashboard') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('customers.index') }}">{{ _('Customers') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('manager.staff_list') }}">{{ _('Manage Staff') }}</a>
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('invoices.list_invoices') }}">Invoices</a>
+                            <li><a class="dropdown-item" href="{{ url_for('invoices.list_invoices') }}">{{ _('Invoices') }}</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('manager.account') }}">My Account &
-                                    Subscription</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('manager.account') }}">{{ _('My Account & Subscription') }}</a></li>
                         </ul>
                     </li>
 
                     {% elif current_user.role == 'customer' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('customer.dashboard') }}">My Dashboard</a>
+                        <a class="nav-link" href="{{ url_for('customer.dashboard') }}">{{ _('My Dashboard') }}</a>
                     </li>
                     {% endif %}
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
                     </li>
 
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.how_to_use') }}">How to Use</a>
+                        <a class="nav-link" href="{{ url_for('public.how_to_use') }}">{{ _('How to Use') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.about') }}">About Us</a>
+                        <a class="nav-link" href="{{ url_for('public.about') }}">{{ _('About Us') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.contact') }}">Contact Us</a>
+                        <a class="nav-link" href="{{ url_for('public.contact') }}">{{ _('Contact Us') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.register') }}">Register</a>
+                        <a class="nav-link" href="{{ url_for('public.register') }}">{{ _('Register') }}</a>
                     </li>
                     {% endif %}
+                    
+                    <!-- Language Selector Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageSelector" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageSelector">
+                            {% for lang, name in config.LANGUAGES.items() %}
+                            <li><a class="dropdown-item" href="{{ url_for('public.set_language', language=lang) }}">{{ name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -141,22 +152,21 @@
                 <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold text-primary">Aquajal</h5>
                     <p>
-                        The complete solution for managing your water supply business efficiently and effectively.
+                        {{ _('The complete solution for managing your water supply business efficiently and effectively.') }}
                     </p>
                 </div>
 
                 <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 fw-bold text-primary">Quick Links</h5>
-                    <p><a href="{{ url_for('public.about') }}" class="text-white" style="text-decoration: none;">About
-                            Us</a></p>
+                    <h5 class="text-uppercase mb-4 fw-bold text-primary">{{ _('Quick Links') }}</h5>
+                    <p><a href="{{ url_for('public.about') }}" class="text-white" style="text-decoration: none;">{{ _('About Us') }}</a></p>
                     <p><a href="{{ url_for('public.how_to_use') }}" class="text-white"
-                            style="text-decoration: none;">How to Use</a></p>
+                            style="text-decoration: none;">{{ _('How to Use') }}</a></p>
                     <p><a href="{{ url_for('public.index') }}#faqAccordion" class="text-white"
-                            style="text-decoration: none;">FAQ</a></p>
+                            style="text-decoration: none;">{{ _('FAQ') }}</a></p>
                 </div>
 
                 <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 fw-bold text-primary">Contact</h5>
+                    <h5 class="text-uppercase mb-4 fw-bold text-primary">{{ _('Contact') }}</h5>
                     <p><i class="bi bi-geo-alt-fill me-3"></i>Deoghar, Jharkhand, India</p>
                     <p><i class="bi bi-envelope-fill me-3"></i>aquajalbusiness@gmail.com</p>
                     <p><i class="bi bi-telephone-fill me-3"></i>+91 8233338857</p>

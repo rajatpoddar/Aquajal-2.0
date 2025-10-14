@@ -61,6 +61,10 @@
                         {% for error in form.price_per_jar.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
+                <div class="mb-3">
+                    {{ form.note.label(class="form-label") }}
+                    {{ form.note(class="form-control", rows=3, placeholder="Any special instructions or notes for this customer...") }}
+                </div>
                 <div>
                     {{ form.submit(class="btn btn-primary") }}
                     <a href="{{ url_for('customers.index') }}" class="btn btn-secondary">Cancel</a>

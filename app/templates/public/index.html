@@ -7,17 +7,18 @@
             <img src="{{ url_for('static', filename='images/hero-image.webp') }}" class="d-block mx-lg-auto img-fluid rounded shadow-lg" alt="Water Jugs" width="700" height="500" loading="lazy">
         </div>
         <div class="col-lg-6" data-aos="fade-right">
-            <h1 class="display-4 fw-bold lh-1 mb-3">Manage Your Water Supply Business with Ease</h1>
-            <p class="lead mb-4">Aquajal helps you automate daily tasks, track sales and inventory, and manage your staff effortlessly—all from one simple dashboard.</p>
+            <h1 class="display-4 fw-bold lh-1 mb-3">The All-in-One Platform to Run Your Water Supply Business</h1>
+            <p class="lead mb-4">Aquajal is a complete SaaS solution that helps you automate sales, manage subscriptions, generate invoices, track inventory, and monitor staff performance effortlessly.</p>
 
             <ul class="list-unstyled mb-4">
-                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Automate Daily Deliveries & Bookings</li>
-                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Track Sales, Stock, and Expenses</li>
-                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Manage Staff Wages and Performance</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Full SaaS Platform:</strong> Manage your business with a 40-day free trial and flexible subscription plans.</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Automated Invoicing:</strong> Generate, download, and email PDF invoices to your customers automatically.</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Advanced Reporting:</strong> Get daily and monthly insights on sales, expenses, and staff attendance.</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i><strong>Customer & Staff Portals:</strong> Empower customers to view history and staff to log deliveries on the go.</li>
             </ul>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Start Your Free Trial</a>
+                <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Start Your 40-Day Free Trial</a>
                 <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
             </div>
         </div>
@@ -25,28 +26,28 @@
 </div>
 
 <div class="container px-4 py-5" id="featured-3">
-    <h2 class="pb-2 border-bottom text-center display-6" data-aos="fade-up">Why Choose Aquajal?</h2>
+    <h2 class="pb-2 border-bottom text-center display-6" data-aos="fade-up">A Modern Platform Built for Growth</h2>
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="100">
             <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
-                <i class="bi bi-people-fill"></i>
+                <i class="bi bi-receipt-cutoff"></i>
             </div>
-            <h3 class="fs-4">Staff & Customer Management</h3>
-            <p>Easily add and manage your staff and customers. Set daily wages for staff and custom jar prices for each customer.</p>
+            <h3 class="fs-4">Professional Invoicing</h3>
+            <p>Automate invoice creation for every transaction, including monthly summaries and event bookings. Email professional PDF invoices directly to clients.</p>
         </div>
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="200">
             <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
-                <i class="bi bi-box-seam"></i>
+                <i class="bi bi-credit-card-fill"></i>
             </div>
-            <h3 class="fs-4">Stock Control</h3>
-            <p>Keep track of your jar and dispenser inventory. Stock is automatically deducted for sales and event bookings.</p>
+            <h3 class="fs-4">Subscription Management</h3>
+            <p>Offer flexible subscription plans with a 40-day free trial. Securely accept online payments with our integrated Razorpay checkout system.</p>
         </div>
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="300">
             <div class="feature-icon d-inline-flex align-items-center justify-content-center text-white bg-primary bg-gradient fs-2 mb-3 rounded-circle" style="width: 4rem; height: 4rem;">
-                <i class="bi bi-graph-up"></i>
+                <i class="bi bi-graph-up-arrow"></i>
             </div>
-            <h3 class="fs-4">Comprehensive Reports</h3>
-            <p>Get daily and monthly reports on sales, expenses, and staff performance. Make data-driven decisions to grow your business.</p>
+            <h3 class="fs-4">Insightful Reports</h3>
+            <p>Make data-driven decisions with comprehensive reports on sales, expenses, staff performance, and even new customer leads.</p>
         </div>
     </div>
 </div>
@@ -54,7 +55,7 @@
 <div class="container py-3" data-aos="fade-up">
     <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
         <h1 class="display-4 fw-normal">Pricing</h1>
-        <p class="fs-5 text-muted">Choose a plan that fits your business needs. Start with a 40-day free trial.</p>
+        <p class="fs-5 text-muted">Choose a plan that fits your needs. Our monthly subscription costs less than a single day's labor, and all plans start with a 40-day free trial.</p>
     </div>
     <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
         {% for plan in plans %}
@@ -69,9 +70,11 @@
                         <li>Regular Price: <del>₹{{ "%.2f"|format(plan.regular_price) }}</del></li>
                         <li>Manage Unlimited Staff</li>
                         <li>Manage Unlimited Customers</li>
+                        <li>Automated Invoicing & Reports</li>
                         <li>Email Support</li>
                     </ul>
-                    <a href="{{ url_for('billing.checkout', plan_id=plan.id) }}" class="w-100 btn btn-lg btn-primary">Get started</a>
+                    <p class="small text-muted">After the initial offer, renewals are at the regular price.</p>
+                    <a href="{{ url_for('public.register') }}" class="w-100 btn btn-lg btn-primary mt-3">Start Free Trial</a>
                 </div>
             </div>
         </div>
@@ -85,24 +88,36 @@
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingOne">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    How are staff wages calculated?
+                    What happens after my 40-day free trial ends?
                 </button>
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                    Staff wages are automatically calculated based on their daily deliveries. The manager can set the minimum number of jars required for a full day's wage and a half day's wage from the business settings panel. This gives you complete flexibility over the attendance policy.
+                    After your trial, you will be prompted to choose a subscription plan to continue using the service. All your data—staff, customers, and reports—will be saved and waiting for you. We accept online payments through Razorpay.
                 </div>
             </div>
         </div>
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingTwo">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Can I set different prices for different customers?
+                    How does the automated invoicing work?
                 </button>
             </h2>
             <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
                 <div class="accordion-body">
-                    Yes, you can. When adding or editing a customer, you can set a custom price per jar for them. This price will be used for all their future deliveries.
+                    Aquajal automatically generates an invoice for every transaction, such as a daily delivery or an event booking. Managers can also generate consolidated monthly invoices for customers, download them as PDFs, or email them directly from the dashboard.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Can I use this on my phone?
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Yes! Aquajal is a Progressive Web App (PWA), which means you can add it to your phone's home screen and use it just like a native application. It's designed to be fully responsive and works great on any device.
                 </div>
             </div>
         </div>

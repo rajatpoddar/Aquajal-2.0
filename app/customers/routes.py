@@ -6,7 +6,7 @@ from app import db
 from app.customers import bp
 from app.models import Customer, User # Import User for validation
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, FloatField, PasswordField
+from wtforms import StringField, IntegerField, SubmitField, FloatField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError, Email
 from sqlalchemy import or_
 
@@ -20,9 +20,9 @@ class CustomerForm(FlaskForm):
     email = StringField('Email Address', validators=[Optional(), Email()])
     password = PasswordField('Set/Change Password', validators=[Optional(), Length(min=4)])
     village = StringField('Village', validators=[DataRequired()])
-    # --- MODIFIED LINES: Made Area and Landmark optional ---
     area = StringField('Area / Street', validators=[Optional()])
     landmark = StringField('Landmark', validators=[Optional()])
+    note = TextAreaField('Note', validators=[Optional(), Length(max=300)])
     daily_jars = IntegerField('Daily Jars Required', validators=[DataRequired()], default=1)
     price_per_jar = FloatField('Price per Jar (₹)', validators=[DataRequired()], default=20)
     submit = SubmitField('Save Customer')
@@ -80,18 +80,17 @@ def index():
 def add_customer():
     form = CustomerForm()
     if form.validate_on_submit():
-        # --- MODIFIED LINE: Convert empty email string to None ---
         customer_email = form.email.data if form.email.data else None
         
         customer = Customer(
             name=form.name.data,
             username=form.username.data,
             mobile_number=form.mobile_number.data,
-            # --- MODIFIED LINE: Use the sanitized email value ---
             email=customer_email,
             village=form.village.data,
             area=form.area.data,
             landmark=form.landmark.data,
+            note=form.note.data,
             daily_jars=form.daily_jars.data,
             price_per_jar=form.price_per_jar.data,
             business_id=current_user.business_id
@@ -119,11 +118,11 @@ def edit_customer(id):
         customer.name = form.name.data
         customer.username = form.username.data
         customer.mobile_number = form.mobile_number.data
-        # --- MODIFIED LINE: Convert empty email string to None ---
         customer.email = form.email.data if form.email.data else None
         customer.village = form.village.data
         customer.area = form.area.data
         customer.landmark = form.landmark.data
+        customer.note = form.note.data
         customer.daily_jars = form.daily_jars.data
         customer.price_per_jar = form.price_per_jar.data
         

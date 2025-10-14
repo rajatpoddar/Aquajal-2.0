@@ -96,6 +96,7 @@ class Customer(UserMixin, db.Model):
     village = db.Column(db.String(100))
     area = db.Column(db.String(100))
     landmark = db.Column(db.String(200))
+    note = db.Column(db.String(300), nullable=True)
     daily_jars = db.Column(db.Integer, default=1)
     price_per_jar = db.Column(db.Float, nullable=False, default=20.0)
     due_amount = db.Column(db.Float, default=0.0)
