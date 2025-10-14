@@ -1,4 +1,6 @@
-# /water_supply_app/app/models.py
+
+
+# File: app/models.py
 
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -33,14 +35,15 @@ class Business(db.Model):
     new_dispenser_price = db.Column(db.Float, default=150.0)
     jar_stock = db.Column(db.Integer, default=0)
     dispenser_stock = db.Column(db.Integer, default=0)
-    full_day_jar_count = db.Column(db.Integer, default=50) # New
-    half_day_jar_count = db.Column(db.Integer, default=1) # New
+    full_day_jar_count = db.Column(db.Integer, default=50) 
+    half_day_jar_count = db.Column(db.Integer, default=1) 
 
     
     employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     customers = db.relationship('Customer', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     product_sales = db.relationship('ProductSale', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     payments = db.relationship('Payment', back_populates='business', lazy='dynamic', cascade="all, delete-orphan")
+    purchase_orders = db.relationship('PurchaseOrder', backref='business', lazy='dynamic', cascade="all, delete-orphan")
 
     subscription_status = db.Column(db.String(20), default='trial')
     trial_ends_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=40))
@@ -53,7 +56,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    role = db.Column(db.String(10), index=True, default='staff')
+    role = db.Column(db.String(10), index=True, default='staff') # Roles: staff, manager, admin, supplier
     daily_wage = db.Column(db.Float, nullable=True)
     cash_balance = db.Column(db.Float, default=0.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=True)
@@ -65,6 +68,8 @@ class User(UserMixin, db.Model):
     expenses = db.relationship('Expense', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
     handovers = db.relationship('CashHandover', foreign_keys='CashHandover.user_id', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
     product_sales = db.relationship('ProductSale', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
+    supplier_profile = db.relationship('SupplierProfile', back_populates='user', uselist=False, cascade="all, delete-orphan")
+
 
     def get_id(self): return f'user-{self.id}'
     def set_password(self, password): self.password_hash = generate_password_hash(password)
@@ -84,6 +89,45 @@ class User(UserMixin, db.Model):
             return None
         return User.query.get(id)
 
+
+# --- NEW: Supplier-related models ---
+class SupplierProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    shop_name = db.Column(db.String(120), nullable=False)
+    address = db.Column(db.String(250), nullable=True)
+    
+    user = db.relationship('User', back_populates='supplier_profile')
+    products = db.relationship('SupplierProduct', backref='supplier', lazy='dynamic', cascade="all, delete-orphan")
+    purchase_orders = db.relationship('PurchaseOrder', backref='supplier', lazy='dynamic', cascade="all, delete-orphan")
+
+class SupplierProduct(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    discount_percentage = db.Column(db.Integer, default=0)
+    category = db.Column(db.String(50), nullable=True) # e.g., Jars, Dispensers, Chemicals, etc.
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier_profile.id'), nullable=False)
+    
+class PurchaseOrder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier_profile.id'), nullable=False)
+    order_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    total_amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='Pending') # e.g., Pending, Confirmed, Delivered
+    items = db.relationship('PurchaseOrderItem', backref='order', lazy='dynamic', cascade="all, delete-orphan")
+
+class PurchaseOrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('purchase_order.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('supplier_product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price_at_purchase = db.Column(db.Float, nullable=False) # Storing price at time of order
+
+    product = db.relationship('SupplierProduct')
+# ------------------------------------
 
 class Customer(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -203,16 +247,15 @@ class EventBooking(db.Model):
     status = db.Column(db.String(20), default='Pending', index=True) # Statuses: Pending, Confirmed, Delivered, Completed
     request_timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     delivery_timestamp = db.Column(db.DateTime, nullable=True)
-    collection_timestamp = db.Column(db.DateTime, nullable=True) # New: When jars were collected
-    jars_returned = db.Column(db.Integer, nullable=True) # New: How many jars were collected back
+    collection_timestamp = db.Column(db.DateTime, nullable=True) 
+    jars_returned = db.Column(db.Integer, nullable=True) 
     dispensers_returned = db.Column(db.Integer, nullable=True)
-    final_amount = db.Column(db.Float, nullable=True) # New: The final settled amount
+    final_amount = db.Column(db.Float, nullable=True) 
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     confirmed_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     delivered_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     collected_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
-    # --- Relationships to easily access user objects ---
     confirmed_by = db.relationship("User", foreign_keys=[confirmed_by_id])
     delivered_by = db.relationship("User", foreign_keys=[delivered_by_id])
     collected_by = db.relationship("User", foreign_keys=[collected_by_id])

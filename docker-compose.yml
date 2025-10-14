@@ -1,21 +1,30 @@
+# File: docker-compose.yml
 version: '3.8'
 
 services:
   web:
     build: .
-    container_name: aquajal_app
-    restart: unless-stopped
     ports:
-      - "2942:2942"
+      # Changed host port from 8000 to 8001 to avoid conflicts
+      - "8001:5000"
+    env_file:
+      - .env
     environment:
-      # Ensure you change this in a real production environment
-      - SECRET_KEY=your_very_secret_key_change_me 
-      - DATABASE_URL=sqlite:////app/data/app.db
+      # This tells the web container to find the database at the hostname 'db'
+      - POSTGRES_HOSTNAME=db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13-alpine
     volumes:
-      # This maps the 'data' folder on your computer to /app/data in the container
-      # It will persist your SQLite database.
-      - ./data:/app/data
-      # This maps the 'uploads' folder on your computer to the container's upload path
-      # It will persist all user-uploaded files.
-      - ./app/static/uploads:/app/app/static/uploads
-    # The command is now handled by the entrypoint script
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      # Changed host port from 5433 to 5434 to avoid conflicts
+      - "5434:5432"
+
+volumes:
+  postgres_data:
+

@@ -3,6 +3,7 @@ from flask import Flask, redirect, url_for, session, request, current_app
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+# The missing 'login_required' has been re-added here.
 from flask_login import LoginManager, current_user, login_required
 from flask_apscheduler import APScheduler
 from sqlalchemy import MetaData
@@ -31,8 +32,10 @@ mail = Mail()
 babel = Babel()
 moment = Moment()
 
+# --- Set the single, unified login view ---
 login.login_view = 'auth.login'
 
+# This function selects the language for the user
 def get_locale():
     return session.get('language', 'en')
 
@@ -44,6 +47,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
+    # Correctly initialize Babel with the locale_selector function
     babel.init_app(app, locale_selector=get_locale)
     moment.init_app(app)
 
@@ -53,6 +57,7 @@ def create_app(config_class=Config):
 
     from .wages import deduct_daily_wages
     
+    # Your original scheduler logic is preserved
     if not scheduler.running:
         scheduler.init_app(app)
         if not scheduler.get_job('deduct-wages'):
@@ -93,7 +98,6 @@ def create_app(config_class=Config):
     from app.invoices import bp as invoices_bp
     app.register_blueprint(invoices_bp, url_prefix='/invoices')
 
-    # This import is now correct
     from app.supplier import bp as supplier_bp
     app.register_blueprint(supplier_bp, url_prefix='/supplier')
     

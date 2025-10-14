@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import flash, redirect, url_for
+from flask import flash, redirect, url_for, abort
 from flask_login import current_user
 from app.models import Business
 from datetime import datetime
@@ -8,10 +8,20 @@ from app import db
 def manager_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role not in ['admin', 'manager']:
+        if not current_user.is_authenticated or current_user.role not in ['admin', 'manager']:
             abort(403) # Forbidden
         return f(*args, **kwargs)
     return decorated_function
+
+# --- NEW: Supplier Required Decorator ---
+def supplier_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'supplier':
+            abort(403) # Forbidden
+        return f(*args, **kwargs)
+    return decorated_function
+# --------------------------------------
 
 def subscription_required(f):
     """
@@ -20,8 +30,12 @@ def subscription_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role == 'admin':
+        if not current_user.is_authenticated or current_user.role == 'admin':
             return f(*args, **kwargs)
+
+        # Skip subscription checks for suppliers and other roles
+        if current_user.role != 'manager':
+             return f(*args, **kwargs)
 
         business = Business.query.get(current_user.business_id)
         if not business:

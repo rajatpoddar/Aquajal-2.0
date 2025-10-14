@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 80vh;
+    }
+    .gear {
+        width: 120px;
+        height: 120px;
+        background: #6f42c1;
+        border-radius: 50%;
+        position: relative;
+        animation: spin 8s linear infinite;
+    }
+    .gear::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        background: var(--bs-body-bg);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .gear-tooth {
+        position: absolute;
+        width: 25px;
+        height: 150px;
+        background: #6f42c1;
+        top: -15px;
+        left: 47.5px;
+    }
+    .tooth-1 { transform: rotate(0deg); }
+    .tooth-2 { transform: rotate(45deg); }
+    .tooth-3 { transform: rotate(90deg); }
+    .tooth-4 { transform: rotate(135deg); }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="container error-container">
+    <div class="gear mb-4">
+        <div class="gear-tooth tooth-1"></div>
+        <div class="gear-tooth tooth-2"></div>
+        <div class="gear-tooth tooth-3"></div>
+        <div class="gear-tooth tooth-4"></div>
+    </div>
+    <h1 class="display-4">Something Went Wrong</h1>
+    <p class="lead">We're experiencing some technical difficulties. Please try again later.</p>
+    <a href="{{ url_for('public.index') }}" class="btn btn-primary mt-4">Go Back Home</a>
+</div>
+{% endblock %}
