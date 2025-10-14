@@ -7,33 +7,39 @@
             <form action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
                 <div class="mb-3">
-                    {{ form.name.label(class="form-label") }}
-                    {{ form.name(class="form-control", id="name") }}
+                    {{ form.name.label(class="form-label") }}<span class="text-danger">*</span>
+                    {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
+                    {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        {{ form.username.label(class="form-label") }}
+                        {{ form.username.label(class="form-label") }}<span class="text-danger">*</span>
                         <div class="input-group">
-                            {{ form.username(class="form-control", id="username") }}
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username") }}
                             <span class="input-group-text" id="username-status"></span>
+                            {% for error in form.username.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        {{ form.mobile_number.label(class="form-label") }}
-                        {{ form.mobile_number(class="form-control") }}
+                        {{ form.mobile_number.label(class="form-label") }}<span class="text-danger">*</span>
+                        {{ form.mobile_number(class="form-control" + (" is-invalid" if form.mobile_number.errors else "")) }}
+                        {% for error in form.mobile_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
                 <div class="mb-3">
                     {{ form.email.label(class="form-label") }}
-                    {{ form.email(class="form-control", placeholder="Optional") }}
+                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Optional") }}
+                    {% for error in form.email.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="mb-3">
                     {{ form.password.label(class="form-label") }}
-                    {{ form.password(class="form-control", placeholder="Leave blank for default password (123456)") }}
+                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Leave blank for default password (123456)") }}
+                    {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="mb-3">
-                    {{ form.village.label(class="form-label") }}
-                    {{ form.village(class="form-control") }}
+                    {{ form.village.label(class="form-label") }}<span class="text-danger">*</span>
+                    {{ form.village(class="form-control" + (" is-invalid" if form.village.errors else "")) }}
+                    {% for error in form.village.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="mb-3">
                     {{ form.area.label(class="form-label") }}
@@ -45,12 +51,14 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        {{ form.daily_jars.label(class="form-label") }}
-                        {{ form.daily_jars(class="form-control") }}
+                        {{ form.daily_jars.label(class="form-label") }}<span class="text-danger">*</span>
+                        {{ form.daily_jars(class="form-control" + (" is-invalid" if form.daily_jars.errors else "")) }}
+                        {% for error in form.daily_jars.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        {{ form.price_per_jar.label(class="form-label") }}
-                        {{ form.price_per_jar(class="form-control") }}
+                        {{ form.price_per_jar.label(class="form-label") }}<span class="text-danger">*</span>
+                        {{ form.price_per_jar(class="form-control" + (" is-invalid" if form.price_per_jar.errors else "")) }}
+                        {% for error in form.price_per_jar.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
                 <div>

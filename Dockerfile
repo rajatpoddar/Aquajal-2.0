@@ -4,6 +4,14 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Install system dependencies required by WeasyPrint
+RUN apt-get update && apt-get install -y \
+    libpango-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-xlib-2.0-0 \
+    libpangoft2-1.0-0 \
+    --no-install-recommends
+
 # Copy the requirements file into the container
 COPY requirements.txt .
 

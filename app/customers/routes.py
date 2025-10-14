@@ -20,7 +20,8 @@ class CustomerForm(FlaskForm):
     email = StringField('Email Address', validators=[Optional(), Email()])
     password = PasswordField('Set/Change Password', validators=[Optional(), Length(min=4)])
     village = StringField('Village', validators=[DataRequired()])
-    area = StringField('Area / Street', validators=[DataRequired()])
+    # --- MODIFIED LINES: Made Area and Landmark optional ---
+    area = StringField('Area / Street', validators=[Optional()])
     landmark = StringField('Landmark', validators=[Optional()])
     daily_jars = IntegerField('Daily Jars Required', validators=[DataRequired()], default=1)
     price_per_jar = FloatField('Price per Jar (₹)', validators=[DataRequired()], default=20)
@@ -79,11 +80,15 @@ def index():
 def add_customer():
     form = CustomerForm()
     if form.validate_on_submit():
+        # --- MODIFIED LINE: Convert empty email string to None ---
+        customer_email = form.email.data if form.email.data else None
+        
         customer = Customer(
             name=form.name.data,
             username=form.username.data,
             mobile_number=form.mobile_number.data,
-            email=form.email.data,
+            # --- MODIFIED LINE: Use the sanitized email value ---
+            email=customer_email,
             village=form.village.data,
             area=form.area.data,
             landmark=form.landmark.data,
@@ -114,7 +119,8 @@ def edit_customer(id):
         customer.name = form.name.data
         customer.username = form.username.data
         customer.mobile_number = form.mobile_number.data
-        customer.email = form.email.data
+        # --- MODIFIED LINE: Convert empty email string to None ---
+        customer.email = form.email.data if form.email.data else None
         customer.village = form.village.data
         customer.area = form.area.data
         customer.landmark = form.landmark.data
