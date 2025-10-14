@@ -1,6 +1,6 @@
 # /water_supply_app/app/__init__.py
 
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, session, request
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 import os
 import calendar
 from flask_mail import Mail
+from flask_babel import Babel, _
 
 # --- Naming convention for database constraints ---
 metadata = MetaData(naming_convention={
@@ -27,9 +28,13 @@ migrate = Migrate()
 login = LoginManager()
 scheduler = APScheduler()
 mail = Mail()
+babel = Babel()
 
 # --- Set the single, unified login view ---
 login.login_view = 'auth.login'
+
+def get_locale():
+    return session.get('language', 'en')
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -39,6 +44,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
+    babel.init_app(app, locale_selector=get_locale)
 
     with app.app_context():
         if not os.path.exists(app.config['UPLOAD_FOLDER']):

@@ -1,0 +1,988 @@
+# Telugu translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-14 14:13+0530\n"
+"PO-Revision-Date: 2025-10-14 13:42+0530\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: te\n"
+"Language-Team: te <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/admin/routes.py:53
+msgid "This coupon code already exists."
+msgstr "ఈ కూపన్ కోడ్ ఇప్పటికే ఉంది."
+
+#: app/admin/routes.py:91 app/admin/routes.py:148
+msgid "This username is already taken."
+msgstr "ఈ వినియోగదారు పేరు ఇప్పటికే తీసుకోబడింది."
+
+#: app/admin/routes.py:97 app/admin/routes.py:154
+msgid "This mobile number is already registered."
+msgstr "ఈ మొబైల్ నంబర్ ఇప్పటికే నమోదు చేయబడింది."
+
+#: app/admin/routes.py:122
+msgid "Please use a different username."
+msgstr "దయచేసి వేరే వినియోగదారు పేరును ఉపయోగించండి."
+
+#: app/admin/routes.py:164 app/templates/base.html:65
+msgid "Admin Dashboard"
+msgstr "అడ్మిన్ డాష్‌బోర్డ్"
+
+#: app/admin/routes.py:182
+msgid "Your profile has been updated."
+msgstr "మీ ప్రొఫైల్ నవీకరించబడింది."
+
+#: app/admin/routes.py:186 app/templates/base.html:67
+msgid "My Profile"
+msgstr "నా ప్రొఫైల్"
+
+#: app/admin/routes.py:198
+#, python-format
+msgid "Business \"%(name)s\" created successfully."
+msgstr "\"%(name)s\" అనే వ్యాపారం విజయవంతంగా సృష్టించబడింది."
+
+#: app/admin/routes.py:200
+msgid "Create New Business"
+msgstr "కొత్త వ్యాపారాన్ని సృష్టించండి"
+
+#: app/admin/routes.py:218
+#, python-format
+msgid "Business \"%(name)s\" details have been updated."
+msgstr "\"%(name)s\" అనే వ్యాపారం వివరాలు నవీకరించబడ్డాయి."
+
+#: app/admin/routes.py:235
+#, python-format
+msgid "Subscription updated for \"%(name)s\"."
+msgstr "\"%(name)s\" కోసం చందా నవీకరించబడింది."
+
+#: app/admin/routes.py:240
+#, python-format
+msgid "Subscription removed for \"%(name)s\". Status set to expired."
+msgstr "\"%(name)s\" కోసం చందా తీసివేయబడింది. స్థితి గడువు ముగిసింది."
+
+#: app/admin/routes.py:245
+msgid "Edit Business"
+msgstr "వ్యాపారాన్ని సవరించండి"
+
+#: app/admin/routes.py:256
+#, python-format
+msgid "Stock for \"%(name)s\" has been reset to zero."
+msgstr "\"%(name)s\" కోసం స్టాక్ సున్నాకి రీసెట్ చేయబడింది."
+
+#: app/admin/routes.py:278
+#, python-format
+msgid "User \"%(username)s\" has been created."
+msgstr "\"%(username)s\" అనే వినియోగదారు సృష్టించబడ్డారు."
+
+#: app/admin/routes.py:280
+msgid "Add New User"
+msgstr "కొత్త వినియోగదారుని జోడించండి"
+
+#: app/admin/routes.py:317
+#, python-format
+msgid "User \"%(username)s\" has been updated."
+msgstr "\"%(username)s\" అనే వినియోగదారు నవీకరించబడ్డారు."
+
+#: app/admin/routes.py:320
+msgid "Edit User"
+msgstr "వినియోగదారుని సవరించండి"
+
+#: app/admin/routes.py:329
+msgid "Cannot delete the admin user."
+msgstr "అడ్మిన్ వినియోగదారుని తొలగించలేరు."
+
+#: app/admin/routes.py:331
+#, python-format
+msgid "User \"%(username)s\" has been deleted."
+msgstr "\"%(username)s\" అనే వినియోగదారు తొలగించబడ్డారు."
+
+#: app/admin/routes.py:345
+msgid "Subscription Plans"
+msgstr "చందా ప్రణాళికలు"
+
+#: app/admin/routes.py:357
+msgid "New subscription plan has been created."
+msgstr "కొత్త చందా ప్రణాళిక సృష్టించబడింది."
+
+#: app/admin/routes.py:359
+msgid "Add New Plan"
+msgstr "కొత్త ప్రణాళికను జోడించండి"
+
+#: app/admin/routes.py:373
+msgid "Subscription plan has been updated."
+msgstr "చందా ప్రణాళిక నవీకరించబడింది."
+
+#: app/admin/routes.py:375
+msgid "Edit Plan"
+msgstr "ప్రణాళికను సవరించండి"
+
+#: app/admin/routes.py:383
+msgid "Cannot delete plan. It is currently assigned to one or more businesses."
+msgstr "ప్రణాళికను తొలగించలేరు. ఇది ప్రస్తుతం ఒకటి లేదా అంతకంటే ఎక్కువ వ్యాపారాలకు కేటాయించబడింది."
+
+#: app/admin/routes.py:387
+#, python-format
+msgid "Plan \"%(name)s\" has been deleted."
+msgstr "\"%(name)s\" అనే ప్రణాళిక తొలగించబడింది."
+
+#: app/admin/routes.py:397
+msgid "Manage Coupons"
+msgstr "కూపన్‌లను నిర్వహించండి"
+
+#: app/admin/routes.py:409
+msgid "New coupon has been created."
+msgstr "కొత్త కూపన్ సృష్టించబడింది."
+
+#: app/admin/routes.py:411
+msgid "Add New Coupon"
+msgstr "కొత్త కూపన్‌ను జోడించండి"
+
+#: app/admin/routes.py:425
+msgid "Coupon has been updated."
+msgstr "కూపన్ నవీకరించబడింది."
+
+#: app/admin/routes.py:427
+msgid "Edit Coupon"
+msgstr "కూపన్‌ను సవరించండి"
+
+#: app/admin/routes.py:436
+#, python-format
+msgid "Coupon \"%(code)s\" has been deleted."
+msgstr "\"%(code)s\" అనే కూపన్ తొలగించబడింది."
+
+#: app/admin/routes.py:449
+#, python-format
+msgid ""
+"Business \"%(name)s\" and all of its associated data have been "
+"permanently deleted."
+msgstr "\"%(name)s\" అనే వ్యాపారం మరియు దానితో అనుబంధించబడిన మొత్తం డేటా శాశ్వతంగా తొలగించబడింది."
+
+#: app/admin/routes.py:452
+#, python-format
+msgid "Error deleting business: %(error)s"
+msgstr "వ్యాపారాన్ని తొలగించడంలో లోపం: %(error)s"
+
+#: app/auth/routes.py:55
+msgid "Invalid username/mobile or password"
+msgstr "చెల్లని వినియోగదారు పేరు/మొబైల్ లేదా పాస్‌వర్డ్"
+
+#: app/auth/routes.py:58 app/templates/auth/login.html:7
+msgid "Sign In"
+msgstr "సైన్ ఇన్ చేయండి"
+
+#: app/templates/base.html:10
+msgid ""
+"The all-in-one solution for managing your water jar supply business. "
+"Streamline deliveries, track inventory, and manage staff with ease."
+msgstr "మీ నీటి కూజా సరఫరా వ్యాపారాన్ని నిర్వహించడానికి ఆల్-ఇన్-వన్ పరిష్కారం. డెలివరీలను క్రమబద్ధీకరించండి, ఇన్వెంటరీని ట్రాక్ చేయండి మరియు సిబ్బందిని సులభంగా నిర్వహించండి."
+
+#: app/templates/base.html:12
+msgid "The all-in-one solution for managing your water jar supply business."
+msgstr "మీ నీటి కూజా సరఫరా వ్యాపారాన్ని నిర్వహించడానికి ఆల్-ఇన్-వన్ పరిష్కారం."
+
+#: app/templates/base.html:62
+msgid "Admin Menu"
+msgstr "అడ్మిన్ మెనూ"
+
+#: app/templates/base.html:75
+msgid "Manager Menu"
+msgstr "మేనేజర్ మెనూ"
+
+#: app/templates/base.html:78
+msgid "Dashboard"
+msgstr "డాష్‌బోర్డ్"
+
+#: app/templates/base.html:79
+msgid "Customers"
+msgstr "వినియోగదారులు"
+
+#: app/templates/base.html:80
+msgid "Manage Staff"
+msgstr "సిబ్బందిని నిర్వహించండి"
+
+#: app/templates/base.html:82 app/templates/customer/dashboard.html:46
+msgid "Invoices"
+msgstr "ఇన్‌వాయిస్‌లు"
+
+#: app/templates/base.html:87
+msgid "My Account & Subscription"
+msgstr "నా ఖాతా & చందా"
+
+#: app/templates/base.html:93
+msgid "My Dashboard"
+msgstr "నా డాష్‌బోర్డ్"
+
+#: app/templates/base.html:98
+msgid "Logout"
+msgstr "లాగ్ అవుట్"
+
+#: app/templates/base.html:103 app/templates/base.html:162
+msgid "How to Use"
+msgstr "ఎలా ఉపయోగించాలి"
+
+#: app/templates/base.html:106 app/templates/base.html:160
+msgid "About Us"
+msgstr "మా గురించి"
+
+#: app/templates/base.html:109
+msgid "Contact Us"
+msgstr "మమ్మల్ని సంప్రదించండి"
+
+#: app/templates/base.html:112 app/templates/public/index.html:22
+msgid "Login"
+msgstr "లాగిన్"
+
+#: app/templates/base.html:115
+msgid "Register"
+msgstr "నమోదు చేసుకోండి"
+
+#: app/templates/base.html:154
+msgid ""
+"The complete solution for managing your water supply business efficiently"
+" and effectively."
+msgstr "మీ నీటి సరఫరా వ్యాపారాన్ని సమర్థవంతంగా మరియు ప్రభావవంతంగా నిర్వహించడానికి పూర్తి పరిష్కారం."
+
+#: app/templates/base.html:159
+msgid "Quick Links"
+msgstr "త్వరిత లింకులు"
+
+#: app/templates/base.html:164
+msgid "FAQ"
+msgstr "తరచుగా అడిగే ప్రశ్నలు"
+
+#: app/templates/base.html:168
+msgid "Contact"
+msgstr "సంప్రదించండి"
+
+#: app/templates/auth/login.html:23
+msgid "Forgot Password?"
+msgstr "పాస్వర్డ్ మర్చిపోయారా?"
+
+#: app/templates/auth/login.html:28
+msgid "New Supplier?"
+msgstr "కొత్త సరఫరాదారు?"
+
+#: app/templates/auth/login.html:28
+msgid "Start your trial here!"
+msgstr "మీ ట్రయల్‌ను ఇక్కడ ప్రారంభించండి!"
+
+#: app/templates/customer/dashboard.html:4
+msgid "Welcome,"
+msgstr "స్వాగతం,"
+
+#: app/templates/customer/dashboard.html:9
+msgid "Outstanding Balance"
+msgstr "బకాయి ఉన్న బ్యాలెన్స్"
+
+#: app/templates/customer/dashboard.html:10
+msgid "You have a due amount of"
+msgstr "మీరు చెల్లించవలసిన మొత్తం"
+
+#: app/templates/customer/dashboard.html:10
+msgid ""
+"Please clear it with the delivery staff by the end of the month to avoid "
+"any interruptions in service."
+msgstr "సేవలో ఎలాంటి అంతరాయాలు కలగకుండా ఉండేందుకు దయచేసి నెల చివరిలోగా డెలివరీ సిబ్బందితో దాన్ని క్లియర్ చేయండి."
+
+#: app/templates/customer/dashboard.html:16
+msgid "Quick Actions"
+msgstr "త్వరిత చర్యలు"
+
+#: app/templates/customer/dashboard.html:19
+msgid "Request Daily Jars"
+msgstr "రోజువారీ కూజాలను అభ్యర్థించండి"
+
+#: app/templates/customer/dashboard.html:29
+msgid "Book for an Event"
+msgstr "ఒక కార్యక్రమం కోసం బుక్ చేయండి"
+
+#: app/templates/customer/dashboard.html:43
+msgid "My Activity"
+msgstr "నా కార్యాచరణ"
+
+#: app/templates/customer/dashboard.html:58
+#: app/templates/delivery/dashboard.html:142
+msgid "jar(s)"
+msgstr "కూజా(లు)"
+
+#: app/templates/customer/dashboard.html:58
+msgid "delivered on"
+msgstr "నాడు డెలివరీ చేయబడింది"
+
+#: app/templates/customer/dashboard.html:62
+#: app/templates/customer/dashboard.html:122
+msgid "Amount:"
+msgstr "మొత్తం:"
+
+#: app/templates/customer/dashboard.html:64
+msgid "Due"
+msgstr "చెల్లించవలసినది"
+
+#: app/templates/customer/dashboard.html:66
+msgid "Paid"
+msgstr "చెల్లించబడింది"
+
+#: app/templates/customer/dashboard.html:73
+msgid "Booked"
+msgstr "బుక్ చేయబడింది"
+
+#: app/templates/customer/dashboard.html:73
+#: app/templates/customer/dashboard.html:89
+msgid "Jar(s)"
+msgstr "కూజా(లు)"
+
+#: app/templates/customer/dashboard.html:74
+#: app/templates/customer/dashboard.html:90
+#: app/templates/delivery/dashboard.html:98
+#: app/templates/delivery/dashboard.html:169
+msgid "Dispenser(s)"
+msgstr "డిస్పెన్సర్(లు)"
+
+#: app/templates/customer/dashboard.html:75
+msgid "for event on"
+msgstr "నాడు జరిగే కార్యక్రమం కోసం"
+
+#: app/templates/customer/dashboard.html:76
+msgid "Booking Delivery"
+msgstr "బుకింగ్ డెలివరీ"
+
+#: app/templates/customer/dashboard.html:83
+msgid "Returned:"
+msgstr "తిరిగి ఇవ్వబడింది:"
+
+#: app/templates/customer/dashboard.html:83
+#: app/templates/delivery/dashboard.html:95
+#: app/templates/delivery/dashboard.html:167
+msgid "Jars"
+msgstr "కూజాలు"
+
+#: app/templates/customer/dashboard.html:83
+msgid "Dispensers"
+msgstr "డిస్పెన్సర్లు"
+
+#: app/templates/customer/dashboard.html:88
+msgid "Lost:"
+msgstr "కోల్పోయింది:"
+
+#: app/templates/customer/dashboard.html:94
+msgid "Final Settled Amount:"
+msgstr "తుది పరిష్కరించబడిన మొత్తం:"
+
+#: app/templates/customer/dashboard.html:96
+msgid "Confirmed Amount:"
+msgstr "ధృవీకరించబడిన మొత్తం:"
+
+#: app/templates/customer/dashboard.html:101
+msgid "No recent activity found."
+msgstr "ఇటీవలి కార్యాచరణ ఏదీ కనుగొనబడలేదు."
+
+#: app/templates/customer/dashboard.html:121
+msgid "Issued:"
+msgstr "జారీ చేయబడింది:"
+
+#: app/templates/customer/dashboard.html:125
+msgid "View"
+msgstr "చూడండి"
+
+#: app/templates/customer/dashboard.html:126
+msgid "Download"
+msgstr "డౌన్‌లోడ్ చేయండి"
+
+#: app/templates/customer/dashboard.html:130
+msgid "No invoices found."
+msgstr "ఇన్‌వాయిస్‌లు ఏవీ కనుగొనబడలేదు."
+
+#: app/templates/delivery/dashboard.html:7
+msgid "Book Jars for Event"
+msgstr "కార్యక్రమం కోసం కూజాలను బుక్ చేయండి"
+
+#: app/templates/delivery/dashboard.html:10
+msgid "Sell New Jar / Dispenser"
+msgstr "కొత్త కూజా / డిస్పెన్సర్‌ను అమ్మండి"
+
+#: app/templates/delivery/dashboard.html:16
+msgid "Supply Jar"
+msgstr "కూజా సరఫరా చేయండి"
+
+#: app/templates/delivery/dashboard.html:18
+msgid "Start typing a name or mobile number..."
+msgstr "ఒక పేరు లేదా మొబైల్ నంబర్‌ను టైప్ చేయడం ప్రారంభించండి..."
+
+#: app/templates/delivery/dashboard.html:30
+msgid "Your Current Cash Balance"
+msgstr "మీ ప్రస్తుత నగదు నిల్వ"
+
+#: app/templates/delivery/dashboard.html:38
+msgid "Add an Expense"
+msgstr "ఒక ఖర్చును జోడించండి"
+
+#: app/templates/delivery/dashboard.html:42
+msgid "Amount"
+msgstr "మొత్తం"
+
+#: app/templates/delivery/dashboard.html:45
+msgid "Description"
+msgstr "వివరణ"
+
+#: app/templates/delivery/dashboard.html:58
+msgid "Customers with Dues"
+msgstr "బకాయిలు ఉన్న వినియోగదారులు"
+
+#: app/templates/delivery/dashboard.html:66
+msgid "Due:"
+msgstr "చెల్లించవలసినది:"
+
+#: app/templates/delivery/dashboard.html:71
+msgid "Confirm you have received"
+msgstr "మీరు అందుకున్నారని నిర్ధారించండి"
+
+#: app/templates/delivery/dashboard.html:71
+msgid "from"
+msgstr "నుండి"
+
+#: app/templates/delivery/dashboard.html:75
+msgid "Mark as Paid"
+msgstr "చెల్లించినట్లుగా గుర్తించండి"
+
+#: app/templates/delivery/dashboard.html:82
+msgid "No customers have outstanding dues."
+msgstr "ఏ వినియోగదారునికి బకాయిలు లేవు."
+
+#: app/templates/delivery/dashboard.html:87
+msgid "Event Jars to Collect"
+msgstr "సేకరించడానికి కార్యక్రమం కూజాలు"
+
+#: app/templates/delivery/dashboard.html:106
+msgid "Jars Ret:"
+msgstr "కూజాలు వాపసు:"
+
+#: app/templates/delivery/dashboard.html:112
+msgid "Dispen Ret:"
+msgstr "డిస్పెన్సర్ వాపసు:"
+
+#: app/templates/delivery/dashboard.html:119
+msgid "Collect"
+msgstr "సేకరించండి"
+
+#: app/templates/delivery/dashboard.html:126
+msgid "No event items pending collection."
+msgstr "సేకరణ కోసం ఏ కార్యక్రమ వస్తువులు పెండింగ్‌లో లేవు."
+
+#: app/templates/delivery/dashboard.html:135
+msgid "Pending Jar Requests"
+msgstr "పెండింగ్‌లో ఉన్న కూజా అభ్యర్థనలు"
+
+#: app/templates/delivery/dashboard.html:142
+msgid "Wants"
+msgstr "కోరుకుంటున్నారు"
+
+#: app/templates/delivery/dashboard.html:146
+#, python-format
+msgid "Confirm delivery of %(qty)s jar(s) to %(name)s?"
+msgstr "%(name)s కు %(qty)s కూజా(ల) డెలివరీని నిర్ధారించాలా?"
+
+#: app/templates/delivery/dashboard.html:147
+#: app/templates/delivery/dashboard.html:177
+msgid "Delivered"
+msgstr "డెలివరీ చేయబడింది"
+
+#: app/templates/delivery/dashboard.html:153
+msgid "No pending jar requests."
+msgstr "పెండింగ్‌లో కూజా అభ్యర్థనలు లేవు."
+
+#: app/templates/delivery/dashboard.html:158
+msgid "Today's Event Deliveries"
+msgstr "నేటి కార్యక్రమం డెలివరీలు"
+
+#: app/templates/delivery/dashboard.html:170
+msgid "for event. Amount:"
+msgstr "కార్యక్రమం కోసం. మొత్తం:"
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Pre-Paid to Manager"
+msgstr "మేనేజర్‌కు ముందస్తు చెల్లింపు"
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Collect Payment"
+msgstr "చెల్లింపును సేకరించండి"
+
+#: app/templates/delivery/dashboard.html:176
+#, python-format
+msgid "Confirm EVENT delivery to %(name)s?"
+msgstr "%(name)s కు కార్యక్రమం డెలివరీని నిర్ధారించాలా?"
+
+#: app/templates/delivery/dashboard.html:183
+msgid "No event deliveries for today."
+msgstr "నేటికి కార్యక్రమం డెలివరీలు లేవు."
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Default:"
+msgstr "డిఫాల్ట్:"
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Jar(s) at"
+msgstr "వద్ద కూజా(లు)"
+
+#: app/templates/delivery/dashboard.html:224
+msgid "Jars:"
+msgstr "కూజాలు:"
+
+#: app/templates/delivery/dashboard.html:232
+msgid "Mark as Due"
+msgstr "చెల్లించవలసినదిగా గుర్తించండి"
+
+#: app/templates/delivery/dashboard.html:236
+msgid "Deliver"
+msgstr "డెలివరీ చేయండి"
+
+#: app/templates/delivery/dashboard.html:245
+msgid "No customers found."
+msgstr "వినియోగదారులు ఎవరూ కనుగొనబడలేదు."
+
+#: app/templates/manager/add_staff_form.html:32
+msgid "Set initial password"
+msgstr "ప్రారంభ పాస్‌వర్డ్‌ను సెట్ చేయండి"
+
+#: app/templates/manager/add_staff_form.html:54
+#: app/templates/manager/edit_staff_form.html:49
+msgid "Cancel"
+msgstr "రద్దు చేయండి"
+
+#: app/templates/manager/edit_staff_form.html:42
+msgid "Current ID Proof:"
+msgstr "ప్రస్తుత ఐడి ప్రూఫ్:"
+
+#: app/templates/manager/list_staff.html:5
+msgid "Manage Your Staff"
+msgstr "మీ సిబ్బందిని నిర్వహించండి"
+
+#: app/templates/manager/list_staff.html:7
+msgid "Add New Staff"
+msgstr "కొత్త సిబ్బందిని జోడించండి"
+
+#: app/templates/manager/list_staff.html:17
+msgid "Username"
+msgstr "వినియోగదారు పేరు"
+
+#: app/templates/manager/list_staff.html:18
+msgid "Mobile"
+msgstr "మొబైల్"
+
+#: app/templates/manager/list_staff.html:19
+msgid "Daily Wage"
+msgstr "రోజువారీ వేతనం"
+
+#: app/templates/manager/list_staff.html:20
+msgid "Actions"
+msgstr "చర్యలు"
+
+#: app/templates/manager/list_staff.html:27
+msgid "N/A"
+msgstr "వర్తించదు"
+
+#: app/templates/manager/list_staff.html:32
+msgid "Not Set"
+msgstr "సెట్ చేయబడలేదు"
+
+#: app/templates/manager/list_staff.html:37
+msgid "Edit Details"
+msgstr "వివరాలను సవరించండి"
+
+#: app/templates/manager/list_staff.html:43
+msgid "No staff members found for your business."
+msgstr "మీ వ్యాపారం కోసం సిబ్బంది సభ్యులు ఎవరూ కనుగొనబడలేదు."
+
+#: app/templates/public/about.html:7
+msgid "About Aquajal"
+msgstr "ఆక్వాజల్ గురించి"
+
+#: app/templates/public/about.html:8
+msgid ""
+"Aquajal is a modern, web-based solution designed to streamline the "
+"operations of water jar supply businesses. Our mission is to empower "
+"business owners with the tools they need to manage their daily tasks "
+"efficiently, from tracking deliveries to managing staff and inventory."
+msgstr "ఆక్వాజల్ అనేది నీటి కూజా సరఫరా వ్యాపారాల కార్యకలాపాలను క్రమబద్ధీకరించడానికి రూపొందించబడిన ఒక ఆధునిక, వెబ్-ఆధారిత పరిష్కారం. డెలివరీలను ట్రాక్ చేయడం నుండి సిబ్బంది మరియు ఇన్వెంటరీని నిర్వహించడం వరకు, వ్యాపార యజమానులకు వారి రోజువారీ పనులను సమర్థవంతంగా నిర్వహించడానికి అవసరమైన సాధనాలతో అధికారం ఇవ్వడమే మా లక్ష్యం."
+
+#: app/templates/public/about.html:11
+msgid "Our Story"
+msgstr "మా కథ"
+
+#: app/templates/public/about.html:12
+msgid ""
+"The idea for Aquajal was born from a simple observation: many local water"
+" suppliers rely on manual, paper-based methods to manage their complex "
+"daily operations. This often leads to inefficiencies, lost revenue, and a"
+" lack of clear insight into the business's performance. We saw an "
+"opportunity to change that."
+msgstr "ఆక్వాజల్ ఆలోచన ఒక సాధారణ పరిశీలన నుండి పుట్టింది: చాలా మంది స్థానిక నీటి సరఫరాదారులు వారి సంక్లిష్టమైన రోజువారీ కార్యకలాపాలను నిర్వహించడానికి మాన్యువల్, కాగితం-ఆధారిత పద్ధతులపై ఆధారపడతారు. ఇది తరచుగా అసమర్థత, కోల్పోయిన రాబడి మరియు వ్యాపారం యొక్క పనితీరుపై స్పష్టమైన అవగాహన లేకపోవడానికి దారితీస్తుంది. దాన్ని మార్చడానికి మేము ఒక అవకాశాన్ని చూశాము."
+
+#: app/templates/public/about.html:13
+msgid ""
+"We set out to create a user-friendly, affordable, and powerful "
+"application that automates routine tasks, provides valuable insights "
+"through reports, and brings all aspects of the business—sales, stock, "
+"staff, and customers—into one centralized platform."
+msgstr "సాధారణ పనులను ఆటోమేట్ చేసే, నివేదికల ద్వారా విలువైన అంతర్దృష్టులను అందించే మరియు వ్యాపారం యొక్క అన్ని అంశాలను - అమ్మకాలు, స్టాక్, సిబ్బంది మరియు వినియోగదారులను - ఒకే కేంద్రీకృత ప్లాట్‌ఫారమ్‌లోకి తీసుకువచ్చే వినియోగదారు-స్నేహపూర్వక, సరసమైన మరియు శక్తివంతమైన అనువర్తనాన్ని సృష్టించడానికి మేము బయలుదేరాము."
+
+#: app/templates/public/about.html:17
+msgid "Our Vision"
+msgstr "మా దృష్టి"
+
+#: app/templates/public/about.html:18
+msgid ""
+"Our vision is to become the go-to management software for water supply "
+"businesses everywhere. We are committed to continuous improvement, adding"
+" new features, and providing exceptional support to our users. We believe"
+" that by simplifying business management, we can help our clients grow "
+"and succeed."
+msgstr "ప్రతిచోటా నీటి సరఫరా వ్యాపారాల కోసం గో-టు మేనేజ్‌మెంట్ సాఫ్ట్‌వేర్‌గా మారడమే మా దృష్టి. నిరంతర అభివృద్ధి, కొత్త ఫీచర్లను జోడించడం మరియు మా వినియోగదారులకు అసాధారణమైన మద్దతును అందించడానికి మేము కట్టుబడి ఉన్నాము. వ్యాపార నిర్వహణను సరళీకృతం చేయడం ద్వారా, మేము మా ఖాతాదారులకు పెరగడానికి మరియు విజయవంతం కావడానికి సహాయపడగలమని మేము నమ్ముతున్నాము."
+
+#: app/templates/public/how_to_use.html:5
+msgid "How to Use Aquajal"
+msgstr "ఆక్వాజల్‌ను ఎలా ఉపయోగించాలి"
+
+#: app/templates/public/how_to_use.html:9
+msgid "For Managers"
+msgstr "మేనేజర్ల కోసం"
+
+#: app/templates/public/how_to_use.html:12
+msgid "Setting Up Your Business"
+msgstr "మీ వ్యాపారాన్ని ఏర్పాటు చేయడం"
+
+#: app/templates/public/how_to_use.html:14
+msgid "Initial Setup:"
+msgstr "ప్రారంభ సెటప్:"
+
+#: app/templates/public/how_to_use.html:14
+msgid ""
+"After registering, your first step is to set your business's default "
+"prices and attendance rules. Go to `Manager Menu > Price Settings` to set"
+" prices for new jars/dispensers and define the minimum jar deliveries for"
+" a full or half day's wage."
+msgstr "నమోదు చేసుకున్న తర్వాత, మీ మొదటి దశ మీ వ్యాపారం యొక్క డిఫాల్ట్ ధరలు మరియు హాజరు నియమాలను సెట్ చేయడం. కొత్త కూజాలు/డిస్పెన్సర్ల కోసం ధరలను సెట్ చేయడానికి మరియు పూర్తి లేదా సగం రోజు వేతనం కోసం కనీస కూజా డెలివరీలను నిర్వచించడానికి `మేనేజర్ మెనూ > ధర సెట్టింగ్‌లు`కు వెళ్లండి."
+
+#: app/templates/public/how_to_use.html:15
+msgid "Manage Staff:"
+msgstr "సిబ్బందిని నిర్వహించండి:"
+
+#: app/templates/public/how_to_use.html:15
+msgid ""
+"Use the `Manager Menu > Manage Staff` option to add your delivery "
+"personnel. You can set their daily wages and even upload ID proofs."
+msgstr "మీ డెలివరీ సిబ్బందిని జోడించడానికి `మేనేజర్ మెనూ > సిబ్బందిని నిర్వహించండి` ఎంపికను ఉపయోగించండి. మీరు వారి రోజువారీ వేతనాలను సెట్ చేయవచ్చు మరియు ఐడి ప్రూఫ్‌లను కూడా అప్‌లోడ్ చేయవచ్చు."
+
+#: app/templates/public/how_to_use.html:16
+msgid "Add Customers:"
+msgstr "వినియోగదారులను జోడించండి:"
+
+#: app/templates/public/how_to_use.html:16
+msgid ""
+"From the `Manager Menu`, select `Customers` to build your customer list. "
+"Here you can set custom jar prices and add special notes for each "
+"customer."
+msgstr "`మేనేజర్ మెనూ` నుండి, మీ వినియోగదారుల జాబితాను రూపొందించడానికి `వినియోగదారులు` ఎంచుకోండి. ఇక్కడ మీరు ప్రతి వినియోగదారునికి అనుకూల కూజా ధరలను సెట్ చేయవచ్చు మరియు ప్రత్యేక గమనికలను జోడించవచ్చు."
+
+#: app/templates/public/how_to_use.html:18
+msgid "Daily Operations"
+msgstr "రోజువారీ కార్యకలాపాలు"
+
+#: app/templates/public/how_to_use.html:20
+msgid "Stock Management:"
+msgstr "స్టాక్ నిర్వహణ:"
+
+#: app/templates/public/how_to_use.html:20
+msgid ""
+"Keep your inventory updated from the `Manager Dashboard` by clicking on "
+"`Manage Stock`. Stock is automatically deducted for sales and confirmed "
+"event bookings."
+msgstr "`మేనేజర్ డాష్‌బోర్డ్` నుండి `స్టాక్‌ను నిర్వహించండి`పై క్లిక్ చేయడం ద్వారా మీ ఇన్వెంటరీని నవీకరించండి. అమ్మకాలు మరియు ధృవీకరించబడిన కార్యక్రమ బుకింగ్‌ల కోసం స్టాక్ స్వయంచాలకంగా తీసివేయబడుతుంది."
+
+#: app/templates/public/how_to_use.html:21
+msgid "Confirm Bookings:"
+msgstr "బుకింగ్‌లను నిర్ధారించండి:"
+
+#: app/templates/public/how_to_use.html:21
+msgid ""
+"New event bookings will appear on your dashboard. Confirm them to "
+"allocate stock and set the final amount."
+msgstr "కొత్త కార్యక్రమ బుకింగ్‌లు మీ డాష్‌బోర్డ్‌లో కనిపిస్తాయి. స్టాక్‌ను కేటాయించడానికి మరియు తుది మొత్తాన్ని సెట్ చేయడానికి వాటిని నిర్ధారించండి."
+
+#: app/templates/public/how_to_use.html:22
+msgid "Receive Cash:"
+msgstr "నగదు స్వీకరించండి:"
+
+#: app/templates/public/how_to_use.html:22
+msgid ""
+"At the end of the day, use the `Receive Cash` button on your dashboard to"
+" record cash received from staff and reset their balance."
+msgstr "రోజు చివరిలో, సిబ్బంది నుండి స్వీకరించిన నగదును రికార్డ్ చేయడానికి మరియు వారి బ్యాలెన్స్‌ను రీసెట్ చేయడానికి మీ డాష్‌బోర్డ్‌లోని `నగదు స్వీకరించండి` బటన్‌ను ఉపయోగించండి."
+
+#: app/templates/public/how_to_use.html:24
+msgid "Invoicing & Reports"
+msgstr "ఇన్‌వాయిసింగ్ & నివేదికలు"
+
+#: app/templates/public/how_to_use.html:26
+msgid "View All Invoices:"
+msgstr "అన్ని ఇన్‌వాయిస్‌లను చూడండి:"
+
+#: app/templates/public/how_to_use.html:26
+msgid ""
+"Go to `Manager Menu > Invoices` to see a list of all invoices generated. "
+"You can view, download as PDF, or email them to customers directly."
+msgstr "`మేనేజర్ మెనూ > ఇన్‌వాయిస్‌లు`కు వెళ్లి, రూపొందించిన అన్ని ఇన్‌వాయిస్‌ల జాబితాను చూడండి. మీరు వాటిని చూడవచ్చు, PDFగా డౌన్‌లోడ్ చేసుకోవచ్చు లేదా నేరుగా వినియోగదారులకు ఇమెయిల్ చేయవచ్చు."
+
+#: app/templates/public/how_to_use.html:27
+msgid "Generate Reports:"
+msgstr "నివేదికలను రూపొందించండి:"
+
+#: app/templates/public/how_to_use.html:27
+msgid ""
+"The `Reports` button on your dashboard takes you to a powerful reporting "
+"tool. View monthly summaries of your income, expenses, and staff "
+"attendance, or drill down into daily transaction logs."
+msgstr "మీ డాష్‌బోర్డ్‌లోని `నివేదికలు` బటన్ మిమ్మల్ని శక్తివంతమైన రిపోర్టింగ్ సాధనానికి తీసుకువెళుతుంది. మీ ఆదాయం, ఖర్చులు మరియు సిబ్బంది హాజరు యొక్క నెలవారీ సారాంశాలను చూడండి లేదా రోజువారీ లావాదేవీల లాగ్‌లలోకి లోతుగా పరిశీలించండి."
+
+#: app/templates/public/how_to_use.html:34
+msgid "For Staff (Delivery Personnel)"
+msgstr "సిబ్బంది కోసం (డెలివరీ సిబ్బంది)"
+
+#: app/templates/public/how_to_use.html:37
+msgid "Your Dashboard is Your Hub"
+msgstr "మీ డాష్‌బోర్డ్ మీ కేంద్రం"
+
+#: app/templates/public/how_to_use.html:38
+msgid ""
+"Your dashboard is designed for quick actions. You can see your current "
+"cash balance, log deliveries, record expenses, and see pending event "
+"deliveries for the day."
+msgstr "మీ డాష్‌బోర్డ్ త్వరిత చర్యల కోసం రూపొందించబడింది. మీరు మీ ప్రస్తుత నగదు నిల్వను చూడవచ్చు, డెలివరీలను లాగ్ చేయవచ్చు, ఖర్చులను రికార్డ్ చేయవచ్చు మరియు రోజు కోసం పెండింగ్‌లో ఉన్న కార్యక్రమ డెలివరీలను చూడవచ్చు."
+
+#: app/templates/public/how_to_use.html:39
+msgid "Logging a Delivery"
+msgstr "డెలివరీని లాగింగ్ చేయడం"
+
+#: app/templates/public/how_to_use.html:40
+msgid ""
+"Use the search bar to find a customer by name or mobile number. Once they"
+" appear, enter the number of jars delivered. If the customer isn't paying"
+" immediately, check the \"Mark as Due\" box before clicking `Deliver`."
+msgstr "పేరు లేదా మొబైల్ నంబర్ ద్వారా వినియోగదారుని కనుగొనడానికి శోధన పట్టీని ఉపయోగించండి. వారు కనిపించిన తర్వాత, డెలివరీ చేయబడిన కూజాల సంఖ్యను నమోదు చేయండి. వినియోగదారు వెంటనే చెల్లించకపోతే, `డెలివరీ`పై క్లిక్ చేసే ముందు \"చెల్లించవలసినదిగా గుర్తించండి\" పెట్టెను తనిఖీ చేయండి."
+
+#: app/templates/public/how_to_use.html:41
+msgid "Selling New Products"
+msgstr "కొత్త ఉత్పత్తులను అమ్మడం"
+
+#: app/templates/public/how_to_use.html:42
+msgid ""
+"You can sell a new jar or dispenser to a walk-in customer using the `Sell"
+" New Jar / Dispenser` button. The amount will be added to your cash "
+"balance and stock will be updated automatically."
+msgstr "`కొత్త కూజా / డిస్పెన్సర్‌ను అమ్మండి` బటన్‌ను ఉపయోగించి మీరు వాక్-ఇన్ కస్టమర్‌కు కొత్త కూజా లేదా డిస్పెన్సర్‌ను అమ్మవచ్చు. మొత్తం మీ నగదు నిల్వకు జోడించబడుతుంది మరియు స్టాక్ స్వయంచాలకంగా నవీకరించబడుతుంది."
+
+#: app/templates/public/how_to_use.html:48
+msgid "For Customers"
+msgstr "వినియోగదారుల కోసం"
+
+#: app/templates/public/how_to_use.html:51
+msgid ""
+"As a customer, your personal dashboard allows you to manage your account "
+"easily. You can:"
+msgstr "ఒక వినియోగదారుగా, మీ వ్యక్తిగత డాష్‌బోర్డ్ మీ ఖాతాను సులభంగా నిర్వహించడానికి మిమ్మల్ని అనుమతిస్తుంది. మీరు చేయగలరు:"
+
+#: app/templates/public/how_to_use.html:53
+msgid ""
+"View your complete activity history, including past deliveries and event "
+"bookings."
+msgstr "గత డెలివరీలు మరియు కార్యక్రమ బుకింగ్‌లతో సహా మీ పూర్తి కార్యాచరణ చరిత్రను చూడండి."
+
+#: app/templates/public/how_to_use.html:54
+msgid "See any outstanding due amounts."
+msgstr "ఏవైనా బకాయి ఉన్న మొత్తాలను చూడండి."
+
+#: app/templates/public/how_to_use.html:55
+msgid "View and download all your past invoices from the `Invoices` tab."
+msgstr "`ఇన్‌వాయిస్‌లు` ట్యాబ్ నుండి మీ గత ఇన్‌వాయిస్‌లన్నింటినీ చూడండి మరియు డౌన్‌లోడ్ చేయండి."
+
+#: app/templates/public/how_to_use.html:56
+msgid ""
+"Quickly request extra jars for daily use or book jars in bulk for an "
+"upcoming event."
+msgstr "రోజువారీ ఉపయోగం కోసం అదనపు కూజాలను త్వరగా అభ్యర్థించండి లేదా రాబోయే కార్యక్రమం కోసం పెద్దమొత్తంలో కూజాలను బుక్ చేయండి."
+
+#: app/templates/public/index.html:10
+msgid "The All-in-One Platform to Run Your Water Supply Business"
+msgstr "మీ నీటి సరఫరా వ్యాపారాన్ని నడపడానికి ఆల్-ఇన్-వన్ ప్లాట్‌ఫారమ్"
+
+#: app/templates/public/index.html:11
+msgid ""
+"Aquajal is a complete SaaS solution that helps you automate sales, manage"
+" subscriptions, generate invoices, track inventory, and monitor staff "
+"performance effortlessly."
+msgstr "ఆక్వాజల్ అనేది ఒక పూర్తి SaaS పరిష్కారం, ఇది మీకు అమ్మకాలను ఆటోమేట్ చేయడానికి, చందాలను నిర్వహించడానికి, ఇన్‌వాయిస్‌లను రూపొందించడానికి, ఇన్వెంటరీని ట్రాక్ చేయడానికి మరియు సిబ్బంది పనితీరును అప్రయత్నంగా పర్యవేక్షించడానికి సహాయపడుతుంది."
+
+#: app/templates/public/index.html:14
+msgid "Full SaaS Platform:"
+msgstr "పూర్తి SaaS ప్లాట్‌ఫారమ్:"
+
+#: app/templates/public/index.html:14
+msgid ""
+"Manage your business with a 40-day free trial and flexible subscription "
+"plans."
+msgstr "40-రోజుల ఉచిత ట్రయల్ మరియు సౌకర్యవంతమైన చందా ప్రణాళికలతో మీ వ్యాపారాన్ని నిర్వహించండి."
+
+#: app/templates/public/index.html:15
+msgid "Automated Invoicing:"
+msgstr "ఆటోమేటెడ్ ఇన్‌వాయిసింగ్:"
+
+#: app/templates/public/index.html:15
+msgid ""
+"Generate, download, and email PDF invoices to your customers "
+"automatically."
+msgstr "మీ వినియోగదారులకు స్వయంచాలకంగా PDF ఇన్‌వాయిస్‌లను రూపొందించండి, డౌన్‌లోడ్ చేయండి మరియు ఇమెయిల్ చేయండి."
+
+#: app/templates/public/index.html:16
+msgid "Advanced Reporting:"
+msgstr "అధునాతన రిపోర్టింగ్:"
+
+#: app/templates/public/index.html:16
+msgid "Get daily and monthly insights on sales, expenses, and staff attendance."
+msgstr "అమ్మకాలు, ఖర్చులు మరియు సిబ్బంది హాజరుపై రోజువారీ మరియు నెలవారీ అంతర్దృష్టులను పొందండి."
+
+#: app/templates/public/index.html:17
+msgid "Customer & Staff Portals:"
+msgstr "వినియోగదారు & సిబ్బంది పోర్టల్స్:"
+
+#: app/templates/public/index.html:17
+msgid "Empower customers to view history and staff to log deliveries on the go."
+msgstr "వినియోగదారులకు చరిత్రను చూడటానికి మరియు సిబ్బందికి ప్రయాణంలో డెలివరీలను లాగ్ చేయడానికి అధికారం ఇవ్వండి."
+
+#: app/templates/public/index.html:21
+msgid "Start Your 40-Day Free Trial"
+msgstr "మీ 40-రోజుల ఉచిత ట్రయల్‌ను ప్రారంభించండి"
+
+#: app/templates/public/index.html:29
+msgid "A Modern Platform Built for Growth"
+msgstr "వృద్ధి కోసం నిర్మించిన ఆధునిక ప్లాట్‌ఫారమ్"
+
+#: app/templates/public/index.html:35
+msgid "Professional Invoicing"
+msgstr "వృత్తిపరమైన ఇన్‌వాయిసింగ్"
+
+#: app/templates/public/index.html:36
+msgid ""
+"Automate invoice creation for every transaction, including monthly "
+"summaries and event bookings. Email professional PDF invoices directly to"
+" clients."
+msgstr "నెలవారీ సారాంశాలు మరియు కార్యక్రమ బుకింగ్‌లతో సహా ప్రతి లావాదేవీకి ఇన్‌వాయిస్ సృష్టిని ఆటోమేట్ చేయండి. క్లయింట్‌లకు నేరుగా వృత్తిపరమైన PDF ఇన్‌వాయిస్‌లను ఇమెయిల్ చేయండి."
+
+#: app/templates/public/index.html:42
+msgid "Subscription Management"
+msgstr "చందా నిర్వహణ"
+
+#: app/templates/public/index.html:43
+msgid ""
+"Offer flexible subscription plans with a 40-day free trial. Securely "
+"accept online payments with our integrated Razorpay checkout system."
+msgstr "40-రోజుల ఉచిత ట్రయల్‌తో సౌకర్యవంతమైన చందా ప్రణాళికలను ఆఫర్ చేయండి. మా ఇంటిగ్రేటెడ్ రేజర్‌పే చెక్అవుట్ సిస్టమ్‌తో ఆన్‌లైన్ చెల్లింపులను సురక్షితంగా అంగీకరించండి."
+
+#: app/templates/public/index.html:49
+msgid "Insightful Reports"
+msgstr "అంతర్దృష్టిగల నివేదికలు"
+
+#: app/templates/public/index.html:50
+msgid ""
+"Make data-driven decisions with comprehensive reports on sales, expenses,"
+" staff performance, and even new customer leads."
+msgstr "అమ్మకాలు, ఖర్చులు, సిబ్బంది పనితీరు మరియు కొత్త వినియోగదారుల లీడ్స్‌పై సమగ్ర నివేదికలతో డేటా-ఆధారిత నిర్ణయాలు తీసుకోండి."
+
+#: app/templates/public/index.html:57
+msgid "Pricing"
+msgstr "ధర"
+
+#: app/templates/public/index.html:58
+msgid ""
+"Choose a plan that fits your needs. Our monthly subscription costs less "
+"than a single day's labor, and all plans start with a 40-day free trial."
+msgstr "మీ అవసరాలకు సరిపోయే ప్రణాళికను ఎంచుకోండి. మా నెలవారీ చందా ఒక రోజు కూలి కంటే తక్కువ ఖర్చవుతుంది మరియు అన్ని ప్రణాళికలు 40-రోజుల ఉచిత ట్రయల్‌తో ప్రారంభమవుతాయి."
+
+#: app/templates/public/index.html:68
+msgid "days"
+msgstr "రోజులు"
+
+#: app/templates/public/index.html:70
+msgid "Regular Price:"
+msgstr "సాధారణ ధర:"
+
+#: app/templates/public/index.html:71
+msgid "Manage Unlimited Staff"
+msgstr "అపరిమిత సిబ్బందిని నిర్వహించండి"
+
+#: app/templates/public/index.html:72
+msgid "Manage Unlimited Customers"
+msgstr "అపరిమిత వినియోగదారులను నిర్వహించండి"
+
+#: app/templates/public/index.html:73
+msgid "Automated Invoicing & Reports"
+msgstr "ఆటోమేటెడ్ ఇన్‌వాయిసింగ్ & నివేదికలు"
+
+#: app/templates/public/index.html:74
+msgid "Email Support"
+msgstr "ఇమెయిల్ మద్దతు"
+
+#: app/templates/public/index.html:76
+msgid "After the initial offer, renewals are at the regular price."
+msgstr "ప్రారంభ ఆఫర్ తర్వాత, పునరుద్ధరణలు సాధారణ ధర వద్ద ఉంటాయి."
+
+#: app/templates/public/index.html:77
+msgid "Start Free Trial"
+msgstr "ఉచిత ట్రయల్‌ను ప్రారంభించండి"
+
+#: app/templates/public/index.html:86
+msgid "Frequently Asked Questions"
+msgstr "తరచుగా అడిగే ప్రశ్నలు"
+
+#: app/templates/public/index.html:91
+msgid "What happens after my 40-day free trial ends?"
+msgstr "నా 40-రోజుల ఉచిత ట్రయల్ ముగిసిన తర్వాత ఏమి జరుగుతుంది?"
+
+#: app/templates/public/index.html:96
+msgid ""
+"After your trial, you will be prompted to choose a subscription plan to "
+"continue using the service. All your data—staff, customers, and "
+"reports—will be saved and waiting for you. We accept online payments "
+"through Razorpay."
+msgstr "మీ ట్రయల్ తర్వాత, సేవను ఉపయోగించడం కొనసాగించడానికి ఒక చందా ప్రణాళికను ఎంచుకోమని మిమ్మల్ని అడగబడుతుంది. మీ మొత్తం డేటా—సిబ్బంది, వినియోగదారులు మరియు నివేదికలు—సేవ్ చేయబడుతుంది మరియు మీ కోసం వేచి ఉంటుంది. మేము రేజర్‌పే ద్వారా ఆన్‌లైన్ చెల్లింపులను అంగీకరిస్తాము."
+
+#: app/templates/public/index.html:103
+msgid "How does the automated invoicing work?"
+msgstr "ఆటోమేటెడ్ ఇన్‌వాయిసింగ్ ఎలా పనిచేస్తుంది?"
+
+#: app/templates/public/index.html:108
+msgid ""
+"Aquajal automatically generates an invoice for every transaction, such as"
+" a daily delivery or an event booking. Managers can also generate "
+"consolidated monthly invoices for customers, download them as PDFs, or "
+"email them directly from the dashboard."
+msgstr "ఆక్వాజల్ ప్రతి లావాదేవీకి, రోజువారీ డెలివరీ లేదా కార్యక్రమ బుకింగ్ వంటి వాటికి స్వయంచాలకంగా ఒక ఇన్‌వాయిస్‌ను రూపొందిస్తుంది. మేనేజర్లు వినియోగదారుల కోసం ఏకీకృత నెలవారీ ఇన్‌వాయిస్‌లను కూడా రూపొందించవచ్చు, వాటిని PDFలుగా డౌన్‌లోడ్ చేసుకోవచ్చు లేదా డాష్‌బోర్డ్ నుండి నేరుగా ఇమెయిల్ చేయవచ్చు."
+
+#: app/templates/public/index.html:115
+msgid "Can I use this on my phone?"
+msgstr "నేను దీన్ని నా ఫోన్‌లో ఉపయోగించవచ్చా?"
+
+#: app/templates/public/index.html:120
+msgid ""
+"Yes! Aquajal is a Progressive Web App (PWA), which means you can add it "
+"to your phone's home screen and use it just like a native application. "
+"It's designed to be fully responsive and works great on any device."
+msgstr "అవును! ఆక్వాజల్ ఒక ప్రగతిశీల వెబ్ యాప్ (PWA), అంటే మీరు దీన్ని మీ ఫోన్ హోమ్ స్క్రీన్‌కు జోడించి, దాన్ని ఒక స్థానిక అనువర్తనంలాగే ఉపయోగించవచ్చు. ఇది పూర్తిగా ప్రతిస్పందించేలా రూపొందించబడింది మరియు ఏ పరికరంలోనైనా అద్భుతంగా పనిచేస్తుంది."

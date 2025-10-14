@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Welcome, {{ current_user.name }}!</h2>
+<h2>{{ _('Welcome,') }} {{ current_user.name }}!</h2>
 <hr>
 
 {% if due_amount > 0 %}
 <div class="alert alert-danger shadow-sm">
-    <h4 class="alert-heading">Outstanding Balance</h4>
-    <p>You have a due amount of <strong>₹{{ "%.2f"|format(due_amount) }}</strong>. Please clear it with the delivery staff by the end of the month to avoid any interruptions in service.</p>
+    <h4 class="alert-heading">{{ _('Outstanding Balance') }}</h4>
+    <p>{{ _('You have a due amount of') }} <strong>₹{{ "%.2f"|format(due_amount) }}</strong>. {{ _('Please clear it with the delivery staff by the end of the month to avoid any interruptions in service.') }}</p>
 </div>
 {% endif %}
 
 <div class="row">
     <div class="col-md-4">
-        <h4>Quick Actions</h4>
+        <h4>{{ _('Quick Actions') }}</h4>
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Request Daily Jars</h5>
+                <h5 class="card-title">{{ _('Request Daily Jars') }}</h5>
                 <form action="{{ url_for('customer.request_jar') }}" method="post">
                     {{ jar_form.hidden_tag() }}
                     <div class="mb-2">{{ jar_form.quantity.label }} {{ jar_form.quantity(class="form-control") }}</div>
@@ -26,7 +26,7 @@
         </div>
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Book for an Event</h5>
+                <h5 class="card-title">{{ _('Book for an Event') }}</h5>
                 <form action="{{ url_for('customer.book_event') }}" method="post">
                     {{ event_form.hidden_tag() }}
                     <div class="mb-2">{{ event_form.quantity.label }} {{ event_form.quantity(class="form-control") }}</div>
@@ -40,10 +40,10 @@
     <div class="col-md-8">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">My Activity</button>
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">{{ _('My Activity') }}</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button">Invoices</button>
+                <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button">{{ _('Invoices') }}</button>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -55,50 +55,50 @@
                             {% if activity.type == 'Regular Delivery' or activity.type == 'Requested Delivery' %}
                                 <div class="d-flex w-100 justify-content-between">
                                     <div>
-                                        <strong>{{ item.jars_delivered }} jar(s)</strong> delivered on {{(item.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
-                                        <small class="d-block text-muted">{{ activity.type }}</small>
+                                        <strong>{{ item.jars_delivered }} {{ _('jar(s)') }}</strong> {{ _('delivered on') }} {{(item.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
+                                        <small class="d-block text-muted">{{ _(activity.type) }}</small>
                                     </div>
                                     <div class="text-end">
-                                        Amount: ₹{{ "%.2f"|format(item.amount_collected) }}
+                                        {{ _('Amount:') }} ₹{{ "%.2f"|format(item.amount_collected) }}
                                         {% if item.payment_status == 'Due' %}
-                                            <span class="badge bg-danger ms-1">Due</span>
+                                            <span class="badge bg-danger ms-1">{{ _('Due') }}</span>
                                         {% else %}
-                                            <span class="badge bg-success ms-1">Paid</span>
+                                            <span class="badge bg-success ms-1">{{ _('Paid') }}</span>
                                         {% endif %}
                                     </div>
                                 </div>
                             {% elif activity.type == 'Booking Delivery' %}
                                 <div class="d-flex w-100 justify-content-between">
                                     <div>
-                                        Booked <strong>{{ item.quantity }} Jar(s)</strong>
-                                        {% if item.dispensers_booked > 0 %}+ <strong>{{ item.dispensers_booked }} Dispenser(s)</strong>{% endif %}
-                                        for event on {{ item.event_date.strftime('%d-%b-%Y') }}
-                                        <small class="d-block text-muted">Booking Delivery</small>
+                                        {{ _('Booked') }} <strong>{{ item.quantity }} {{ _('Jar(s)') }}</strong>
+                                        {% if item.dispensers_booked > 0 %}+ <strong>{{ item.dispensers_booked }} {{ _('Dispenser(s)') }}</strong>{% endif %}
+                                        {{ _('for event on') }} {{ item.event_date.strftime('%d-%b-%Y') }}
+                                        <small class="d-block text-muted">{{ _('Booking Delivery') }}</small>
                                     </div>
-                                    <span class="badge bg-warning my-auto">{{ item.status }}</span>
+                                    <span class="badge bg-warning my-auto">{{ _(item.status) }}</span>
                                 </div>
                                 {% if item.status == 'Completed' %}
                                     <hr class="my-2">
                                     <small class="d-block">
-                                        Returned: {{ item.jars_returned }} Jars, {{ item.dispensers_returned or 0 }} Dispensers.
+                                        {{ _('Returned:') }} {{ item.jars_returned }} {{ _('Jars') }}, {{ item.dispensers_returned or 0 }} {{ _('Dispensers') }}.
                                         {% set lost_jars = item.quantity - item.jars_returned %}
                                         {% set lost_dispensers = (item.dispensers_booked or 0) - (item.dispensers_returned or 0) %}
                                         {% if lost_jars > 0 or lost_dispensers > 0 %}
                                             <span class="text-danger">
-                                                Lost:
-                                                {% if lost_jars > 0 %}{{ lost_jars }} Jar(s){% endif %}
-                                                {% if lost_dispensers > 0 %}, {{ lost_dispensers }} Dispenser(s){% endif %}
+                                                {{ _('Lost:') }}
+                                                {% if lost_jars > 0 %}{{ lost_jars }} {{ _('Jar(s)') }}{% endif %}
+                                                {% if lost_dispensers > 0 %}, {{ lost_dispensers }} {{ _('Dispenser(s)') }}{% endif %}
                                             </span>
                                         {% endif %}
                                     </small>
-                                    <small class="d-block"><strong>Final Settled Amount: ₹{{ "%.2f"|format(item.final_amount) }}</strong></small>
+                                    <small class="d-block"><strong>{{ _('Final Settled Amount:') }} ₹{{ "%.2f"|format(item.final_amount) }}</strong></small>
                                 {% elif item.amount %}
-                                    <small class="d-block">Confirmed Amount: ₹{{ "%.2f"|format(item.amount) }}</small>
+                                    <small class="d-block">{{ _('Confirmed Amount:') }} ₹{{ "%.2f"|format(item.amount) }}</small>
                                 {% endif %}
                             {% endif %}
                         </li>
                     {% else %}
-                        <li class="list-group-item">No recent activity found.</li>
+                        <li class="list-group-item">{{ _('No recent activity found.') }}</li>
                     {% endfor %}
                 </ul>
                 {% if total_activity_pages > 1 %}
@@ -118,16 +118,16 @@
                     {% for invoice in invoices_pagination.items %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>#{{ invoice.invoice_number }}</strong> - Issued: {{ invoice.issue_date.strftime('%d-%b-%Y') }}
-                            <span class="d-block">Amount: ₹{{ "%.2f"|format(invoice.total_amount) }}</span>
+                            <strong>#{{ invoice.invoice_number }}</strong> - {{ _('Issued:') }} {{ invoice.issue_date.strftime('%d-%b-%Y') }}
+                            <span class="d-block">{{ _('Amount:') }} ₹{{ "%.2f"|format(invoice.total_amount) }}</span>
                         </div>
                         <div>
-                            <a href="{{ url_for('invoices.view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
-                            <a href="{{ url_for('invoices.download_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary">Download</a>
+                            <a href="{{ url_for('invoices.view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-secondary">{{ _('View') }}</a>
+                            <a href="{{ url_for('invoices.download_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Download') }}</a>
                         </div>
                     </li>
                     {% else %}
-                    <li class="list-group-item">No invoices found.</li>
+                    <li class="list-group-item">{{ _('No invoices found.') }}</li>
                     {% endfor %}
                 </ul>
                 {% if invoices_pagination.pages > 1 %}

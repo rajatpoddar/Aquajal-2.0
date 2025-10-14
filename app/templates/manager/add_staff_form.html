@@ -29,7 +29,7 @@
                 {% for error in form.daily_wage.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
             </div>
             <hr>
-             <p class="text-muted">Set initial password</p>
+             <p class="text-muted">{{ _('Set initial password') }}</p>
              <div class="row">
                 <div class="col-md-6 mb-3">
                     {{ form.password.label(class="form-label") }}
@@ -51,7 +51,7 @@
             
             <div>
                 {{ form.submit(class="btn btn-primary") }}
-                <a href="{{ url_for('manager.staff_list') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('manager.staff_list') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
             </div>
         </form>
     </div>

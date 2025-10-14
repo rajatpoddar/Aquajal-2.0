@@ -4,18 +4,18 @@
 <div class="container">
     <div class="d-flex justify-content-end mb-3">
         <a href="{{ url_for('delivery.book_event') }}" class="btn btn-info me-2">
-            <i class="bi bi-calendar-plus-fill"></i> Book Jars for Event
+            <i class="bi bi-calendar-plus-fill"></i> {{ _('Book Jars for Event') }}
         </a>
         <a href="{{ url_for('sales.new_product_sale') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle-fill"></i> Sell New Jar / Dispenser
+            <i class="bi bi-plus-circle-fill"></i> {{ _('Sell New Jar / Dispenser') }}
         </a>
     </div>
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <h5 class="card-title">Supply Jar</h5>
+            <h5 class="card-title">{{ _('Supply Jar') }}</h5>
             <div class="input-group">
-                {{ search_form.search_term(id="customer-search-input", class="form-control form-control-lg", placeholder="Start typing a name or mobile number...") }}
+                {{ search_form.search_term(id="customer-search-input", class="form-control form-control-lg", placeholder=_('Start typing a name or mobile number...')) }}
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
         <div class="col-md-6 mb-3">
             <div class="card text-center text-white bg-success shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Your Current Cash Balance</h5>
+                    <h5 class="card-title">{{ _('Your Current Cash Balance') }}</h5>
                     <p class="card-text display-4">₹{{ "%.2f"|format(current_user.cash_balance if current_user.cash_balance is not none else 0.0) }}</p>
                 </div>
             </div>
@@ -35,14 +35,14 @@
         <div class="col-md-6 mb-3">
             <div class="card shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Add an Expense</h5>
+                    <h5 class="card-title">{{ _('Add an Expense') }}</h5>
                     <form action="{{ url_for('delivery.add_expense') }}" method="post" class="row g-3 align-items-center">
                         {{ expense_form.hidden_tag() }}
                         <div class="col-sm-4">
-                            {{ expense_form.amount(class="form-control", placeholder="Amount") }}
+                            {{ expense_form.amount(class="form-control", placeholder=_('Amount')) }}
                         </div>
                         <div class="col-sm-5">
-                            {{ expense_form.description(class="form-control", placeholder="Description") }}
+                            {{ expense_form.description(class="form-control", placeholder=_('Description')) }}
                         </div>
                         <div class="col-sm-3">
                             {{ expense_form.submit_expense(class="btn btn-warning w-100") }}
@@ -55,7 +55,7 @@
 
     <div class="row">
         <div class="col-md-6">
-            <h4 class="mt-4">Customers with Dues</h4>
+            <h4 class="mt-4">{{ _('Customers with Dues') }}</h4>
             <div class="list-group mb-4">
                 {% for customer in customers_with_dues %}
                 <div class="list-group-item">
@@ -63,28 +63,28 @@
                         <div>
                             <h5 class="mb-1">{{ customer.name }}</h5>
                             <p class="mb-1">
-                                <strong class="text-danger">Due: ₹{{ "%.2f"|format(customer.due_amount) }}</strong>
+                                <strong class="text-danger">{{ _('Due:') }} ₹{{ "%.2f"|format(customer.due_amount) }}</strong>
                             </p>
                             <small><i class="bi bi-geo-alt-fill"></i> {{ customer.area }}, {{ customer.village }}</small>
                         </div>
                         <div class="my-auto">
-                             <form action="{{ url_for('delivery.clear_dues') }}" method="post" onsubmit="return confirm('Confirm you have received ₹{{ customer.due_amount }} from {{ customer.name }}?');">
+                             <form action="{{ url_for('delivery.clear_dues') }}" method="post" onsubmit="return confirm('{{ _('Confirm you have received') }} ₹{{ customer.due_amount }} {{ _('from') }} {{ customer.name }}?');">
                                 {{ clear_dues_form.hidden_tag() }}
                                 <input type="hidden" name="customer_id" value="{{ customer.id }}">
                                 <button type="submit" class="btn btn-sm btn-success">
-                                    <i class="bi bi-check-circle-fill"></i> Mark as Paid
+                                    <i class="bi bi-check-circle-fill"></i> {{ _('Mark as Paid') }}
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <div class="list-group-item">No customers have outstanding dues.</div>
+                <div class="list-group-item">{{ _('No customers have outstanding dues.') }}</div>
                 {% endfor %}
             </div>
         </div>
         <div class="col-md-6">
-            <h4 class="mt-4">Event Jars to Collect</h4>
+            <h4 class="mt-4">{{ _('Event Jars to Collect') }}</h4>
             <div class="list-group mb-4">
                 {% for booking in bookings_to_collect %}
                 <div class="list-group-item list-group-item-action">
@@ -92,10 +92,10 @@
                         <div class="col-md-5">
                             <h5 class="mb-1">{{ booking.customer.name }}</h5>
                             <p class="mb-1">
-                                <i class="bi bi-box-seam"></i> <strong>{{ booking.quantity }} Jars</strong>
+                                <i class="bi bi-box-seam"></i> <strong>{{ booking.quantity }} {{ _('Jars') }}</strong>
                                 {# FIX: Check if dispensers_booked is not None #}
                                 {% if booking.dispensers_booked and booking.dispensers_booked > 0 %}
-                                + <strong>{{ booking.dispensers_booked }} Dispenser(s)</strong>
+                                + <strong>{{ booking.dispensers_booked }} {{ _('Dispenser(s)') }}</strong>
                                 {% endif %}
                             </p>
                             <small><i class="bi bi-geo-alt-fill"></i> {{ booking.customer.area }}, {{ booking.customer.village }}</small>
@@ -103,27 +103,27 @@
                         <div class="col-md-7">
                             <form action="{{ url_for('delivery.collect_event_jars', booking_id=booking.id) }}" method="post" class="row g-2 align-items-center justify-content-end">
                                 <div class="col-auto">
-                                    <label for="jars_returned-{{ booking.id }}" class="col-form-label">Jars Ret:</label>
+                                    <label for="jars_returned-{{ booking.id }}" class="col-form-label">{{ _('Jars Ret:') }}</label>
                                     <input type="number" name="jars_returned" id="jars_returned-{{ booking.id }}" class="form-control" value="{{ booking.quantity }}" min="0" max="{{ booking.quantity }}" style="width: 80px;">
                                 </div>
                                 {# FIX: Check if dispensers_booked is not None #}
                                 {% if booking.dispensers_booked and booking.dispensers_booked > 0 %}
                                 <div class="col-auto">
-                                    <label for="dispensers_returned-{{ booking.id }}" class="col-form-label">Dispen Ret:</label>
+                                    <label for="dispensers_returned-{{ booking.id }}" class="col-form-label">{{ _('Dispen Ret:') }}</label>
                                     <input type="number" name="dispensers_returned" id="dispensers_returned-{{ booking.id }}" class="form-control" value="{{ booking.dispensers_booked }}" min="0" max="{{ booking.dispensers_booked }}" style="width: 80px;">
                                 </div>
                                 {% else %}
                                     <input type="hidden" name="dispensers_returned" value="0">
                                 {% endif %}
                                 <div class="col-auto">
-                                     <button type="submit" class="btn btn-primary"><i class="bi bi-check-all"></i> Collect</button>
+                                     <button type="submit" class="btn btn-primary"><i class="bi bi-check-all"></i> {{ _('Collect') }}</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <div class="list-group-item">No event items pending collection.</div>
+                <div class="list-group-item">{{ _('No event items pending collection.') }}</div>
                 {% endfor %}
             </div>
         </div>
@@ -132,30 +132,30 @@
 
     <div class="row mt-4 mb-4">
         <div class="col-md-6 mb-3">
-            <h4>Pending Jar Requests</h4>
+            <h4>{{ _('Pending Jar Requests') }}</h4>
             <div class="list-group">
                 {% for req in jar_requests %}
                 <div class="list-group-item">
                     <div class="d-flex w-100 justify-content-between">
                         <div>
                             <h5 class="mb-1">{{ req.customer.name }}</h5>
-                            <p class="mb-1">Wants <strong>{{ req.quantity }} jar(s)</strong></p>
+                            <p class="mb-1">{{ _('Wants') }} <strong>{{ req.quantity }} {{ _('jar(s)') }}</strong></p>
                             <small>{{ req.customer.area }}, {{ req.customer.village }}</small>
                         </div>
                         <div class="my-auto">
-                            <a href="{{ url_for('delivery.confirm_jar_request', request_id=req.id) }}" class="btn btn-sm btn-success" onclick="return confirm('Confirm delivery of {{req.quantity}} jar(s) to {{req.customer.name}}?')">
-                                <i class="bi bi-check-circle-fill"></i> Delivered
+                            <a href="{{ url_for('delivery.confirm_jar_request', request_id=req.id) }}" class="btn btn-sm btn-success" onclick="return confirm('{{ _('Confirm delivery of %(qty)s jar(s) to %(name)s?', qty=req.quantity, name=req.customer.name) }}');">
+                                <i class="bi bi-check-circle-fill"></i> {{ _('Delivered') }}
                             </a>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <div class="list-group-item">No pending jar requests.</div>
+                <div class="list-group-item">{{ _('No pending jar requests.') }}</div>
                 {% endfor %}
             </div>
         </div>
         <div class="col-md-6">
-            <h4>Today's Event Deliveries</h4>
+            <h4>{{ _('Today\'s Event Deliveries') }}</h4>
             <div class="list-group">
                 {% for event in event_bookings_today %}
                 <div class="list-group-item list-group-item-warning">
@@ -164,23 +164,23 @@
                             <h5 class="mb-1">{{ event.customer.name }}</h5>
                             <a href="tel:{{ event.customer.mobile_number }}" class="text-decoration-none text-dark">{{ event.customer.mobile_number }}</a>
                             <p class="mb-1">
-                                <strong>{{ event.quantity }} Jars</strong>
+                                <strong>{{ event.quantity }} {{ _('Jars') }}</strong>
                                 {# FIX: Check if dispensers_booked is not None #}
-                                {% if event.dispensers_booked and event.dispensers_booked > 0 %}+ <strong>{{ event.dispensers_booked }} Dispenser(s)</strong>{% endif %}
-                                for event. Amount: ₹{{ "%.2f"|format(event.amount) }}
+                                {% if event.dispensers_booked and event.dispensers_booked > 0 %}+ <strong>{{ event.dispensers_booked }} {{ _('Dispenser(s)') }}</strong>{% endif %}
+                                {{ _('for event. Amount:') }} ₹{{ "%.2f"|format(event.amount) }}
                             </p>
                             <small>{{ event.customer.area }}, {{ event.customer.village }}</small><br>
-                            {% if event.paid_to_manager %}<span class="badge bg-secondary">Pre-Paid to Manager</span>{% else %}<span class="badge bg-danger">Collect Payment</span>{% endif %}
+                            {% if event.paid_to_manager %}<span class="badge bg-secondary">{{ _('Pre-Paid to Manager') }}</span>{% else %}<span class="badge bg-danger">{{ _('Collect Payment') }}</span>{% endif %}
                         </div>
                         <div class="my-auto">
-                            <a href="{{ url_for('delivery.confirm_event_delivery', booking_id=event.id) }}" class="btn btn-sm btn-success" onclick="return confirm('Confirm EVENT delivery to {{event.customer.name}}?')">
-                                 <i class="bi bi-check-circle-fill"></i> Delivered
+                            <a href="{{ url_for('delivery.confirm_event_delivery', booking_id=event.id) }}" class="btn btn-sm btn-success" onclick="return confirm('{{ _('Confirm EVENT delivery to %(name)s?', name=event.customer.name) }}');">
+                                 <i class="bi bi-check-circle-fill"></i> {{ _('Delivered') }}
                             </a>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <div class="list-group-item">No event deliveries for today.</div>
+                <div class="list-group-item">{{ _('No event deliveries for today.') }}</div>
                 {% endfor %}
             </div>
         </div>
@@ -216,12 +216,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <div class="col-md-5">
                                             <h5 class="mb-1">${customer.name}</h5>
                                             <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> ${customer.area}, ${customer.village}</p>
-                                            <small>Default: ${customer.daily_jars} Jar(s) at ₹${price}</small>
+                                            <small>{{ _('Default:') }} ${customer.daily_jars} {{ _('Jar(s) at') }} ₹${price}</small>
                                         </div>
                                         <div class="col-md-7">
                                             <form action="/log_delivery/${customer.id}" method="post" class="row g-2 align-items-center justify-content-end">
                                                 <div class="col-auto">
-                                                    <label for="jars_delivered-${customer.id}" class="col-form-label">Jars:</label>
+                                                    <label for="jars_delivered-${customer.id}" class="col-form-label">{{ _('Jars:') }}</label>
                                                 </div>
                                                 <div class="col-auto">
                                                     <input type="number" name="jars_delivered" id="jars_delivered-${customer.id}" class="form-control" value="${customer.daily_jars}" style="width: 80px;">
@@ -229,11 +229,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <div class="col-auto">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input" type="checkbox" role="switch" name="is_due" value="true" id="is_due-${customer.id}">
-                                                        <label class="form-check-label" for="is_due-${customer.id}">Mark as Due</label>
+                                                        <label class="form-check-label" for="is_due-${customer.id}">{{ _('Mark as Due') }}</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                     <button type="submit" class="btn btn-success"><i class="bi bi-truck"></i> Deliver</button>
+                                                     <button type="submit" class="btn btn-success"><i class="bi bi-truck"></i> {{ _('Deliver') }}</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             `;
                         });
                     } else {
-                        html = '<div class="alert alert-warning">No customers found.</div>';
+                        html = `<div class="alert alert-warning">{{ _('No customers found.') }}</div>`;
                     }
                     resultsContainer.innerHTML = html;
                 })

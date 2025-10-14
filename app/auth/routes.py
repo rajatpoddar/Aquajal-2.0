@@ -9,12 +9,13 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from sqlalchemy import or_ # Import 'or_' for combined queries
+from flask_babel import _, lazy_gettext as _l
 
 class LoginForm(FlaskForm):
-    username = StringField('Username or Mobile Number', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    username = StringField(_l('Username or Mobile Number'), validators=[DataRequired()])
+    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    remember_me = BooleanField(_l('Remember Me'))
+    submit = SubmitField(_l('Sign In'))
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -51,10 +52,10 @@ def login():
                 next_page = url_for('home')
             return redirect(next_page)
         else:
-            flash('Invalid username/mobile or password')
+            flash(_('Invalid username/mobile or password'))
             return redirect(url_for('auth.login'))
         
-    return render_template('auth/login.html', title='Sign In', form=form)
+    return render_template('auth/login.html', title=_('Sign In'), form=form)
 
 @bp.route('/logout')
 def logout():

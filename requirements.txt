@@ -16,3 +16,4 @@ itsdangerous
 PyJWT
 email-validator
 WeasyPrint
+Flask-Babel

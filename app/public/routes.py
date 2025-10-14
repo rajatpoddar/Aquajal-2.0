@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask_login import login_user, current_user
 from app import db
 from app.public import bp
@@ -9,6 +9,7 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationE
 import random
 import string
 from app.email import send_password_reset_email, send_registration_email
+from flask import current_app
 
 class RegistrationForm(FlaskForm):
     owner_name = StringField('Your Name', validators=[DataRequired()])
@@ -147,3 +148,9 @@ def reset_password(token):
 @bp.route('/offline')
 def offline():
     return render_template('public/offline.html', title='Offline')
+
+@bp.route('/language/<language>')
+def set_language(language=None):
+    if language in current_app.config['LANGUAGES']:
+        session['language'] = language
+    return redirect(request.referrer or url_for('public.index'))

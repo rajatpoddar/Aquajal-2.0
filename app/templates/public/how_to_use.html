@@ -2,58 +2,58 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="display-4 text-center mb-5">How to Use Aquajal</h1>
+    <h1 class="display-4 text-center mb-5">{{ _('How to Use Aquajal') }}</h1>
 
     <div class="card shadow-sm mb-5">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">For Managers</h3>
+            <h3 class="mb-0">{{ _('For Managers') }}</h3>
         </div>
         <div class="card-body">
-            <h5 class="card-title">1. Setting Up Your Business</h5>
+            <h5 class="card-title">1. {{ _('Setting Up Your Business') }}</h5>
             <ul>
-                <li><strong>Initial Setup:</strong> After registering, your first step is to set your business's default prices and attendance rules. Go to `Manager Menu > Price Settings` to set prices for new jars/dispensers and define the minimum jar deliveries for a full or half day's wage.</li>
-                <li><strong>Manage Staff:</strong> Use the `Manager Menu > Manage Staff` option to add your delivery personnel. You can set their daily wages and even upload ID proofs.</li>
-                <li><strong>Add Customers:</strong> From the `Manager Menu`, select `Customers` to build your customer list. Here you can set custom jar prices and add special notes for each customer.</li>
+                <li><strong>{{ _('Initial Setup:') }}</strong> {{ _('After registering, your first step is to set your business\'s default prices and attendance rules. Go to `Manager Menu > Price Settings` to set prices for new jars/dispensers and define the minimum jar deliveries for a full or half day\'s wage.') }}</li>
+                <li><strong>{{ _('Manage Staff:') }}</strong> {{ _('Use the `Manager Menu > Manage Staff` option to add your delivery personnel. You can set their daily wages and even upload ID proofs.') }}</li>
+                <li><strong>{{ _('Add Customers:') }}</strong> {{ _('From the `Manager Menu`, select `Customers` to build your customer list. Here you can set custom jar prices and add special notes for each customer.') }}</li>
             </ul>
-            <h5 class="card-title mt-4">2. Daily Operations</h5>
+            <h5 class="card-title mt-4">2. {{ _('Daily Operations') }}</h5>
             <ul>
-                <li><strong>Stock Management:</strong> Keep your inventory updated from the `Manager Dashboard` by clicking on `Manage Stock`. Stock is automatically deducted for sales and confirmed event bookings.</li>
-                <li><strong>Confirm Bookings:</strong> New event bookings will appear on your dashboard. Confirm them to allocate stock and set the final amount.</li>
-                <li><strong>Receive Cash:</strong> At the end of the day, use the `Receive Cash` button on your dashboard to record cash received from staff and reset their balance.</li>
+                <li><strong>{{ _('Stock Management:') }}</strong> {{ _('Keep your inventory updated from the `Manager Dashboard` by clicking on `Manage Stock`. Stock is automatically deducted for sales and confirmed event bookings.') }}</li>
+                <li><strong>{{ _('Confirm Bookings:') }}</strong> {{ _('New event bookings will appear on your dashboard. Confirm them to allocate stock and set the final amount.') }}</li>
+                <li><strong>{{ _('Receive Cash:') }}</strong> {{ _('At the end of the day, use the `Receive Cash` button on your dashboard to record cash received from staff and reset their balance.') }}</li>
             </ul>
-            <h5 class="card-title mt-4">3. Invoicing & Reports</h5>
+            <h5 class="card-title mt-4">3. {{ _('Invoicing & Reports') }}</h5>
             <ul>
-                <li><strong>View All Invoices:</strong> Go to `Manager Menu > Invoices` to see a list of all invoices generated. You can view, download as PDF, or email them to customers directly.</li>
-                <li><strong>Generate Reports:</strong> The `Reports` button on your dashboard takes you to a powerful reporting tool. View monthly summaries of your income, expenses, and staff attendance, or drill down into daily transaction logs.</li>
+                <li><strong>{{ _('View All Invoices:') }}</strong> {{ _('Go to `Manager Menu > Invoices` to see a list of all invoices generated. You can view, download as PDF, or email them to customers directly.') }}</li>
+                <li><strong>{{ _('Generate Reports:') }}</strong> {{ _('The `Reports` button on your dashboard takes you to a powerful reporting tool. View monthly summaries of your income, expenses, and staff attendance, or drill down into daily transaction logs.') }}</li>
             </ul>
         </div>
     </div>
 
     <div class="card shadow-sm mb-5">
         <div class="card-header bg-success text-white">
-            <h3 class="mb-0">For Staff (Delivery Personnel)</h3>
+            <h3 class="mb-0">{{ _('For Staff (Delivery Personnel)') }}</h3>
         </div>
         <div class="card-body">
-            <h5 class="card-title">1. Your Dashboard is Your Hub</h5>
-            <p>Your dashboard is designed for quick actions. You can see your current cash balance, log deliveries, record expenses, and see pending event deliveries for the day.</p>
-            <h5 class="card-title mt-4">2. Logging a Delivery</h5>
-            <p>Use the search bar to find a customer by name or mobile number. Once they appear, enter the number of jars delivered. If the customer isn't paying immediately, check the "Mark as Due" box before clicking `Deliver`.</p>
-             <h5 class="card-title mt-4">3. Selling New Products</h5>
-            <p>You can sell a new jar or dispenser to a walk-in customer using the `Sell New Jar / Dispenser` button. The amount will be added to your cash balance and stock will be updated automatically.</p>
+            <h5 class="card-title">1. {{ _('Your Dashboard is Your Hub') }}</h5>
+            <p>{{ _('Your dashboard is designed for quick actions. You can see your current cash balance, log deliveries, record expenses, and see pending event deliveries for the day.') }}</p>
+            <h5 class="card-title mt-4">2. {{ _('Logging a Delivery') }}</h5>
+            <p>{{ _('Use the search bar to find a customer by name or mobile number. Once they appear, enter the number of jars delivered. If the customer isn\'t paying immediately, check the "Mark as Due" box before clicking `Deliver`.') }}</p>
+             <h5 class="card-title mt-4">3. {{ _('Selling New Products') }}</h5>
+            <p>{{ _('You can sell a new jar or dispenser to a walk-in customer using the `Sell New Jar / Dispenser` button. The amount will be added to your cash balance and stock will be updated automatically.') }}</p>
         </div>
     </div>
 
     <div class="card shadow-sm">
         <div class="card-header bg-info text-white">
-            <h3 class="mb-0">For Customers</h3>
+            <h3 class="mb-0">{{ _('For Customers') }}</h3>
         </div>
         <div class="card-body">
-            <p>As a customer, your personal dashboard allows you to manage your account easily. You can:</p>
+            <p>{{ _('As a customer, your personal dashboard allows you to manage your account easily. You can:') }}</p>
             <ul>
-                <li>View your complete activity history, including past deliveries and event bookings.</li>
-                <li>See any outstanding due amounts.</li>
-                <li>View and download all your past invoices from the `Invoices` tab.</li>
-                <li>Quickly request extra jars for daily use or book jars in bulk for an upcoming event.</li>
+                <li>{{ _('View your complete activity history, including past deliveries and event bookings.') }}</li>
+                <li>{{ _('See any outstanding due amounts.') }}</li>
+                <li>{{ _('View and download all your past invoices from the `Invoices` tab.') }}</li>
+                <li>{{ _('Quickly request extra jars for daily use or book jars in bulk for an upcoming event.') }}</li>
             </ul>
         </div>
     </div>

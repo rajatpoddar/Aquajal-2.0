@@ -1,0 +1,988 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-14 14:13+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/admin/routes.py:53
+msgid "This coupon code already exists."
+msgstr ""
+
+#: app/admin/routes.py:91 app/admin/routes.py:148
+msgid "This username is already taken."
+msgstr ""
+
+#: app/admin/routes.py:97 app/admin/routes.py:154
+msgid "This mobile number is already registered."
+msgstr ""
+
+#: app/admin/routes.py:122
+msgid "Please use a different username."
+msgstr ""
+
+#: app/admin/routes.py:164 app/templates/base.html:65
+msgid "Admin Dashboard"
+msgstr ""
+
+#: app/admin/routes.py:182
+msgid "Your profile has been updated."
+msgstr ""
+
+#: app/admin/routes.py:186 app/templates/base.html:67
+msgid "My Profile"
+msgstr ""
+
+#: app/admin/routes.py:198
+#, python-format
+msgid "Business \"%(name)s\" created successfully."
+msgstr ""
+
+#: app/admin/routes.py:200
+msgid "Create New Business"
+msgstr ""
+
+#: app/admin/routes.py:218
+#, python-format
+msgid "Business \"%(name)s\" details have been updated."
+msgstr ""
+
+#: app/admin/routes.py:235
+#, python-format
+msgid "Subscription updated for \"%(name)s\"."
+msgstr ""
+
+#: app/admin/routes.py:240
+#, python-format
+msgid "Subscription removed for \"%(name)s\". Status set to expired."
+msgstr ""
+
+#: app/admin/routes.py:245
+msgid "Edit Business"
+msgstr ""
+
+#: app/admin/routes.py:256
+#, python-format
+msgid "Stock for \"%(name)s\" has been reset to zero."
+msgstr ""
+
+#: app/admin/routes.py:278
+#, python-format
+msgid "User \"%(username)s\" has been created."
+msgstr ""
+
+#: app/admin/routes.py:280
+msgid "Add New User"
+msgstr ""
+
+#: app/admin/routes.py:317
+#, python-format
+msgid "User \"%(username)s\" has been updated."
+msgstr ""
+
+#: app/admin/routes.py:320
+msgid "Edit User"
+msgstr ""
+
+#: app/admin/routes.py:329
+msgid "Cannot delete the admin user."
+msgstr ""
+
+#: app/admin/routes.py:331
+#, python-format
+msgid "User \"%(username)s\" has been deleted."
+msgstr ""
+
+#: app/admin/routes.py:345
+msgid "Subscription Plans"
+msgstr ""
+
+#: app/admin/routes.py:357
+msgid "New subscription plan has been created."
+msgstr ""
+
+#: app/admin/routes.py:359
+msgid "Add New Plan"
+msgstr ""
+
+#: app/admin/routes.py:373
+msgid "Subscription plan has been updated."
+msgstr ""
+
+#: app/admin/routes.py:375
+msgid "Edit Plan"
+msgstr ""
+
+#: app/admin/routes.py:383
+msgid "Cannot delete plan. It is currently assigned to one or more businesses."
+msgstr ""
+
+#: app/admin/routes.py:387
+#, python-format
+msgid "Plan \"%(name)s\" has been deleted."
+msgstr ""
+
+#: app/admin/routes.py:397
+msgid "Manage Coupons"
+msgstr ""
+
+#: app/admin/routes.py:409
+msgid "New coupon has been created."
+msgstr ""
+
+#: app/admin/routes.py:411
+msgid "Add New Coupon"
+msgstr ""
+
+#: app/admin/routes.py:425
+msgid "Coupon has been updated."
+msgstr ""
+
+#: app/admin/routes.py:427
+msgid "Edit Coupon"
+msgstr ""
+
+#: app/admin/routes.py:436
+#, python-format
+msgid "Coupon \"%(code)s\" has been deleted."
+msgstr ""
+
+#: app/admin/routes.py:449
+#, python-format
+msgid ""
+"Business \"%(name)s\" and all of its associated data have been "
+"permanently deleted."
+msgstr ""
+
+#: app/admin/routes.py:452
+#, python-format
+msgid "Error deleting business: %(error)s"
+msgstr ""
+
+#: app/auth/routes.py:55
+msgid "Invalid username/mobile or password"
+msgstr ""
+
+#: app/auth/routes.py:58 app/templates/auth/login.html:7
+msgid "Sign In"
+msgstr ""
+
+#: app/templates/base.html:10
+msgid ""
+"The all-in-one solution for managing your water jar supply business. "
+"Streamline deliveries, track inventory, and manage staff with ease."
+msgstr ""
+
+#: app/templates/base.html:12
+msgid "The all-in-one solution for managing your water jar supply business."
+msgstr ""
+
+#: app/templates/base.html:62
+msgid "Admin Menu"
+msgstr ""
+
+#: app/templates/base.html:75
+msgid "Manager Menu"
+msgstr ""
+
+#: app/templates/base.html:78
+msgid "Dashboard"
+msgstr ""
+
+#: app/templates/base.html:79
+msgid "Customers"
+msgstr ""
+
+#: app/templates/base.html:80
+msgid "Manage Staff"
+msgstr ""
+
+#: app/templates/base.html:82 app/templates/customer/dashboard.html:46
+msgid "Invoices"
+msgstr ""
+
+#: app/templates/base.html:87
+msgid "My Account & Subscription"
+msgstr ""
+
+#: app/templates/base.html:93
+msgid "My Dashboard"
+msgstr ""
+
+#: app/templates/base.html:98
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base.html:103 app/templates/base.html:162
+msgid "How to Use"
+msgstr ""
+
+#: app/templates/base.html:106 app/templates/base.html:160
+msgid "About Us"
+msgstr ""
+
+#: app/templates/base.html:109
+msgid "Contact Us"
+msgstr ""
+
+#: app/templates/base.html:112 app/templates/public/index.html:22
+msgid "Login"
+msgstr ""
+
+#: app/templates/base.html:115
+msgid "Register"
+msgstr ""
+
+#: app/templates/base.html:154
+msgid ""
+"The complete solution for managing your water supply business efficiently"
+" and effectively."
+msgstr ""
+
+#: app/templates/base.html:159
+msgid "Quick Links"
+msgstr ""
+
+#: app/templates/base.html:164
+msgid "FAQ"
+msgstr ""
+
+#: app/templates/base.html:168
+msgid "Contact"
+msgstr ""
+
+#: app/templates/auth/login.html:23
+msgid "Forgot Password?"
+msgstr ""
+
+#: app/templates/auth/login.html:28
+msgid "New Supplier?"
+msgstr ""
+
+#: app/templates/auth/login.html:28
+msgid "Start your trial here!"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:4
+msgid "Welcome,"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:9
+msgid "Outstanding Balance"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:10
+msgid "You have a due amount of"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:10
+msgid ""
+"Please clear it with the delivery staff by the end of the month to avoid "
+"any interruptions in service."
+msgstr ""
+
+#: app/templates/customer/dashboard.html:16
+msgid "Quick Actions"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:19
+msgid "Request Daily Jars"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:29
+msgid "Book for an Event"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:43
+msgid "My Activity"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:58
+#: app/templates/delivery/dashboard.html:142
+msgid "jar(s)"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:58
+msgid "delivered on"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:62
+#: app/templates/customer/dashboard.html:122
+msgid "Amount:"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:64
+msgid "Due"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:66
+msgid "Paid"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:73
+msgid "Booked"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:73
+#: app/templates/customer/dashboard.html:89
+msgid "Jar(s)"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:74
+#: app/templates/customer/dashboard.html:90
+#: app/templates/delivery/dashboard.html:98
+#: app/templates/delivery/dashboard.html:169
+msgid "Dispenser(s)"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:75
+msgid "for event on"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:76
+msgid "Booking Delivery"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:83
+msgid "Returned:"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:83
+#: app/templates/delivery/dashboard.html:95
+#: app/templates/delivery/dashboard.html:167
+msgid "Jars"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:83
+msgid "Dispensers"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:88
+msgid "Lost:"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:94
+msgid "Final Settled Amount:"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:96
+msgid "Confirmed Amount:"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:101
+msgid "No recent activity found."
+msgstr ""
+
+#: app/templates/customer/dashboard.html:121
+msgid "Issued:"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:125
+msgid "View"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:126
+msgid "Download"
+msgstr ""
+
+#: app/templates/customer/dashboard.html:130
+msgid "No invoices found."
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:7
+msgid "Book Jars for Event"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:10
+msgid "Sell New Jar / Dispenser"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:16
+msgid "Supply Jar"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:18
+msgid "Start typing a name or mobile number..."
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:30
+msgid "Your Current Cash Balance"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:38
+msgid "Add an Expense"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:42
+msgid "Amount"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:45
+msgid "Description"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:58
+msgid "Customers with Dues"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:66
+msgid "Due:"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:71
+msgid "Confirm you have received"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:71
+msgid "from"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:75
+msgid "Mark as Paid"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:82
+msgid "No customers have outstanding dues."
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:87
+msgid "Event Jars to Collect"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:106
+msgid "Jars Ret:"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:112
+msgid "Dispen Ret:"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:119
+msgid "Collect"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:126
+msgid "No event items pending collection."
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:135
+msgid "Pending Jar Requests"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:142
+msgid "Wants"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:146
+#, python-format
+msgid "Confirm delivery of %(qty)s jar(s) to %(name)s?"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:147
+#: app/templates/delivery/dashboard.html:177
+msgid "Delivered"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:153
+msgid "No pending jar requests."
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:158
+msgid "Today's Event Deliveries"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:170
+msgid "for event. Amount:"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Pre-Paid to Manager"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Collect Payment"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:176
+#, python-format
+msgid "Confirm EVENT delivery to %(name)s?"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:183
+msgid "No event deliveries for today."
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Default:"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Jar(s) at"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:224
+msgid "Jars:"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:232
+msgid "Mark as Due"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:236
+msgid "Deliver"
+msgstr ""
+
+#: app/templates/delivery/dashboard.html:245
+msgid "No customers found."
+msgstr ""
+
+#: app/templates/manager/add_staff_form.html:32
+msgid "Set initial password"
+msgstr ""
+
+#: app/templates/manager/add_staff_form.html:54
+#: app/templates/manager/edit_staff_form.html:49
+msgid "Cancel"
+msgstr ""
+
+#: app/templates/manager/edit_staff_form.html:42
+msgid "Current ID Proof:"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:5
+msgid "Manage Your Staff"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:7
+msgid "Add New Staff"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:17
+msgid "Username"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:18
+msgid "Mobile"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:19
+msgid "Daily Wage"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:20
+msgid "Actions"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:27
+msgid "N/A"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:32
+msgid "Not Set"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:37
+msgid "Edit Details"
+msgstr ""
+
+#: app/templates/manager/list_staff.html:43
+msgid "No staff members found for your business."
+msgstr ""
+
+#: app/templates/public/about.html:7
+msgid "About Aquajal"
+msgstr ""
+
+#: app/templates/public/about.html:8
+msgid ""
+"Aquajal is a modern, web-based solution designed to streamline the "
+"operations of water jar supply businesses. Our mission is to empower "
+"business owners with the tools they need to manage their daily tasks "
+"efficiently, from tracking deliveries to managing staff and inventory."
+msgstr ""
+
+#: app/templates/public/about.html:11
+msgid "Our Story"
+msgstr ""
+
+#: app/templates/public/about.html:12
+msgid ""
+"The idea for Aquajal was born from a simple observation: many local water"
+" suppliers rely on manual, paper-based methods to manage their complex "
+"daily operations. This often leads to inefficiencies, lost revenue, and a"
+" lack of clear insight into the business's performance. We saw an "
+"opportunity to change that."
+msgstr ""
+
+#: app/templates/public/about.html:13
+msgid ""
+"We set out to create a user-friendly, affordable, and powerful "
+"application that automates routine tasks, provides valuable insights "
+"through reports, and brings all aspects of the business—sales, stock, "
+"staff, and customers—into one centralized platform."
+msgstr ""
+
+#: app/templates/public/about.html:17
+msgid "Our Vision"
+msgstr ""
+
+#: app/templates/public/about.html:18
+msgid ""
+"Our vision is to become the go-to management software for water supply "
+"businesses everywhere. We are committed to continuous improvement, adding"
+" new features, and providing exceptional support to our users. We believe"
+" that by simplifying business management, we can help our clients grow "
+"and succeed."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:5
+msgid "How to Use Aquajal"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:9
+msgid "For Managers"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:12
+msgid "Setting Up Your Business"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:14
+msgid "Initial Setup:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:14
+msgid ""
+"After registering, your first step is to set your business's default "
+"prices and attendance rules. Go to `Manager Menu > Price Settings` to set"
+" prices for new jars/dispensers and define the minimum jar deliveries for"
+" a full or half day's wage."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:15
+msgid "Manage Staff:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:15
+msgid ""
+"Use the `Manager Menu > Manage Staff` option to add your delivery "
+"personnel. You can set their daily wages and even upload ID proofs."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:16
+msgid "Add Customers:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:16
+msgid ""
+"From the `Manager Menu`, select `Customers` to build your customer list. "
+"Here you can set custom jar prices and add special notes for each "
+"customer."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:18
+msgid "Daily Operations"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:20
+msgid "Stock Management:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:20
+msgid ""
+"Keep your inventory updated from the `Manager Dashboard` by clicking on "
+"`Manage Stock`. Stock is automatically deducted for sales and confirmed "
+"event bookings."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:21
+msgid "Confirm Bookings:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:21
+msgid ""
+"New event bookings will appear on your dashboard. Confirm them to "
+"allocate stock and set the final amount."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:22
+msgid "Receive Cash:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:22
+msgid ""
+"At the end of the day, use the `Receive Cash` button on your dashboard to"
+" record cash received from staff and reset their balance."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:24
+msgid "Invoicing & Reports"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:26
+msgid "View All Invoices:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:26
+msgid ""
+"Go to `Manager Menu > Invoices` to see a list of all invoices generated. "
+"You can view, download as PDF, or email them to customers directly."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:27
+msgid "Generate Reports:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:27
+msgid ""
+"The `Reports` button on your dashboard takes you to a powerful reporting "
+"tool. View monthly summaries of your income, expenses, and staff "
+"attendance, or drill down into daily transaction logs."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:34
+msgid "For Staff (Delivery Personnel)"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:37
+msgid "Your Dashboard is Your Hub"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:38
+msgid ""
+"Your dashboard is designed for quick actions. You can see your current "
+"cash balance, log deliveries, record expenses, and see pending event "
+"deliveries for the day."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:39
+msgid "Logging a Delivery"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:40
+msgid ""
+"Use the search bar to find a customer by name or mobile number. Once they"
+" appear, enter the number of jars delivered. If the customer isn't paying"
+" immediately, check the \"Mark as Due\" box before clicking `Deliver`."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:41
+msgid "Selling New Products"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:42
+msgid ""
+"You can sell a new jar or dispenser to a walk-in customer using the `Sell"
+" New Jar / Dispenser` button. The amount will be added to your cash "
+"balance and stock will be updated automatically."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:48
+msgid "For Customers"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:51
+msgid ""
+"As a customer, your personal dashboard allows you to manage your account "
+"easily. You can:"
+msgstr ""
+
+#: app/templates/public/how_to_use.html:53
+msgid ""
+"View your complete activity history, including past deliveries and event "
+"bookings."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:54
+msgid "See any outstanding due amounts."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:55
+msgid "View and download all your past invoices from the `Invoices` tab."
+msgstr ""
+
+#: app/templates/public/how_to_use.html:56
+msgid ""
+"Quickly request extra jars for daily use or book jars in bulk for an "
+"upcoming event."
+msgstr ""
+
+#: app/templates/public/index.html:10
+msgid "The All-in-One Platform to Run Your Water Supply Business"
+msgstr ""
+
+#: app/templates/public/index.html:11
+msgid ""
+"Aquajal is a complete SaaS solution that helps you automate sales, manage"
+" subscriptions, generate invoices, track inventory, and monitor staff "
+"performance effortlessly."
+msgstr ""
+
+#: app/templates/public/index.html:14
+msgid "Full SaaS Platform:"
+msgstr ""
+
+#: app/templates/public/index.html:14
+msgid ""
+"Manage your business with a 40-day free trial and flexible subscription "
+"plans."
+msgstr ""
+
+#: app/templates/public/index.html:15
+msgid "Automated Invoicing:"
+msgstr ""
+
+#: app/templates/public/index.html:15
+msgid ""
+"Generate, download, and email PDF invoices to your customers "
+"automatically."
+msgstr ""
+
+#: app/templates/public/index.html:16
+msgid "Advanced Reporting:"
+msgstr ""
+
+#: app/templates/public/index.html:16
+msgid "Get daily and monthly insights on sales, expenses, and staff attendance."
+msgstr ""
+
+#: app/templates/public/index.html:17
+msgid "Customer & Staff Portals:"
+msgstr ""
+
+#: app/templates/public/index.html:17
+msgid "Empower customers to view history and staff to log deliveries on the go."
+msgstr ""
+
+#: app/templates/public/index.html:21
+msgid "Start Your 40-Day Free Trial"
+msgstr ""
+
+#: app/templates/public/index.html:29
+msgid "A Modern Platform Built for Growth"
+msgstr ""
+
+#: app/templates/public/index.html:35
+msgid "Professional Invoicing"
+msgstr ""
+
+#: app/templates/public/index.html:36
+msgid ""
+"Automate invoice creation for every transaction, including monthly "
+"summaries and event bookings. Email professional PDF invoices directly to"
+" clients."
+msgstr ""
+
+#: app/templates/public/index.html:42
+msgid "Subscription Management"
+msgstr ""
+
+#: app/templates/public/index.html:43
+msgid ""
+"Offer flexible subscription plans with a 40-day free trial. Securely "
+"accept online payments with our integrated Razorpay checkout system."
+msgstr ""
+
+#: app/templates/public/index.html:49
+msgid "Insightful Reports"
+msgstr ""
+
+#: app/templates/public/index.html:50
+msgid ""
+"Make data-driven decisions with comprehensive reports on sales, expenses,"
+" staff performance, and even new customer leads."
+msgstr ""
+
+#: app/templates/public/index.html:57
+msgid "Pricing"
+msgstr ""
+
+#: app/templates/public/index.html:58
+msgid ""
+"Choose a plan that fits your needs. Our monthly subscription costs less "
+"than a single day's labor, and all plans start with a 40-day free trial."
+msgstr ""
+
+#: app/templates/public/index.html:68
+msgid "days"
+msgstr ""
+
+#: app/templates/public/index.html:70
+msgid "Regular Price:"
+msgstr ""
+
+#: app/templates/public/index.html:71
+msgid "Manage Unlimited Staff"
+msgstr ""
+
+#: app/templates/public/index.html:72
+msgid "Manage Unlimited Customers"
+msgstr ""
+
+#: app/templates/public/index.html:73
+msgid "Automated Invoicing & Reports"
+msgstr ""
+
+#: app/templates/public/index.html:74
+msgid "Email Support"
+msgstr ""
+
+#: app/templates/public/index.html:76
+msgid "After the initial offer, renewals are at the regular price."
+msgstr ""
+
+#: app/templates/public/index.html:77
+msgid "Start Free Trial"
+msgstr ""
+
+#: app/templates/public/index.html:86
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: app/templates/public/index.html:91
+msgid "What happens after my 40-day free trial ends?"
+msgstr ""
+
+#: app/templates/public/index.html:96
+msgid ""
+"After your trial, you will be prompted to choose a subscription plan to "
+"continue using the service. All your data—staff, customers, and "
+"reports—will be saved and waiting for you. We accept online payments "
+"through Razorpay."
+msgstr ""
+
+#: app/templates/public/index.html:103
+msgid "How does the automated invoicing work?"
+msgstr ""
+
+#: app/templates/public/index.html:108
+msgid ""
+"Aquajal automatically generates an invoice for every transaction, such as"
+" a daily delivery or an event booking. Managers can also generate "
+"consolidated monthly invoices for customers, download them as PDFs, or "
+"email them directly from the dashboard."
+msgstr ""
+
+#: app/templates/public/index.html:115
+msgid "Can I use this on my phone?"
+msgstr ""
+
+#: app/templates/public/index.html:120
+msgid ""
+"Yes! Aquajal is a Progressive Web App (PWA), which means you can add it "
+"to your phone's home screen and use it just like a native application. "
+"It's designed to be fully responsive and works great on any device."
+msgstr ""
+

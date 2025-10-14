@@ -10,6 +10,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, IntegerField, BooleanField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Length, EqualTo, Optional, ValidationError, NumberRange, Email
 from wtforms.fields import DateField as WTDateField
+from flask_babel import _, lazy_gettext as _l
 
 from functools import wraps
 import os
@@ -28,18 +29,18 @@ def admin_required(f):
 
 # --- Forms ---
 class PlanForm(FlaskForm):
-    name = StringField('Plan Name', validators=[DataRequired()])
-    regular_price = FloatField('Regular Price (₹)', validators=[DataRequired(), NumberRange(min=0)])
-    sale_price = FloatField('Sale Price (₹)', validators=[DataRequired(), NumberRange(min=0)])
-    duration_days = IntegerField('Duration (in days)', validators=[DataRequired(), NumberRange(min=1)])
-    submit = SubmitField('Save Plan')
+    name = StringField(_l('Plan Name'), validators=[DataRequired()])
+    regular_price = FloatField(_l('Regular Price (₹)'), validators=[DataRequired(), NumberRange(min=0)])
+    sale_price = FloatField(_l('Sale Price (₹)'), validators=[DataRequired(), NumberRange(min=0)])
+    duration_days = IntegerField(_l('Duration (in days)'), validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField(_l('Save Plan'))
 
 class CouponForm(FlaskForm):
-    code = StringField('Coupon Code', validators=[DataRequired()])
-    discount_percentage = IntegerField('Discount Percentage (%)', validators=[DataRequired(), NumberRange(min=1, max=100)])
-    is_active = BooleanField('Active', default=True)
-    expiry_date = DateField('Expiry Date (Optional)', validators=[Optional()])
-    submit = SubmitField('Save Coupon')
+    code = StringField(_l('Coupon Code'), validators=[DataRequired()])
+    discount_percentage = IntegerField(_l('Discount Percentage (%%)'), validators=[DataRequired(), NumberRange(min=1, max=100)])
+    is_active = BooleanField(_l('Active'), default=True)
+    expiry_date = DateField(_l('Expiry Date (Optional)'), validators=[Optional()])
+    submit = SubmitField(_l('Save Coupon'))
 
     def __init__(self, original_code=None, *args, **kwargs):
         super(CouponForm, self).__init__(*args, **kwargs)
@@ -49,34 +50,34 @@ class CouponForm(FlaskForm):
         if code.data.upper() != self.original_code:
             coupon = Coupon.query.filter(Coupon.code == code.data.upper()).first()
             if coupon:
-                raise ValidationError('This coupon code already exists.')
+                raise ValidationError(_('This coupon code already exists.'))
 
 class BusinessSubscriptionForm(FlaskForm):
-    subscription_plan_id = SelectField('Assign Plan', coerce=int, validators=[Optional()])
-    subscription_ends_at = WTDateField('Subscription Ends On', format='%Y-%m-%d', validators=[Optional()])
-    submit_subscription = SubmitField('Update Subscription')
+    subscription_plan_id = SelectField(_l('Assign Plan'), coerce=int, validators=[Optional()])
+    subscription_ends_at = WTDateField(_l('Subscription Ends On'), format='%Y-%m-%d', validators=[Optional()])
+    submit_subscription = SubmitField(_l('Update Subscription'))
 
     def __init__(self, *args, **kwargs):
         super(BusinessSubscriptionForm, self).__init__(*args, **kwargs)
-        self.subscription_plan_id.choices = [(0, '--- No Plan (Trial/Expired) ---')] + \
+        self.subscription_plan_id.choices = [(0, _l('--- No Plan (Trial/Expired) ---'))] + \
                                             [(p.id, f"{p.name} ({p.duration_days} days)") for p in SubscriptionPlan.query.order_by('name').all()]
 
 
 class BusinessForm(FlaskForm):
-    name = StringField('Business Name (e.g., Plant Location)', validators=[DataRequired()])
-    owner_name = StringField('Owner Name', validators=[Optional()])
-    email = StringField('Business Email', validators=[Optional(), Email()])
-    location = StringField('Location / Address', validators=[Optional()])
-    new_jar_price = FloatField('Default New Jar Price (₹)', default=150.0, validators=[DataRequired()])
-    new_dispenser_price = FloatField('Default New Dispenser Price (₹)', default=1500.0, validators=[DataRequired()])
-    submit = SubmitField('Save Business')
+    name = StringField(_l('Business Name (e.g., Plant Location)'), validators=[DataRequired()])
+    owner_name = StringField(_l('Owner Name'), validators=[Optional()])
+    email = StringField(_l('Business Email'), validators=[Optional(), Email()])
+    location = StringField(_l('Location / Address'), validators=[Optional()])
+    new_jar_price = FloatField(_l('Default New Jar Price (₹)'), default=150.0, validators=[DataRequired()])
+    new_dispenser_price = FloatField(_l('Default New Dispenser Price (₹)'), default=1500.0, validators=[DataRequired()])
+    submit = SubmitField(_l('Save Business'))
 
 class AdminProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
-    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
-    password = PasswordField('New Password (leave blank to keep current)', validators=[Optional(), Length(min=6)])
-    password2 = PasswordField('Repeat New Password', validators=[EqualTo('password', message='Passwords must match.')])
-    submit = SubmitField('Update Profile')
+    username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    mobile_number = StringField(_l('Mobile Number'), validators=[Optional(), Length(max=15)])
+    password = PasswordField(_l('New Password (leave blank to keep current)'), validators=[Optional(), Length(min=6)])
+    password2 = PasswordField(_l('Repeat New Password'), validators=[EqualTo('password', message=_l('Passwords must match.'))])
+    submit = SubmitField(_l('Update Profile'))
 
     def __init__(self, original_username, original_mobile_number, *args, **kwargs):
         super(AdminProfileForm, self).__init__(*args, **kwargs)
@@ -87,29 +88,29 @@ class AdminProfileForm(FlaskForm):
         if username.data != self.original_username:
             user = User.query.filter_by(username=self.username.data).first()
             if user is not None:
-                raise ValidationError('This username is already taken.')
+                raise ValidationError(_('This username is already taken.'))
 
     def validate_mobile_number(self, mobile_number):
         if mobile_number.data and mobile_number.data != self.original_mobile_number:
             user = User.query.filter_by(mobile_number=self.mobile_number.data).first()
             if user is not None:
-                raise ValidationError('This mobile number is already registered.')
+                raise ValidationError(_('This mobile number is already registered.'))
 
 
 class UserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
-    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
-    address = TextAreaField('Address', validators=[Optional(), Length(max=200)])
-    role = SelectField('Role', choices=[('staff', 'Staff'), ('manager', 'Manager')], validators=[DataRequired()])
-    business_id = SelectField('Assign to Business', coerce=int, validators=[DataRequired()])
-    daily_wage = FloatField('Daily Wage (₹)', validators=[Optional()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
+    username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    mobile_number = StringField(_l('Mobile Number'), validators=[Optional(), Length(max=15)])
+    address = TextAreaField(_l('Address'), validators=[Optional(), Length(max=200)])
+    role = SelectField(_l('Role'), choices=[('staff', 'Staff'), ('manager', 'Manager')], validators=[DataRequired()])
+    business_id = SelectField(_l('Assign to Business'), coerce=int, validators=[DataRequired()])
+    daily_wage = FloatField(_l('Daily Wage (₹)'), validators=[Optional()])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    password2 = PasswordField(_l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
+    id_proof = FileField(_l('ID Proof Image (JPG, PNG)'), validators=[
         Optional(),
-        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+        FileAllowed(['jpg', 'png', 'jpeg'], _l('Images only!'))
     ])
-    submit = SubmitField('Create User')
+    submit = SubmitField(_l('Create User'))
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
@@ -118,21 +119,21 @@ class UserForm(FlaskForm):
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError(_('Please use a different username.'))
 
 class EditUserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
-    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
-    address = StringField('Address', validators=[Optional(), Length(max=200)])
-    role = SelectField('Role', choices=[('staff', 'Staff'), ('manager', 'Manager')], validators=[DataRequired()])
-    business_id = SelectField('Assign to Business', coerce=int, validators=[DataRequired()])
-    daily_wage = FloatField('Daily Wage (₹) (for Staff only)', validators=[Optional()])
-    password = PasswordField('New Password (leave blank to keep current)', validators=[Optional(), Length(min=6)])
-    id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
+    username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    mobile_number = StringField(_l('Mobile Number'), validators=[Optional(), Length(max=15)])
+    address = StringField(_l('Address'), validators=[Optional(), Length(max=200)])
+    role = SelectField(_l('Role'), choices=[('staff', 'Staff'), ('manager', 'Manager')], validators=[DataRequired()])
+    business_id = SelectField(_l('Assign to Business'), coerce=int, validators=[DataRequired()])
+    daily_wage = FloatField(_l('Daily Wage (₹) (for Staff only)'), validators=[Optional()])
+    password = PasswordField(_l('New Password (leave blank to keep current)'), validators=[Optional(), Length(min=6)])
+    id_proof = FileField(_l('ID Proof Image (JPG, PNG)'), validators=[
         Optional(),
-        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+        FileAllowed(['jpg', 'png', 'jpeg'], _l('Images only!'))
     ])
-    submit = SubmitField('Update User')
+    submit = SubmitField(_l('Update User'))
 
     def __init__(self, original_username, original_mobile_number, *args, **kwargs):
         super(EditUserForm, self).__init__(*args, **kwargs)
@@ -144,13 +145,13 @@ class EditUserForm(FlaskForm):
         if username.data != self.original_username:
             if User.query.filter_by(username=username.data).first() or \
                Customer.query.filter_by(username=username.data).first():
-                raise ValidationError('This username is already taken.')
+                raise ValidationError(_('This username is already taken.'))
 
     def validate_mobile_number(self, mobile_number):
         if mobile_number.data and mobile_number.data != self.original_mobile_number:
             user = User.query.filter_by(mobile_number=mobile_number.data).first()
             if user is not None:
-                raise ValidationError('This mobile number is already registered.')
+                raise ValidationError(_('This mobile number is already registered.'))
 
 
 # --- Routes ---
@@ -160,7 +161,7 @@ class EditUserForm(FlaskForm):
 def dashboard():
     businesses = Business.query.order_by(Business.name).all()
     users = User.query.filter(User.role.in_(['manager', 'staff'])).order_by(User.business_id, User.role, User.username).all()
-    return render_template('admin/dashboard.html', businesses=businesses, users=users, title="Admin Dashboard")
+    return render_template('admin/dashboard.html', businesses=businesses, users=users, title=_("Admin Dashboard"))
 
 # --- Admin Profile ---
 @bp.route('/profile', methods=['GET', 'POST'])
@@ -178,11 +179,11 @@ def profile():
         if form.password.data:
             current_user.set_password(form.password.data)
         db.session.commit()
-        flash('Your profile has been updated.', 'success')
+        flash(_('Your profile has been updated.'), 'success')
         # Re-login the user to update the session with the new username if it changed
         login_user(current_user)
         return redirect(url_for('admin.profile'))
-    return render_template('admin/profile_form.html', title="My Profile", form=form)
+    return render_template('admin/profile_form.html', title=_("My Profile"), form=form)
 
 # --- Business Management ---
 @bp.route('/business/add', methods=['GET', 'POST'])
@@ -194,9 +195,9 @@ def add_business():
         business = Business(name=form.name.data, location=form.location.data, new_jar_price=form.new_jar_price.data, new_dispenser_price=form.new_dispenser_price.data)
         db.session.add(business)
         db.session.commit()
-        flash(f'Business "{business.name}" created successfully.')
+        flash(_('Business "%(name)s" created successfully.', name=business.name))
         return redirect(url_for('admin.dashboard'))
-    return render_template('admin/business_form.html', form=form, title="Create New Business", business=None)
+    return render_template('admin/business_form.html', form=form, title=_("Create New Business"), business=None)
 
 @bp.route('/business/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -214,7 +215,7 @@ def edit_business(id):
         business.new_jar_price = form.new_jar_price.data
         business.new_dispenser_price = form.new_dispenser_price.data
         db.session.commit()
-        flash(f'Business "{business.name}" details have been updated.', 'success')
+        flash(_('Business "%(name)s" details have been updated.', name=business.name), 'success')
         return redirect(url_for('admin.edit_business', id=id))
 
     if sub_form.submit_subscription.data and sub_form.validate_on_submit():
@@ -231,17 +232,17 @@ def edit_business(id):
                 # Calculate end date based on plan duration
                 plan = SubscriptionPlan.query.get(plan_id)
                 business.subscription_ends_at = datetime.utcnow() + timedelta(days=plan.duration_days)
-            flash(f'Subscription updated for "{business.name}".', 'success')
+            flash(_('Subscription updated for "%(name)s".', name=business.name), 'success')
         else: # No plan is selected
             business.subscription_plan_id = None
             business.subscription_status = 'expired'
             business.subscription_ends_at = None
-            flash(f'Subscription removed for "{business.name}". Status set to expired.', 'warning')
+            flash(_('Subscription removed for "%(name)s". Status set to expired.', name=business.name), 'warning')
         
         db.session.commit()
         return redirect(url_for('admin.edit_business', id=id))
 
-    return render_template('admin/business_form.html', form=form, sub_form=sub_form, business=business, title="Edit Business")
+    return render_template('admin/business_form.html', form=form, sub_form=sub_form, business=business, title=_("Edit Business"))
 
 
 @bp.route('/business/reset_stock/<int:id>', methods=['POST'])
@@ -252,7 +253,7 @@ def reset_stock(id):
     business.jar_stock = 0
     business.dispenser_stock = 0
     db.session.commit()
-    flash(f'Stock for "{business.name}" has been reset to zero.', 'success')
+    flash(_('Stock for "%(name)s" has been reset to zero.', name=business.name), 'success')
     return redirect(url_for('admin.dashboard'))
 
 # --- User Management ---
@@ -274,9 +275,9 @@ def add_user():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(f'User "{user.username}" has been created.')
+        flash(_('User "%(username)s" has been created.', username=user.username))
         return redirect(url_for('admin.dashboard'))
-    return render_template('admin/user_form.html', form=form, title="Add New User", user=None)
+    return render_template('admin/user_form.html', form=form, title=_("Add New User"), user=None)
 
 @bp.route('/user/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -313,10 +314,10 @@ def edit_user(id):
             user.id_proof_filename = filename
 
         db.session.commit()
-        flash(f'User "{user.username}" has been updated.')
+        flash(_('User "%(username)s" has been updated.', username=user.username))
         return redirect(url_for('admin.dashboard'))
 
-    return render_template('admin/user_form.html', form=form, user=user, title="Edit User")
+    return render_template('admin/user_form.html', form=form, user=user, title=_("Edit User"))
 
 
 @bp.route('/user/delete/<int:id>', methods=['POST'])
@@ -325,9 +326,9 @@ def edit_user(id):
 def delete_user(id):
     user = User.query.get_or_404(id)
     if user.role == 'admin':
-        flash('Cannot delete the admin user.')
+        flash(_('Cannot delete the admin user.'))
         return redirect(url_for('admin.dashboard'))
-    flash(f'User "{user.username}" has been deleted.')
+    flash(_('User "%(username)s" has been deleted.', username=user.username))
     db.session.delete(user)
     db.session.commit()
     return redirect(url_for('admin.dashboard'))
@@ -341,7 +342,7 @@ def delete_user(id):
 @admin_required
 def list_plans():
     plans = SubscriptionPlan.query.all()
-    return render_template('admin/subscription_plans.html', plans=plans, title="Subscription Plans")
+    return render_template('admin/subscription_plans.html', plans=plans, title=_("Subscription Plans"))
 
 @bp.route('/plans/add', methods=['GET', 'POST'])
 @login_required
@@ -353,9 +354,9 @@ def add_plan():
                                 sale_price=form.sale_price.data, duration_days=form.duration_days.data)
         db.session.add(plan)
         db.session.commit()
-        flash('New subscription plan has been created.', 'success')
+        flash(_('New subscription plan has been created.'), 'success')
         return redirect(url_for('admin.list_plans'))
-    return render_template('admin/plan_form.html', form=form, title="Add New Plan")
+    return render_template('admin/plan_form.html', form=form, title=_("Add New Plan"))
 
 @bp.route('/plans/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -369,9 +370,9 @@ def edit_plan(id):
         plan.sale_price = form.sale_price.data
         plan.duration_days = form.duration_days.data
         db.session.commit()
-        flash('Subscription plan has been updated.', 'success')
+        flash(_('Subscription plan has been updated.'), 'success')
         return redirect(url_for('admin.list_plans'))
-    return render_template('admin/plan_form.html', form=form, title="Edit Plan")
+    return render_template('admin/plan_form.html', form=form, title=_("Edit Plan"))
 
 @bp.route('/plans/delete/<int:id>', methods=['POST'])
 @login_required
@@ -379,11 +380,11 @@ def edit_plan(id):
 def delete_plan(id):
     plan = SubscriptionPlan.query.get_or_404(id)
     if Business.query.filter_by(subscription_plan_id=id).first():
-        flash('Cannot delete plan. It is currently assigned to one or more businesses.', 'danger')
+        flash(_('Cannot delete plan. It is currently assigned to one or more businesses.'), 'danger')
     else:
         db.session.delete(plan)
         db.session.commit()
-        flash(f'Plan "{plan.name}" has been deleted.', 'success')
+        flash(_('Plan "%(name)s" has been deleted.', name=plan.name), 'success')
     return redirect(url_for('admin.list_plans'))
 
 
@@ -393,7 +394,7 @@ def delete_plan(id):
 @admin_required
 def list_coupons():
     coupons = Coupon.query.all()
-    return render_template('admin/coupons.html', coupons=coupons, title="Manage Coupons")
+    return render_template('admin/coupons.html', coupons=coupons, title=_("Manage Coupons"))
 
 @bp.route('/coupons/add', methods=['GET', 'POST'])
 @login_required
@@ -405,9 +406,9 @@ def add_coupon():
                         is_active=form.is_active.data, expiry_date=form.expiry_date.data)
         db.session.add(coupon)
         db.session.commit()
-        flash('New coupon has been created.', 'success')
+        flash(_('New coupon has been created.'), 'success')
         return redirect(url_for('admin.list_coupons'))
-    return render_template('admin/coupon_form.html', form=form, title="Add New Coupon")
+    return render_template('admin/coupon_form.html', form=form, title=_("Add New Coupon"))
 
 @bp.route('/coupons/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -421,9 +422,9 @@ def edit_coupon(id):
         coupon.is_active = form.is_active.data
         coupon.expiry_date = form.expiry_date.data
         db.session.commit()
-        flash('Coupon has been updated.', 'success')
+        flash(_('Coupon has been updated.'), 'success')
         return redirect(url_for('admin.list_coupons'))
-    return render_template('admin/coupon_form.html', form=form, title="Edit Coupon")
+    return render_template('admin/coupon_form.html', form=form, title=_("Edit Coupon"))
 
 @bp.route('/coupons/delete/<int:id>', methods=['POST'])
 @login_required
@@ -432,7 +433,7 @@ def delete_coupon(id):
     coupon = Coupon.query.get_or_404(id)
     db.session.delete(coupon)
     db.session.commit()
-    flash(f'Coupon "{coupon.code}" has been deleted.', 'success')
+    flash(_('Coupon "%(code)s" has been deleted.', code=coupon.code), 'success')
     return redirect(url_for('admin.list_coupons'))
 
 @bp.route('/business/delete/<int:id>', methods=['POST'])
@@ -445,8 +446,8 @@ def delete_business(id):
         # will automatically delete all related employees, customers, sales, etc.
         db.session.delete(business)
         db.session.commit()
-        flash(f'Business "{business.name}" and all of its associated data have been permanently deleted.', 'success')
+        flash(_('Business "%(name)s" and all of its associated data have been permanently deleted.', name=business.name), 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error deleting business: {e}', 'danger')
+        flash(_('Error deleting business: %(error)s', error=e), 'danger')
     return redirect(url_for('admin.dashboard'))

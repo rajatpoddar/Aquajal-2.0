@@ -39,14 +39,14 @@
             </div>
             {% if staff.id_proof_filename %}
             <div class="mb-3">
-                <p><strong>Current ID Proof:</strong></p>
+                <p><strong>{{ _('Current ID Proof:') }}</strong></p>
                 <img src="{{ url_for('static', filename='uploads/' + staff.id_proof_filename) }}" alt="ID Proof" class="img-fluid rounded" style="max-height: 200px;">
             </div>
             {% endif %}
             
             <div>
                 {{ form.submit(class="btn btn-primary") }}
-                <a href="{{ url_for('manager.staff_list') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('manager.staff_list') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
             </div>
         </form>
     </div>

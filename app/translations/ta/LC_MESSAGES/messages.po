@@ -1,0 +1,988 @@
+# Tamil translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-14 14:13+0530\n"
+"PO-Revision-Date: 2025-10-14 13:41+0530\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ta\n"
+"Language-Team: ta <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/admin/routes.py:53
+msgid "This coupon code already exists."
+msgstr "இந்த கூப்பன் குறியீடு ஏற்கனவே உள்ளது."
+
+#: app/admin/routes.py:91 app/admin/routes.py:148
+msgid "This username is already taken."
+msgstr "இந்த பயனர்பெயர் ஏற்கனவே எடுக்கப்பட்டுவிட்டது."
+
+#: app/admin/routes.py:97 app/admin/routes.py:154
+msgid "This mobile number is already registered."
+msgstr "இந்த மொபைல் எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது."
+
+#: app/admin/routes.py:122
+msgid "Please use a different username."
+msgstr "தயவுசெய்து வேறு பயனர்பெயரைப் பயன்படுத்தவும்."
+
+#: app/admin/routes.py:164 app/templates/base.html:65
+msgid "Admin Dashboard"
+msgstr "நிர்வாகி டாஷ்போர்டு"
+
+#: app/admin/routes.py:182
+msgid "Your profile has been updated."
+msgstr "உங்கள் சுயவிவரம் புதுப்பிக்கப்பட்டது."
+
+#: app/admin/routes.py:186 app/templates/base.html:67
+msgid "My Profile"
+msgstr "என் சுயவிவரம்"
+
+#: app/admin/routes.py:198
+#, python-format
+msgid "Business \"%(name)s\" created successfully."
+msgstr "\"%(name)s\" என்ற வணிகம் வெற்றிகரமாக உருவாக்கப்பட்டது."
+
+#: app/admin/routes.py:200
+msgid "Create New Business"
+msgstr "புதிய வணிகத்தை உருவாக்கவும்"
+
+#: app/admin/routes.py:218
+#, python-format
+msgid "Business \"%(name)s\" details have been updated."
+msgstr "\"%(name)s\" என்ற வணிகத்தின் விவரங்கள் புதுப்பிக்கப்பட்டன."
+
+#: app/admin/routes.py:235
+#, python-format
+msgid "Subscription updated for \"%(name)s\"."
+msgstr "\"%(name)s\" க்கான சந்தா புதுப்பிக்கப்பட்டது."
+
+#: app/admin/routes.py:240
+#, python-format
+msgid "Subscription removed for \"%(name)s\". Status set to expired."
+msgstr "\"%(name)s\" க்கான சந்தா அகற்றப்பட்டது. நிலை காலாவதியாக அமைக்கப்பட்டது."
+
+#: app/admin/routes.py:245
+msgid "Edit Business"
+msgstr "வணிகத்தைத் திருத்தவும்"
+
+#: app/admin/routes.py:256
+#, python-format
+msgid "Stock for \"%(name)s\" has been reset to zero."
+msgstr "\"%(name)s\" க்கான இருப்பு பூஜ்ஜியத்திற்கு மீட்டமைக்கப்பட்டது."
+
+#: app/admin/routes.py:278
+#, python-format
+msgid "User \"%(username)s\" has been created."
+msgstr "\"%(username)s\" என்ற பயனர் உருவாக்கப்பட்டுள்ளார்."
+
+#: app/admin/routes.py:280
+msgid "Add New User"
+msgstr "புதிய பயனரைச் சேர்க்கவும்"
+
+#: app/admin/routes.py:317
+#, python-format
+msgid "User \"%(username)s\" has been updated."
+msgstr "\"%(username)s\" என்ற பயனர் புதுப்பிக்கப்பட்டுள்ளார்."
+
+#: app/admin/routes.py:320
+msgid "Edit User"
+msgstr "பயனரைத் திருத்தவும்"
+
+#: app/admin/routes.py:329
+msgid "Cannot delete the admin user."
+msgstr "நிர்வாகி பயனரை நீக்க முடியாது."
+
+#: app/admin/routes.py:331
+#, python-format
+msgid "User \"%(username)s\" has been deleted."
+msgstr "\"%(username)s\" என்ற பயனர் நீக்கப்பட்டுள்ளார்."
+
+#: app/admin/routes.py:345
+msgid "Subscription Plans"
+msgstr "சந்தா திட்டங்கள்"
+
+#: app/admin/routes.py:357
+msgid "New subscription plan has been created."
+msgstr "புதிய சந்தா திட்டம் உருவாக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:359
+msgid "Add New Plan"
+msgstr "புதிய திட்டத்தைச் சேர்க்கவும்"
+
+#: app/admin/routes.py:373
+msgid "Subscription plan has been updated."
+msgstr "சந்தா திட்டம் புதுப்பிக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:375
+msgid "Edit Plan"
+msgstr "திட்டத்தைத் திருத்தவும்"
+
+#: app/admin/routes.py:383
+msgid "Cannot delete plan. It is currently assigned to one or more businesses."
+msgstr "திட்டத்தை நீக்க முடியாது. இது தற்போது ஒன்று அல்லது அதற்கு மேற்பட்ட வணிகங்களுக்கு ஒதுக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:387
+#, python-format
+msgid "Plan \"%(name)s\" has been deleted."
+msgstr "\"%(name)s\" என்ற திட்டம் நீக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:397
+msgid "Manage Coupons"
+msgstr "கூப்பன்களை நிர்வகிக்கவும்"
+
+#: app/admin/routes.py:409
+msgid "New coupon has been created."
+msgstr "புதிய கூப்பன் உருவாக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:411
+msgid "Add New Coupon"
+msgstr "புதிய கூப்பனைச் சேர்க்கவும்"
+
+#: app/admin/routes.py:425
+msgid "Coupon has been updated."
+msgstr "கூப்பன் புதுப்பிக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:427
+msgid "Edit Coupon"
+msgstr "கூப்பனைத் திருத்தவும்"
+
+#: app/admin/routes.py:436
+#, python-format
+msgid "Coupon \"%(code)s\" has been deleted."
+msgstr "\"%(code)s\" என்ற கூப்பன் நீக்கப்பட்டுள்ளது."
+
+#: app/admin/routes.py:449
+#, python-format
+msgid ""
+"Business \"%(name)s\" and all of its associated data have been "
+"permanently deleted."
+msgstr "\"%(name)s\" என்ற வணிகமும் அதனுடன் தொடர்புடைய அனைத்து தரவுகளும் நிரந்தரமாக நீக்கப்பட்டுள்ளன."
+
+#: app/admin/routes.py:452
+#, python-format
+msgid "Error deleting business: %(error)s"
+msgstr "வணிகத்தை நீக்குவதில் பிழை: %(error)s"
+
+#: app/auth/routes.py:55
+msgid "Invalid username/mobile or password"
+msgstr "தவறான பயனர்பெயர்/மொபைல் அல்லது கடவுச்சொல்"
+
+#: app/auth/routes.py:58 app/templates/auth/login.html:7
+msgid "Sign In"
+msgstr "உள்நுழைக"
+
+#: app/templates/base.html:10
+msgid ""
+"The all-in-one solution for managing your water jar supply business. "
+"Streamline deliveries, track inventory, and manage staff with ease."
+msgstr "உங்கள் தண்ணீர் ஜார் விநியோக வணிகத்தை நிர்வகிப்பதற்கான முழுமையான தீர்வு. விநியோகங்களை நெறிப்படுத்துங்கள், இருப்பைக் கண்காணிக்கவும், மற்றும் ஊழியர்களை எளிதாக நிர்வகிக்கவும்."
+
+#: app/templates/base.html:12
+msgid "The all-in-one solution for managing your water jar supply business."
+msgstr "உங்கள் தண்ணீர் ஜார் விநியோக வணிகத்தை நிர்வகிப்பதற்கான முழுமையான தீர்வு."
+
+#: app/templates/base.html:62
+msgid "Admin Menu"
+msgstr "நிர்வாகி மெனு"
+
+#: app/templates/base.html:75
+msgid "Manager Menu"
+msgstr "மேலாளர் மெனு"
+
+#: app/templates/base.html:78
+msgid "Dashboard"
+msgstr "டாஷ்போர்டு"
+
+#: app/templates/base.html:79
+msgid "Customers"
+msgstr "வாடிக்கையாளர்கள்"
+
+#: app/templates/base.html:80
+msgid "Manage Staff"
+msgstr "ஊழியர்களை நிர்வகிக்கவும்"
+
+#: app/templates/base.html:82 app/templates/customer/dashboard.html:46
+msgid "Invoices"
+msgstr "விலைப்பட்டியல்கள்"
+
+#: app/templates/base.html:87
+msgid "My Account & Subscription"
+msgstr "என் கணக்கு & சந்தா"
+
+#: app/templates/base.html:93
+msgid "My Dashboard"
+msgstr "என் டாஷ்போர்டு"
+
+#: app/templates/base.html:98
+msgid "Logout"
+msgstr "வெளியேறு"
+
+#: app/templates/base.html:103 app/templates/base.html:162
+msgid "How to Use"
+msgstr "எப்படி பயன்படுத்துவது"
+
+#: app/templates/base.html:106 app/templates/base.html:160
+msgid "About Us"
+msgstr "எங்களை பற்றி"
+
+#: app/templates/base.html:109
+msgid "Contact Us"
+msgstr "தொடர்பு கொள்ள"
+
+#: app/templates/base.html:112 app/templates/public/index.html:22
+msgid "Login"
+msgstr "உள்நுழைய"
+
+#: app/templates/base.html:115
+msgid "Register"
+msgstr "பதிவு செய்யவும்"
+
+#: app/templates/base.html:154
+msgid ""
+"The complete solution for managing your water supply business efficiently"
+" and effectively."
+msgstr "உங்கள் தண்ணீர் விநியோக வணிகத்தை திறமையாகவும் திறம்படவும் நிர்வகிப்பதற்கான முழுமையான தீர்வு."
+
+#: app/templates/base.html:159
+msgid "Quick Links"
+msgstr "விரைவு இணைப்புகள்"
+
+#: app/templates/base.html:164
+msgid "FAQ"
+msgstr "அடிக்கடி கேட்கப்படும் கேள்விகள்"
+
+#: app/templates/base.html:168
+msgid "Contact"
+msgstr "தொடர்பு"
+
+#: app/templates/auth/login.html:23
+msgid "Forgot Password?"
+msgstr "கடவுச்சொல்லை மறந்துவிட்டீர்களா?"
+
+#: app/templates/auth/login.html:28
+msgid "New Supplier?"
+msgstr "புதிய சப்ளையரா?"
+
+#: app/templates/auth/login.html:28
+msgid "Start your trial here!"
+msgstr "உங்கள் சோதனையை இங்கே தொடங்குங்கள்!"
+
+#: app/templates/customer/dashboard.html:4
+msgid "Welcome,"
+msgstr "வரவேற்கிறோம்,"
+
+#: app/templates/customer/dashboard.html:9
+msgid "Outstanding Balance"
+msgstr "நிலுவைத் தொகை"
+
+#: app/templates/customer/dashboard.html:10
+msgid "You have a due amount of"
+msgstr "உங்களுக்கு செலுத்த வேண்டிய தொகை"
+
+#: app/templates/customer/dashboard.html:10
+msgid ""
+"Please clear it with the delivery staff by the end of the month to avoid "
+"any interruptions in service."
+msgstr "சேவையில் எந்தவித இடையூறுகளையும் தவிர்க்க, மாத இறுதிக்குள் டெலிவரி ஊழியர்களிடம் இதை செலுத்தி முடிக்கவும்."
+
+#: app/templates/customer/dashboard.html:16
+msgid "Quick Actions"
+msgstr "விரைவு நடவடிக்கைகள்"
+
+#: app/templates/customer/dashboard.html:19
+msgid "Request Daily Jars"
+msgstr "தினசரி ஜார்களுக்கு கோரிக்கை"
+
+#: app/templates/customer/dashboard.html:29
+msgid "Book for an Event"
+msgstr "ஒரு நிகழ்வுக்காக பதிவு செய்யவும்"
+
+#: app/templates/customer/dashboard.html:43
+msgid "My Activity"
+msgstr "என் செயல்பாடு"
+
+#: app/templates/customer/dashboard.html:58
+#: app/templates/delivery/dashboard.html:142
+msgid "jar(s)"
+msgstr "ஜார்(கள்)"
+
+#: app/templates/customer/dashboard.html:58
+msgid "delivered on"
+msgstr "அன்று வழங்கப்பட்டது"
+
+#: app/templates/customer/dashboard.html:62
+#: app/templates/customer/dashboard.html:122
+msgid "Amount:"
+msgstr "தொகை:"
+
+#: app/templates/customer/dashboard.html:64
+msgid "Due"
+msgstr "செலுத்த வேண்டியவை"
+
+#: app/templates/customer/dashboard.html:66
+msgid "Paid"
+msgstr "செலுத்தப்பட்டது"
+
+#: app/templates/customer/dashboard.html:73
+msgid "Booked"
+msgstr "பதிவு செய்யப்பட்டது"
+
+#: app/templates/customer/dashboard.html:73
+#: app/templates/customer/dashboard.html:89
+msgid "Jar(s)"
+msgstr "ஜார்(கள்)"
+
+#: app/templates/customer/dashboard.html:74
+#: app/templates/customer/dashboard.html:90
+#: app/templates/delivery/dashboard.html:98
+#: app/templates/delivery/dashboard.html:169
+msgid "Dispenser(s)"
+msgstr "டிஸ்பென்சர்(கள்)"
+
+#: app/templates/customer/dashboard.html:75
+msgid "for event on"
+msgstr "அன்று நடக்கும் நிகழ்வுக்காக"
+
+#: app/templates/customer/dashboard.html:76
+msgid "Booking Delivery"
+msgstr "புக்கிங் டெலிவரி"
+
+#: app/templates/customer/dashboard.html:83
+msgid "Returned:"
+msgstr "திருப்பி அனுப்பப்பட்டது:"
+
+#: app/templates/customer/dashboard.html:83
+#: app/templates/delivery/dashboard.html:95
+#: app/templates/delivery/dashboard.html:167
+msgid "Jars"
+msgstr "ஜார்கள்"
+
+#: app/templates/customer/dashboard.html:83
+msgid "Dispensers"
+msgstr "டிஸ்பென்சர்கள்"
+
+#: app/templates/customer/dashboard.html:88
+msgid "Lost:"
+msgstr "இழந்தது:"
+
+#: app/templates/customer/dashboard.html:94
+msgid "Final Settled Amount:"
+msgstr "இறுதி தீர்க்கப்பட்ட தொகை:"
+
+#: app/templates/customer/dashboard.html:96
+msgid "Confirmed Amount:"
+msgstr "உறுதிப்படுத்தப்பட்ட தொகை:"
+
+#: app/templates/customer/dashboard.html:101
+msgid "No recent activity found."
+msgstr "சமீபத்திய செயல்பாடு எதுவும் இல்லை."
+
+#: app/templates/customer/dashboard.html:121
+msgid "Issued:"
+msgstr "வழங்கப்பட்டது:"
+
+#: app/templates/customer/dashboard.html:125
+msgid "View"
+msgstr "காண்க"
+
+#: app/templates/customer/dashboard.html:126
+msgid "Download"
+msgstr "பதிவிறக்க"
+
+#: app/templates/customer/dashboard.html:130
+msgid "No invoices found."
+msgstr "விலைப்பட்டியல்கள் எதுவும் இல்லை."
+
+#: app/templates/delivery/dashboard.html:7
+msgid "Book Jars for Event"
+msgstr "நிகழ்வுக்காக ஜார்களை பதிவு செய்யவும்"
+
+#: app/templates/delivery/dashboard.html:10
+msgid "Sell New Jar / Dispenser"
+msgstr "புதிய ஜார் / டிஸ்பென்சரை விற்கவும்"
+
+#: app/templates/delivery/dashboard.html:16
+msgid "Supply Jar"
+msgstr "ஜார் விநியோகம்"
+
+#: app/templates/delivery/dashboard.html:18
+msgid "Start typing a name or mobile number..."
+msgstr "பெயர் அல்லது மொபைல் எண்ணை தட்டச்சு செய்யத் தொடங்குங்கள்..."
+
+#: app/templates/delivery/dashboard.html:30
+msgid "Your Current Cash Balance"
+msgstr "உங்கள் தற்போதைய ரொக்க இருப்பு"
+
+#: app/templates/delivery/dashboard.html:38
+msgid "Add an Expense"
+msgstr "ஒரு செலவைச் சேர்க்கவும்"
+
+#: app/templates/delivery/dashboard.html:42
+msgid "Amount"
+msgstr "தொகை"
+
+#: app/templates/delivery/dashboard.html:45
+msgid "Description"
+msgstr "விளக்கம்"
+
+#: app/templates/delivery/dashboard.html:58
+msgid "Customers with Dues"
+msgstr "நிலுவையுள்ள வாடிக்கையாளர்கள்"
+
+#: app/templates/delivery/dashboard.html:66
+msgid "Due:"
+msgstr "செலுத்த வேண்டியவை:"
+
+#: app/templates/delivery/dashboard.html:71
+msgid "Confirm you have received"
+msgstr "நீங்கள் பெற்றுள்ளீர்கள் என்பதை உறுதிப்படுத்தவும்"
+
+#: app/templates/delivery/dashboard.html:71
+msgid "from"
+msgstr "இருந்து"
+
+#: app/templates/delivery/dashboard.html:75
+msgid "Mark as Paid"
+msgstr "செலுத்தப்பட்டதாகக் குறிக்கவும்"
+
+#: app/templates/delivery/dashboard.html:82
+msgid "No customers have outstanding dues."
+msgstr "எந்த வாடிக்கையாளருக்கும் நிலுவைத் தொகை இல்லை."
+
+#: app/templates/delivery/dashboard.html:87
+msgid "Event Jars to Collect"
+msgstr "சேகரிக்க வேண்டிய நிகழ்வு ஜார்கள்"
+
+#: app/templates/delivery/dashboard.html:106
+msgid "Jars Ret:"
+msgstr "ஜார்கள் திரும்ப:"
+
+#: app/templates/delivery/dashboard.html:112
+msgid "Dispen Ret:"
+msgstr "டிஸ்பென்சர் திரும்ப:"
+
+#: app/templates/delivery/dashboard.html:119
+msgid "Collect"
+msgstr "சேகரிக்க"
+
+#: app/templates/delivery/dashboard.html:126
+msgid "No event items pending collection."
+msgstr "சேகரிப்பிற்காக எந்த நிகழ்வு பொருட்களும் நிலுவையில் இல்லை."
+
+#: app/templates/delivery/dashboard.html:135
+msgid "Pending Jar Requests"
+msgstr "நிலுவையில் உள்ள ஜார் கோரிக்கைகள்"
+
+#: app/templates/delivery/dashboard.html:142
+msgid "Wants"
+msgstr "விரும்புகிறது"
+
+#: app/templates/delivery/dashboard.html:146
+#, python-format
+msgid "Confirm delivery of %(qty)s jar(s) to %(name)s?"
+msgstr "%(name)s க்கு %(qty)s ஜார்(கள்) விநியோகத்தை உறுதிப்படுத்தவா?"
+
+#: app/templates/delivery/dashboard.html:147
+#: app/templates/delivery/dashboard.html:177
+msgid "Delivered"
+msgstr "வழங்கப்பட்டது"
+
+#: app/templates/delivery/dashboard.html:153
+msgid "No pending jar requests."
+msgstr "நிலுவையில் ஜார் கோரிக்கைகள் எதுவும் இல்லை."
+
+#: app/templates/delivery/dashboard.html:158
+msgid "Today's Event Deliveries"
+msgstr "இன்றைய நிகழ்வு விநியோகங்கள்"
+
+#: app/templates/delivery/dashboard.html:170
+msgid "for event. Amount:"
+msgstr "நிகழ்வுக்காக. தொகை:"
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Pre-Paid to Manager"
+msgstr "மேலாளருக்கு முன்கூட்டியே செலுத்தப்பட்டது"
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Collect Payment"
+msgstr "பணத்தை சேகரிக்கவும்"
+
+#: app/templates/delivery/dashboard.html:176
+#, python-format
+msgid "Confirm EVENT delivery to %(name)s?"
+msgstr "%(name)s க்கு நிகழ்வு விநியோகத்தை உறுதிப்படுத்தவா?"
+
+#: app/templates/delivery/dashboard.html:183
+msgid "No event deliveries for today."
+msgstr "இன்றுக்கு நிகழ்வு விநியோகங்கள் எதுவும் இல்லை."
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Default:"
+msgstr "இயல்புநிலை:"
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Jar(s) at"
+msgstr "ஜார்(கள்)"
+
+#: app/templates/delivery/dashboard.html:224
+msgid "Jars:"
+msgstr "ஜார்கள்:"
+
+#: app/templates/delivery/dashboard.html:232
+msgid "Mark as Due"
+msgstr "செலுத்த வேண்டியதாகக் குறிக்கவும்"
+
+#: app/templates/delivery/dashboard.html:236
+msgid "Deliver"
+msgstr "வழங்க"
+
+#: app/templates/delivery/dashboard.html:245
+msgid "No customers found."
+msgstr "வாடிக்கையாளர்கள் யாரும் இல்லை."
+
+#: app/templates/manager/add_staff_form.html:32
+msgid "Set initial password"
+msgstr "ஆரம்ப கடவுச்சொல்லை அமைக்கவும்"
+
+#: app/templates/manager/add_staff_form.html:54
+#: app/templates/manager/edit_staff_form.html:49
+msgid "Cancel"
+msgstr "ரத்துசெய்"
+
+#: app/templates/manager/edit_staff_form.html:42
+msgid "Current ID Proof:"
+msgstr "தற்போதைய அடையாளச் சான்று:"
+
+#: app/templates/manager/list_staff.html:5
+msgid "Manage Your Staff"
+msgstr "உங்கள் ஊழியர்களை நிர்வகிக்கவும்"
+
+#: app/templates/manager/list_staff.html:7
+msgid "Add New Staff"
+msgstr "புதிய ஊழியரைச் சேர்க்கவும்"
+
+#: app/templates/manager/list_staff.html:17
+msgid "Username"
+msgstr "பயனர்பெயர்"
+
+#: app/templates/manager/list_staff.html:18
+msgid "Mobile"
+msgstr "மொபைல்"
+
+#: app/templates/manager/list_staff.html:19
+msgid "Daily Wage"
+msgstr "தினசரி ஊதியம்"
+
+#: app/templates/manager/list_staff.html:20
+msgid "Actions"
+msgstr "செயல்கள்"
+
+#: app/templates/manager/list_staff.html:27
+msgid "N/A"
+msgstr "பொருந்தாது"
+
+#: app/templates/manager/list_staff.html:32
+msgid "Not Set"
+msgstr "அமைக்கப்படவில்லை"
+
+#: app/templates/manager/list_staff.html:37
+msgid "Edit Details"
+msgstr "விவரங்களைத் திருத்தவும்"
+
+#: app/templates/manager/list_staff.html:43
+msgid "No staff members found for your business."
+msgstr "உங்கள் வணிகத்திற்காக ஊழியர்கள் யாரும் இல்லை."
+
+#: app/templates/public/about.html:7
+msgid "About Aquajal"
+msgstr "அக்வாஜல் பற்றி"
+
+#: app/templates/public/about.html:8
+msgid ""
+"Aquajal is a modern, web-based solution designed to streamline the "
+"operations of water jar supply businesses. Our mission is to empower "
+"business owners with the tools they need to manage their daily tasks "
+"efficiently, from tracking deliveries to managing staff and inventory."
+msgstr "அக்வாஜல் என்பது தண்ணீர் ஜார் விநியோக வணிகங்களின் செயல்பாடுகளை நெறிப்படுத்த வடிவமைக்கப்பட்ட ஒரு நவீன, வலை அடிப்படையிலான தீர்வாகும். விநியோகங்களைக் கண்காணிப்பதில் இருந்து ஊழியர்கள் மற்றும் இருப்பை நிர்வகிப்பது வரை, வணிக உரிமையாளர்களுக்கு அவர்களின் தினசரி பணிகளை திறமையாக நிர்வகிக்க தேவையான கருவிகளை வழங்குவதே எங்கள் நோக்கம்."
+
+#: app/templates/public/about.html:11
+msgid "Our Story"
+msgstr "எங்கள் கதை"
+
+#: app/templates/public/about.html:12
+msgid ""
+"The idea for Aquajal was born from a simple observation: many local water"
+" suppliers rely on manual, paper-based methods to manage their complex "
+"daily operations. This often leads to inefficiencies, lost revenue, and a"
+" lack of clear insight into the business's performance. We saw an "
+"opportunity to change that."
+msgstr "அக்வாஜலுக்கான யோசனை ஒரு எளிய கவனிப்பிலிருந்து பிறந்தது: பல உள்ளூர் தண்ணீர் விநியோகஸ்தர்கள் தங்கள் சிக்கலான தினசரி செயல்பாடுகளை நிர்வகிக்க கைமுறை, காகித அடிப்படையிலான முறைகளை நம்பியுள்ளனர். இது பெரும்பாலும் திறமையின்மை, வருவாய் இழப்பு மற்றும் வணிகத்தின் செயல்திறன் குறித்த தெளிவான பார்வையின்மைக்கு வழிவகுக்கிறது. அதை மாற்றுவதற்கான ஒரு வாய்ப்பை நாங்கள் கண்டோம்."
+
+#: app/templates/public/about.html:13
+msgid ""
+"We set out to create a user-friendly, affordable, and powerful "
+"application that automates routine tasks, provides valuable insights "
+"through reports, and brings all aspects of the business—sales, stock, "
+"staff, and customers—into one centralized platform."
+msgstr "வழக்கமான பணிகளை தானியக்கமாக்கும், அறிக்கைகள் மூலம் மதிப்புமிக்க நுண்ணறிவுகளை வழங்கும், மற்றும் வணிகத்தின் அனைத்து அம்சங்களையும் - விற்பனை, இருப்பு, ஊழியர்கள் மற்றும் வாடிக்கையாளர்களை - ஒரு மையப்படுத்தப்பட்ட தளத்தில் கொண்டுவரும் ஒரு பயனர் நட்பு, மலிவு மற்றும் சக்திவாய்ந்த பயன்பாட்டை உருவாக்க நாங்கள் புறப்பட்டோம்."
+
+#: app/templates/public/about.html:17
+msgid "Our Vision"
+msgstr "எங்கள் பார்வை"
+
+#: app/templates/public/about.html:18
+msgid ""
+"Our vision is to become the go-to management software for water supply "
+"businesses everywhere. We are committed to continuous improvement, adding"
+" new features, and providing exceptional support to our users. We believe"
+" that by simplifying business management, we can help our clients grow "
+"and succeed."
+msgstr "எங்கள் பார்வை எல்லா இடங்களிலும் உள்ள தண்ணீர் விநியோக வணிகங்களுக்கான முதன்மை மேலாண்மை மென்பொருளாக மாறுவதாகும். நாங்கள் தொடர்ச்சியான முன்னேற்றம், புதிய அம்சங்களைச் சேர்ப்பது மற்றும் எங்கள் பயனர்களுக்கு விதிவிலக்கான ஆதரவை வழங்குவதில் உறுதியாக உள்ளோம். வணிக நிர்வாகத்தை எளிதாக்குவதன் மூலம், எங்கள் வாடிக்கையாளர்களுக்கு வளரவும் வெற்றிபெறவும் உதவ முடியும் என்று நாங்கள் நம்புகிறோம்."
+
+#: app/templates/public/how_to_use.html:5
+msgid "How to Use Aquajal"
+msgstr "அக்வாஜலை எப்படி பயன்படுத்துவது"
+
+#: app/templates/public/how_to_use.html:9
+msgid "For Managers"
+msgstr "மேலாளர்களுக்கு"
+
+#: app/templates/public/how_to_use.html:12
+msgid "Setting Up Your Business"
+msgstr "உங்கள் வணிகத்தை அமைத்தல்"
+
+#: app/templates/public/how_to_use.html:14
+msgid "Initial Setup:"
+msgstr "ஆரம்ப அமைப்பு:"
+
+#: app/templates/public/how_to_use.html:14
+msgid ""
+"After registering, your first step is to set your business's default "
+"prices and attendance rules. Go to `Manager Menu > Price Settings` to set"
+" prices for new jars/dispensers and define the minimum jar deliveries for"
+" a full or half day's wage."
+msgstr "பதிவுசெய்த பிறகு, உங்கள் முதல் படி உங்கள் வணிகத்தின் இயல்புநிலை விலைகள் மற்றும் வருகை விதிகளை அமைப்பதாகும். புதிய ஜார்கள்/டிஸ்பென்சர்களுக்கான விலைகளை அமைக்க மற்றும் ஒரு முழு அல்லது அரை நாள் ஊதியத்திற்கான குறைந்தபட்ச ஜார் விநியோகங்களை வரையறுக்க `மேலாளர் மெனு > விலை அமைப்புகள்` என்பதற்குச் செல்லவும்."
+
+#: app/templates/public/how_to_use.html:15
+msgid "Manage Staff:"
+msgstr "ஊழியர்களை நிர்வகிக்கவும்:"
+
+#: app/templates/public/how_to_use.html:15
+msgid ""
+"Use the `Manager Menu > Manage Staff` option to add your delivery "
+"personnel. You can set their daily wages and even upload ID proofs."
+msgstr "உங்கள் டெலிவரி ஊழியர்களைச் சேர்க்க `மேலாளர் மெனு > ஊழியர்களை நிர்வகிக்கவும்` விருப்பத்தைப் பயன்படுத்தவும். நீங்கள் அவர்களின் தினசரி ஊதியத்தை அமைக்கலாம் மற்றும் அடையாளச் சான்றுகளை கூட பதிவேற்றலாம்."
+
+#: app/templates/public/how_to_use.html:16
+msgid "Add Customers:"
+msgstr "வாடிக்கையாளர்களைச் சேர்க்கவும்:"
+
+#: app/templates/public/how_to_use.html:16
+msgid ""
+"From the `Manager Menu`, select `Customers` to build your customer list. "
+"Here you can set custom jar prices and add special notes for each "
+"customer."
+msgstr "`மேலாளர் மெனு`விலிருந்து, உங்கள் வாடிக்கையாளர் பட்டியலை உருவாக்க `வாடிக்கையாளர்கள்` என்பதைத் தேர்ந்தெடுக்கவும். இங்கே நீங்கள் ஒவ்வொரு வாடிக்கையாளருக்கும் தனிப்பயன் ஜார் விலைகளை அமைக்கலாம் மற்றும் சிறப்பு குறிப்புகளைச் சேர்க்கலாம்."
+
+#: app/templates/public/how_to_use.html:18
+msgid "Daily Operations"
+msgstr "தினசரி செயல்பாடுகள்"
+
+#: app/templates/public/how_to_use.html:20
+msgid "Stock Management:"
+msgstr "இருப்பு மேலாண்மை:"
+
+#: app/templates/public/how_to_use.html:20
+msgid ""
+"Keep your inventory updated from the `Manager Dashboard` by clicking on "
+"`Manage Stock`. Stock is automatically deducted for sales and confirmed "
+"event bookings."
+msgstr "`மேலாளர் டாஷ்போர்டு`விலிருந்து `இருப்பை நிர்வகிக்கவும்` என்பதைக் கிளிக் செய்வதன் மூலம் உங்கள் இருப்பை புதுப்பித்த நிலையில் வைத்திருக்கவும். விற்பனை மற்றும் உறுதிப்படுத்தப்பட்ட நிகழ்வு முன்பதிவுகளுக்கு இருப்பு தானாகவே கழிக்கப்படுகிறது."
+
+#: app/templates/public/how_to_use.html:21
+msgid "Confirm Bookings:"
+msgstr "முன்பதிவுகளை உறுதிப்படுத்தவும்:"
+
+#: app/templates/public/how_to_use.html:21
+msgid ""
+"New event bookings will appear on your dashboard. Confirm them to "
+"allocate stock and set the final amount."
+msgstr "புதிய நிகழ்வு முன்பதிவுகள் உங்கள் டாஷ்போர்டில் தோன்றும். இருப்பை ஒதுக்க மற்றும் இறுதித் தொகையை அமைக்க அவற்றை உறுதிப்படுத்தவும்."
+
+#: app/templates/public/how_to_use.html:22
+msgid "Receive Cash:"
+msgstr "ரொக்கம் பெற:"
+
+#: app/templates/public/how_to_use.html:22
+msgid ""
+"At the end of the day, use the `Receive Cash` button on your dashboard to"
+" record cash received from staff and reset their balance."
+msgstr "நாள் முடிவில், ஊழியர்களிடமிருந்து பெறப்பட்ட ரொக்கத்தைப் பதிவு செய்யவும் மற்றும் அவர்களின் இருப்பை மீட்டமைக்கவும் உங்கள் டாஷ்போர்டில் உள்ள `ரொக்கம் பெற` பொத்தானைப் பயன்படுத்தவும்."
+
+#: app/templates/public/how_to_use.html:24
+msgid "Invoicing & Reports"
+msgstr "விலைப்பட்டியல் & அறிக்கைகள்"
+
+#: app/templates/public/how_to_use.html:26
+msgid "View All Invoices:"
+msgstr "அனைத்து விலைப்பட்டியல்களையும் காண்க:"
+
+#: app/templates/public/how_to_use.html:26
+msgid ""
+"Go to `Manager Menu > Invoices` to see a list of all invoices generated. "
+"You can view, download as PDF, or email them to customers directly."
+msgstr "`மேலாளர் மெனு > விலைப்பட்டியல்கள்` என்பதற்குச் சென்று உருவாக்கப்பட்ட அனைத்து விலைப்பட்டியல்களின் பட்டியலையும் பார்க்கவும். நீங்கள் அவற்றைப் பார்க்கலாம், PDF ஆக பதிவிறக்கலாம் அல்லது நேரடியாக வாடிக்கையாளர்களுக்கு மின்னஞ்சல் செய்யலாம்."
+
+#: app/templates/public/how_to_use.html:27
+msgid "Generate Reports:"
+msgstr "அறிக்கைகளை உருவாக்கவும்:"
+
+#: app/templates/public/how_to_use.html:27
+msgid ""
+"The `Reports` button on your dashboard takes you to a powerful reporting "
+"tool. View monthly summaries of your income, expenses, and staff "
+"attendance, or drill down into daily transaction logs."
+msgstr "உங்கள் டாஷ்போர்டில் உள்ள `அறிக்கைகள்` பொத்தான் உங்களை ஒரு சக்திவாய்ந்த அறிக்கையிடல் கருவிக்கு அழைத்துச் செல்கிறது. உங்கள் வருமானம், செலவுகள் மற்றும் ஊழியர்களின் வருகை ஆகியவற்றின் மாதாந்திர சுருக்கங்களைப் பார்க்கவும் அல்லது தினசரி பரிவர்த்தனை பதிவுகளில் ஆழமாக ஆராயவும்."
+
+#: app/templates/public/how_to_use.html:34
+msgid "For Staff (Delivery Personnel)"
+msgstr "ஊழியர்களுக்கு (விநியோகப் பணியாளர்கள்)"
+
+#: app/templates/public/how_to_use.html:37
+msgid "Your Dashboard is Your Hub"
+msgstr "உங்கள் டாஷ்போர்டு உங்கள் மையம்"
+
+#: app/templates/public/how_to_use.html:38
+msgid ""
+"Your dashboard is designed for quick actions. You can see your current "
+"cash balance, log deliveries, record expenses, and see pending event "
+"deliveries for the day."
+msgstr "உங்கள் டாஷ்போர்டு விரைவான செயல்களுக்காக வடிவமைக்கப்பட்டுள்ளது. உங்கள் தற்போதைய ரொக்க இருப்பு, பதிவு விநியோகங்கள், செலவுகளைப் பதிவு செய்தல் மற்றும் நாளுக்கான நிலுவையில் உள்ள நிகழ்வு விநியோகங்களைப் பார்க்கலாம்."
+
+#: app/templates/public/how_to_use.html:39
+msgid "Logging a Delivery"
+msgstr "ஒரு விநியோகத்தைப் பதிவு செய்தல்"
+
+#: app/templates/public/how_to_use.html:40
+msgid ""
+"Use the search bar to find a customer by name or mobile number. Once they"
+" appear, enter the number of jars delivered. If the customer isn't paying"
+" immediately, check the \"Mark as Due\" box before clicking `Deliver`."
+msgstr "பெயர் அல்லது மொபைல் எண் மூலம் ஒரு வாடிக்கையாளரைக் கண்டுபிடிக்க தேடல் பட்டியைப் பயன்படுத்தவும். அவர்கள் தோன்றியதும், வழங்கப்பட்ட ஜார்களின் எண்ணிக்கையை உள்ளிடவும். வாடிக்கையாளர் உடனடியாக பணம் செலுத்தவில்லை என்றால், `வழங்க` என்பதைக் கிளிக் செய்வதற்கு முன் \"செலுத்த வேண்டியதாகக் குறிக்கவும்\" பெட்டியைச் சரிபார்க்கவும்."
+
+#: app/templates/public/how_to_use.html:41
+msgid "Selling New Products"
+msgstr "புதிய தயாரிப்புகளை விற்பனை செய்தல்"
+
+#: app/templates/public/how_to_use.html:42
+msgid ""
+"You can sell a new jar or dispenser to a walk-in customer using the `Sell"
+" New Jar / Dispenser` button. The amount will be added to your cash "
+"balance and stock will be updated automatically."
+msgstr "`புதிய ஜார் / டிஸ்பென்சரை விற்கவும்` பொத்தானைப் பயன்படுத்தி நீங்கள் ஒரு வாடிக்கையாளருக்கு புதிய ஜார் அல்லது டிஸ்பென்சரை விற்கலாம். தொகை உங்கள் ரொக்க இருப்பில் சேர்க்கப்படும் மற்றும் இருப்பு தானாகவே புதுப்பிக்கப்படும்."
+
+#: app/templates/public/how_to_use.html:48
+msgid "For Customers"
+msgstr "வாடிக்கையாளர்களுக்கு"
+
+#: app/templates/public/how_to_use.html:51
+msgid ""
+"As a customer, your personal dashboard allows you to manage your account "
+"easily. You can:"
+msgstr "ஒரு வாடிக்கையாளராக, உங்கள் தனிப்பட்ட டாஷ்போர்டு உங்கள் கணக்கை எளிதாக நிர்வகிக்க அனுமதிக்கிறது. நீங்கள்:"
+
+#: app/templates/public/how_to_use.html:53
+msgid ""
+"View your complete activity history, including past deliveries and event "
+"bookings."
+msgstr "கடந்தகால விநியோகங்கள் மற்றும் நிகழ்வு முன்பதிவுகள் உட்பட உங்கள் முழுமையான செயல்பாட்டு வரலாற்றைக் காண்க."
+
+#: app/templates/public/how_to_use.html:54
+msgid "See any outstanding due amounts."
+msgstr "எந்தவொரு நிலுவைத் தொகையையும் காண்க."
+
+#: app/templates/public/how_to_use.html:55
+msgid "View and download all your past invoices from the `Invoices` tab."
+msgstr "`விலைப்பட்டியல்கள்` தாவலில் இருந்து உங்கள் கடந்தகால அனைத்து விலைப்பட்டியல்களையும் காண்க மற்றும் பதிவிறக்கவும்."
+
+#: app/templates/public/how_to_use.html:56
+msgid ""
+"Quickly request extra jars for daily use or book jars in bulk for an "
+"upcoming event."
+msgstr "தினசரி பயன்பாட்டிற்காக கூடுதல் ஜார்களை விரைவாகக் கோரவும் அல்லது வரவிருக்கும் நிகழ்வுக்காக மொத்தமாக ஜார்களை முன்பதிவு செய்யவும்."
+
+#: app/templates/public/index.html:10
+msgid "The All-in-One Platform to Run Your Water Supply Business"
+msgstr "உங்கள் தண்ணீர் விநியோக வணிகத்தை நடத்துவதற்கான முழுமையான தளம்"
+
+#: app/templates/public/index.html:11
+msgid ""
+"Aquajal is a complete SaaS solution that helps you automate sales, manage"
+" subscriptions, generate invoices, track inventory, and monitor staff "
+"performance effortlessly."
+msgstr "அக்வாஜல் ஒரு முழுமையான SaaS தீர்வாகும், இது விற்பனையை தானியக்கமாக்கவும், சந்தாக்களை நிர்வகிக்கவும், விலைப்பட்டியல்களை உருவாக்கவும், இருப்பைக் கண்காணிக்கவும் மற்றும் ஊழியர்களின் செயல்திறனை சிரமமின்றி கண்காணிக்கவும் உதவுகிறது."
+
+#: app/templates/public/index.html:14
+msgid "Full SaaS Platform:"
+msgstr "முழுமையான SaaS தளம்:"
+
+#: app/templates/public/index.html:14
+msgid ""
+"Manage your business with a 40-day free trial and flexible subscription "
+"plans."
+msgstr "உங்கள் வணிகத்தை 40-நாள் இலவச சோதனை மற்றும் நெகிழ்வான சந்தா திட்டங்களுடன் நிர்வகிக்கவும்."
+
+#: app/templates/public/index.html:15
+msgid "Automated Invoicing:"
+msgstr "தானியங்கி விலைப்பட்டியல்:"
+
+#: app/templates/public/index.html:15
+msgid ""
+"Generate, download, and email PDF invoices to your customers "
+"automatically."
+msgstr "உங்கள் வாடிக்கையாளர்களுக்கு தானாகவே PDF விலைப்பட்டியல்களை உருவாக்கி, பதிவிறக்கி, மின்னஞ்சல் செய்யவும்."
+
+#: app/templates/public/index.html:16
+msgid "Advanced Reporting:"
+msgstr "மேம்பட்ட அறிக்கையிடல்:"
+
+#: app/templates/public/index.html:16
+msgid "Get daily and monthly insights on sales, expenses, and staff attendance."
+msgstr "விற்பனை, செலவுகள் மற்றும் ஊழியர்களின் வருகை குறித்த தினசரி மற்றும் மாதாந்திர நுண்ணறிவுகளைப் பெறுங்கள்."
+
+#: app/templates/public/index.html:17
+msgid "Customer & Staff Portals:"
+msgstr "வாடிக்கையாளர் & ஊழியர் தளங்கள்:"
+
+#: app/templates/public/index.html:17
+msgid "Empower customers to view history and staff to log deliveries on the go."
+msgstr "வாடிக்கையாளர்களுக்கு வரலாற்றைக் காணவும், ஊழியர்களுக்கு பயணத்தின்போது விநியோகங்களைப் பதிவு செய்யவும் அதிகாரம் அளியுங்கள்."
+
+#: app/templates/public/index.html:21
+msgid "Start Your 40-Day Free Trial"
+msgstr "உங்கள் 40-நாள் இலவச சோதனையைத் தொடங்குங்கள்"
+
+#: app/templates/public/index.html:29
+msgid "A Modern Platform Built for Growth"
+msgstr "வளர்ச்சிக்காக உருவாக்கப்பட்ட ஒரு நவீன தளம்"
+
+#: app/templates/public/index.html:35
+msgid "Professional Invoicing"
+msgstr "தொழில்முறை விலைப்பட்டியல்"
+
+#: app/templates/public/index.html:36
+msgid ""
+"Automate invoice creation for every transaction, including monthly "
+"summaries and event bookings. Email professional PDF invoices directly to"
+" clients."
+msgstr "மாதாந்திர சுருக்கங்கள் மற்றும் நிகழ்வு முன்பதிவுகள் உட்பட ஒவ்வொரு பரிவர்த்தனைக்கும் விலைப்பட்டியல் உருவாக்கத்தை தானியக்கமாக்குங்கள். வாடிக்கையாளர்களுக்கு தொழில்முறை PDF விலைப்பட்டியல்களை நேரடியாக மின்னஞ்சல் செய்யவும்."
+
+#: app/templates/public/index.html:42
+msgid "Subscription Management"
+msgstr "சந்தா மேலாண்மை"
+
+#: app/templates/public/index.html:43
+msgid ""
+"Offer flexible subscription plans with a 40-day free trial. Securely "
+"accept online payments with our integrated Razorpay checkout system."
+msgstr "40-நாள் இலவச சோதனையுடன் நெகிழ்வான சந்தா திட்டங்களை வழங்குங்கள். எங்கள் ஒருங்கிணைந்த ரேஸர்பே செக்அவுட் அமைப்புடன் ஆன்லைன் கட்டணங்களை பாதுகாப்பாக ஏற்கவும்."
+
+#: app/templates/public/index.html:49
+msgid "Insightful Reports"
+msgstr "நுண்ணறிவுமிக்க அறிக்கைகள்"
+
+#: app/templates/public/index.html:50
+msgid ""
+"Make data-driven decisions with comprehensive reports on sales, expenses,"
+" staff performance, and even new customer leads."
+msgstr "விற்பனை, செலவுகள், ஊழியர்களின் செயல்திறன் மற்றும் புதிய வாடிக்கையாளர் வழிகாட்டுதல்கள் மீதான விரிவான அறிக்கைகளுடன் தரவு சார்ந்த முடிவுகளை எடுக்கவும்."
+
+#: app/templates/public/index.html:57
+msgid "Pricing"
+msgstr "விலை நிர்ணயம்"
+
+#: app/templates/public/index.html:58
+msgid ""
+"Choose a plan that fits your needs. Our monthly subscription costs less "
+"than a single day's labor, and all plans start with a 40-day free trial."
+msgstr "உங்கள் தேவைகளுக்கு ஏற்ற திட்டத்தைத் தேர்வுசெய்யுங்கள். எங்கள் மாதாந்திர சந்தா ஒரு நாள் உழைப்பை விட குறைவாக செலவாகும், மேலும் அனைத்து திட்டங்களும் 40-நாள் இலவச சோதனையுடன் தொடங்குகின்றன."
+
+#: app/templates/public/index.html:68
+msgid "days"
+msgstr "நாட்கள்"
+
+#: app/templates/public/index.html:70
+msgid "Regular Price:"
+msgstr "சாதாரண விலை:"
+
+#: app/templates/public/index.html:71
+msgid "Manage Unlimited Staff"
+msgstr "வரம்பற்ற ஊழியர்களை நிர்வகிக்கவும்"
+
+#: app/templates/public/index.html:72
+msgid "Manage Unlimited Customers"
+msgstr "வரம்பற்ற வாடிக்கையாளர்களை நிர்வகிக்கவும்"
+
+#: app/templates/public/index.html:73
+msgid "Automated Invoicing & Reports"
+msgstr "தானியங்கி விலைப்பட்டியல் & அறிக்கைகள்"
+
+#: app/templates/public/index.html:74
+msgid "Email Support"
+msgstr "மின்னஞ்சல் ஆதரவு"
+
+#: app/templates/public/index.html:76
+msgid "After the initial offer, renewals are at the regular price."
+msgstr "ஆரம்ப சலுகைக்குப் பிறகு, புதுப்பித்தல்கள் சாதாரண விலையில் இருக்கும்."
+
+#: app/templates/public/index.html:77
+msgid "Start Free Trial"
+msgstr "இலவச சோதனையைத் தொடங்குங்கள்"
+
+#: app/templates/public/index.html:86
+msgid "Frequently Asked Questions"
+msgstr "அடிக்கடி கேட்கப்படும் கேள்விகள்"
+
+#: app/templates/public/index.html:91
+msgid "What happens after my 40-day free trial ends?"
+msgstr "எனது 40-நாள் இலவச சோதனை முடிந்ததும் என்ன நடக்கும்?"
+
+#: app/templates/public/index.html:96
+msgid ""
+"After your trial, you will be prompted to choose a subscription plan to "
+"continue using the service. All your data—staff, customers, and "
+"reports—will be saved and waiting for you. We accept online payments "
+"through Razorpay."
+msgstr "உங்கள் சோதனைக்குப் பிறகு, சேவையைப் பயன்படுத்துவதைத் தொடர ஒரு சந்தா திட்டத்தைத் தேர்வுசெய்யும்படி கேட்கப்படுவீர்கள். உங்கள் எல்லா தரவுகளும் - ஊழியர்கள், வாடிக்கையாளர்கள் மற்றும் அறிக்கைகள் - சேமிக்கப்பட்டு உங்களுக்காக காத்திருக்கும். நாங்கள் ரேஸர்பே மூலம் ஆன்லைன் கட்டணங்களை ஏற்கிறோம்."
+
+#: app/templates/public/index.html:103
+msgid "How does the automated invoicing work?"
+msgstr "தானியங்கி விலைப்பட்டியல் எப்படி வேலை செய்கிறது?"
+
+#: app/templates/public/index.html:108
+msgid ""
+"Aquajal automatically generates an invoice for every transaction, such as"
+" a daily delivery or an event booking. Managers can also generate "
+"consolidated monthly invoices for customers, download them as PDFs, or "
+"email them directly from the dashboard."
+msgstr "அக்வாஜல் தினசரி விநியோகம் அல்லது நிகழ்வு முன்பதிவு போன்ற ஒவ்வொரு பரிவர்த்தனைக்கும் தானாகவே ஒரு விலைப்பட்டியலை உருவாக்குகிறது. மேலாளர்கள் வாடிக்கையாளர்களுக்காக ஒருங்கிணைந்த மாதாந்திர விலைப்பட்டியல்களை உருவாக்கலாம், அவற்றை PDFகளாக பதிவிறக்கலாம் அல்லது டாஷ்போர்டிலிருந்து நேரடியாக மின்னஞ்சல் செய்யலாம்."
+
+#: app/templates/public/index.html:115
+msgid "Can I use this on my phone?"
+msgstr "இதை எனது தொலைபேசியில் பயன்படுத்தலாமா?"
+
+#: app/templates/public/index.html:120
+msgid ""
+"Yes! Aquajal is a Progressive Web App (PWA), which means you can add it "
+"to your phone's home screen and use it just like a native application. "
+"It's designed to be fully responsive and works great on any device."
+msgstr "ஆம்! அக்வாஜல் ஒரு முற்போக்கான வலை பயன்பாடு (PWA) ஆகும், அதாவது நீங்கள் அதை உங்கள் தொலைபேசியின் முகப்புத் திரையில் சேர்க்கலாம் மற்றும் அதை ஒரு சொந்த பயன்பாட்டைப் போலவே பயன்படுத்தலாம். இது முழுமையாக பதிலளிக்கக்கூடியதாக வடிவமைக்கப்பட்டுள்ளது மற்றும் எந்த சாதனத்திலும் சிறப்பாக செயல்படுகிறது."

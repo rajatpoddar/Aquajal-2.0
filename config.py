@@ -23,3 +23,15 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['your-email@example.com']
+    
+    # Supported languages
+    LANGUAGES = {
+        'en': 'English',
+        'hi': 'हिन्दी',       # Hindi
+        'bn': 'বাংলা',       # Bengali
+        'mr': 'मराठी',      # Marathi
+        'pa': 'ਪੰਜਾਬੀ',     # Punjabi
+        'ta': 'தமிழ்',      # Tamil
+        'te': 'తెలుగు',     # Telugu
+        'gu': 'ગુજરાતી'      # Gujarati
+    }
