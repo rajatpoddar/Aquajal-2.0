@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, Response, 
 from flask_login import login_required, current_user
 from app import db
 from app.invoices import bp
-from app.models import Invoice, Customer, InvoiceItem, EventBooking, DailyLog, User
+from app.models import Invoice, Customer, InvoiceItem, EventBooking, DailyLog, User, PurchaseOrder
 from weasyprint import HTML, CSS
 from app.email import send_invoice_email
 from app.decorators import manager_required
@@ -105,8 +105,20 @@ def email_invoice(invoice_id):
 @manager_required
 def list_invoices():
     page = request.args.get('page', 1, type=int)
-    invoices = Invoice.query.filter_by(business_id=current_user.business_id).order_by(Invoice.issue_date.desc()).paginate(page=page, per_page=10)
-    return render_template('manager/list_invoices.html', invoices=invoices, title="All Invoices")
+    
+    # Fetch customer invoices
+    customer_invoices = Invoice.query.filter_by(business_id=current_user.business_id).order_by(Invoice.issue_date.desc()).paginate(page=page, per_page=10)
+    
+    # Fetch supplier invoices (Purchase Orders)
+    supplier_invoices = PurchaseOrder.query.filter(
+        PurchaseOrder.business_id == current_user.business_id,
+        PurchaseOrder.invoice_number.isnot(None)
+    ).order_by(PurchaseOrder.order_date.desc()).all()
+
+    return render_template('manager/list_invoices.html', 
+                           customer_invoices=customer_invoices, 
+                           supplier_invoices=supplier_invoices,
+                           title="All Invoices")
 
 @bp.route('/generate/<int:customer_id>', methods=['GET', 'POST'])
 @login_required

@@ -33,26 +33,18 @@ def checkout(plan_id):
     if not is_first_payment:
         final_amount = plan.regular_price
 
-    coupon_code = None
+    coupon_code = request.form.get('coupon')
     applied_coupon = False
 
-    if request.method == 'POST':
-        coupon_code = request.form.get('coupon')
-        if coupon_code:
-            coupon = Coupon.query.filter(Coupon.code.ilike(coupon_code), Coupon.is_active==True).first()
-            if coupon and (not coupon.expiry_date or coupon.expiry_date.date() > datetime.today().date()):
-                discount = (final_amount * coupon.discount_percentage) / 100
-                final_amount -= discount
-                applied_coupon = True
-                flash(f'Coupon "{coupon_code}" applied! You get a {coupon.discount_percentage}% discount.', 'success')
-            else:
-                flash('Invalid or expired coupon code.', 'danger')
-        else: # Handle price reset if coupon is removed
-            if not is_first_payment:
-                final_amount = plan.regular_price
-            else:
-                final_amount = plan.sale_price
-
+    if request.method == 'POST' and coupon_code:
+        coupon = Coupon.query.filter(Coupon.code.ilike(coupon_code), Coupon.is_active==True).first()
+        if coupon and (not coupon.expiry_date or coupon.expiry_date.date() > datetime.today().date()):
+            discount = (final_amount * coupon.discount_percentage) / 100
+            final_amount -= discount
+            applied_coupon = True
+            flash(f'Coupon "{coupon_code}" applied! You get a {coupon.discount_percentage}% discount.', 'success')
+        else:
+            flash('Invalid or expired coupon code.', 'danger')
 
     client = razorpay.Client(auth=(current_app.config['RAZORPAY_KEY_ID'], current_app.config['RAZORPAY_KEY_SECRET']))
     payment_data = {
@@ -62,19 +54,46 @@ def checkout(plan_id):
     }
     order = client.order.create(data=payment_data)
     
-    # Store the plan_id with the payment temporarily
     payment = Payment(
         business_id=business.id,
         razorpay_order_id=order['id'],
         amount=final_amount,
         status='created',
-        subscription_plan_id=plan.id  # Store plan id
+        subscription_plan_id=plan.id
     )
     db.session.add(payment)
     db.session.commit()
 
-    # --- MODIFIED LINE ---
-    return render_template('billing/checkout.html', title='Checkout', plan=plan, order=order, final_amount=final_amount, is_first_payment=is_first_payment, applied_coupon=applied_coupon, razorpay_key_id=current_app.config['RAZORPAY_KEY_ID'])
+    return render_template('billing/checkout.html', title='Checkout', plan=plan, order=order, final_amount=final_amount, is_first_payment=is_first_payment, applied_coupon=applied_coupon, coupon_code=coupon_code, razorpay_key_id=current_app.config['RAZORPAY_KEY_ID'])
+
+
+@bp.route('/cod_checkout/<int:plan_id>', methods=['POST'])
+@login_required
+def cod_checkout(plan_id):
+    plan = SubscriptionPlan.query.get_or_404(plan_id)
+    business = Business.query.get(current_user.business_id)
+    
+    business.subscription_status = 'active'
+    business.subscription_plan_id = plan.id
+    
+    start_date = datetime.utcnow()
+    if business.subscription_ends_at and business.subscription_ends_at > start_date:
+        start_date = business.subscription_ends_at
+    
+    business.subscription_ends_at = start_date + timedelta(days=plan.duration_days)
+    
+    payment = Payment(
+        business_id=business.id,
+        amount=0, # Or the actual amount if you want to track it
+        status='cod',
+        subscription_plan_id=plan.id
+    )
+    db.session.add(payment)
+
+    db.session.commit()
+    
+    flash('Your order has been placed! Your subscription will be activated upon payment.', 'success')
+    return redirect(url_for('manager.dashboard'))
 
 
 @bp.route('/payment_success', methods=['POST'])

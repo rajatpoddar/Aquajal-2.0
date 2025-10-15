@@ -10,14 +10,31 @@
                     <h5 class="card-title">Plan: {{ plan.name|capitalize }}</h5>
                     <p class="card-text">Amount: ₹{{ "%.2f"|format(final_amount) }}</p>
                     
-                    <form action="{{ url_for('billing.checkout', plan_id=plan.id) }}" method="post">
+                    <form action="{{ url_for('billing.checkout', plan_id=plan.id) }}" method="post" id="coupon-form">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="Coupon Code" name="coupon" value="{{ coupon_code or '' }}">
                             <button class="btn btn-outline-secondary" type="submit">Apply</button>
                         </div>
                     </form>
 
-                    <button id="rzp-button1" class="btn btn-primary">Pay with Razorpay</button>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                Cash on Delivery (COD)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
+                            <label class="form-check-label" for="razorpay">
+                                Pay with Razorpay
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="checkout-button" class="btn btn-primary">Place Order</button>
+
+                    <form id="cod-form" action="{{ url_for('billing.cod_checkout', plan_id=plan.id) }}" method="post" style="display: none;"></form>
                 </div>
             </div>
         </div>
@@ -26,53 +43,85 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-var options = {
-    // --- MODIFIED LINE ---
-    "key": "{{ razorpay_key_id }}",
-    "amount": "{{ order.amount }}", 
-    "currency": "INR",
-    "name": "Aquajal Subscriptions",
-    "description": "Test Transaction",
-    "order_id": "{{ order.id }}",
-    "handler": function (response){
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{{ url_for('billing.payment_success') }}";
+document.addEventListener('DOMContentLoaded', function() {
+    const checkoutButton = document.getElementById('checkout-button');
+    const codForm = document.getElementById('cod-form');
+    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
 
-        var orderIdField = document.createElement('input');
-        orderIdField.type = 'hidden';
-        orderIdField.name = 'razorpay_order_id';
-        orderIdField.value = response.razorpay_order_id;
-        form.appendChild(orderIdField);
+    let rzp;
 
-        var paymentIdField = document.createElement('input');
-        paymentIdField.type = 'hidden';
-        paymentIdField.name = 'razorpay_payment_id';
-        paymentIdField.value = response.razorpay_payment_id;
-        form.appendChild(paymentIdField);
+    const razorpayOptions = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ order.amount }}", 
+        "currency": "INR",
+        "name": "Aquajal Subscriptions",
+        "description": "Test Transaction",
+        "order_id": "{{ order.id }}",
+        "handler": function (response){
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('billing.payment_success') }}";
 
-        var signatureField = document.createElement('input');
-        signatureField.type = 'hidden';
-        signatureField.name = 'razorpay_signature';
-        signatureField.value = response.razorpay_signature;
-        form.appendChild(signatureField);
+            var orderIdField = document.createElement('input');
+            orderIdField.type = 'hidden';
+            orderIdField.name = 'razorpay_order_id';
+            orderIdField.value = response.razorpay_order_id;
+            form.appendChild(orderIdField);
 
-        document.body.appendChild(form);
-        form.submit();
-    },
-    "prefill": {
-        "name": "{{ current_user.username }}",
-        "email": "",
-        "contact": "{{ current_user.mobile_number or '' }}"
-    },
-    "theme": {
-        "color": "#3399cc"
+            var paymentIdField = document.createElement('input');
+            paymentIdField.type = 'hidden';
+            paymentIdField.name = 'razorpay_payment_id';
+            paymentIdField.value = response.razorpay_payment_id;
+            form.appendChild(paymentIdField);
+
+            var signatureField = document.createElement('input');
+            signatureField.type = 'hidden';
+            signatureField.name = 'razorpay_signature';
+            signatureField.value = response.razorpay_signature;
+            form.appendChild(signatureField);
+
+            document.body.appendChild(form);
+            form.submit();
+        },
+        "prefill": {
+            "name": "{{ current_user.username }}",
+            "email": "",
+            "contact": "{{ current_user.mobile_number or '' }}"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+
+    function updateButton() {
+        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        if (selectedMethod === 'cod') {
+            checkoutButton.innerText = 'Place Order';
+        } else {
+            checkoutButton.innerText = 'Pay ₹{{ "%.2f"|format(final_amount) }}';
+        }
     }
-};
-var rzp1 = new Razorpay(options);
-document.getElementById('rzp-button1').onclick = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
+
+    paymentMethods.forEach(radio => {
+        radio.addEventListener('change', updateButton);
+    });
+
+    checkoutButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (selectedMethod === 'cod') {
+            codForm.submit();
+        } else {
+            if (!rzp) {
+                rzp = new Razorpay(razorpayOptions);
+            }
+            rzp.open();
+        }
+    });
+
+    // Initialize button text
+    updateButton();
+});
 </script>
 {% endblock %}

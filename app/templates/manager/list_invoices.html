@@ -5,63 +5,114 @@
     <h2>All Invoices</h2>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Invoice #</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th class="text-end">Amount</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for invoice in invoices.items %}
-                    <tr>
-                        <td>{{ invoice.invoice_number }}</td>
-                        <td>{{ invoice.customer.name }}</td>
-                        <td>{{ invoice.issue_date.strftime('%d-%b-%Y') }}</td>
-                        <td class="text-end">₹{{ "%.2f"|format(invoice.total_amount) }}</td>
-                        <td class="text-center">
-                            {% if invoice.status == 'Paid' %}
-                                <span class="badge bg-success">{{ invoice.status }}</span>
+<ul class="nav nav-tabs" id="invoiceTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="customer-invoices-tab" data-bs-toggle="tab" data-bs-target="#customer-invoices" type="button" role="tab">Invoices of Customers</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="supplier-invoices-tab" data-bs-toggle="tab" data-bs-target="#supplier-invoices" type="button" role="tab">Invoices from Suppliers</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="invoiceTabsContent">
+    <div class="tab-pane fade show active" id="customer-invoices" role="tabpanel">
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in customer_invoices.items %}
+                            <tr>
+                                <td>{{ invoice.invoice_number }}</td>
+                                <td>{{ invoice.customer.name }}</td>
+                                <td>{{ invoice.issue_date.strftime('%d-%b-%Y') }}</td>
+                                <td class="text-end">₹{{ "%.2f"|format(invoice.total_amount) }}</td>
+                                <td class="text-center">
+                                    {% if invoice.status == 'Paid' %}
+                                        <span class="badge bg-success">{{ invoice.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ invoice.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('invoices.view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ url_for('invoices.download_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary" title="Download"><i class="bi bi-download"></i></a>
+                                    <a href="{{ url_for('invoices.email_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-success" title="Email to Customer" onclick="return confirm('Are you sure you want to email this invoice to the customer?');"><i class="bi bi-envelope"></i></a>
+                                </td>
+                            </tr>
                             {% else %}
-                                <span class="badge bg-warning">{{ invoice.status }}</span>
+                            <tr>
+                                <td colspan="6" class="text-center">No customer invoices found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <nav>
+                    <ul class="pagination">
+                        {% for page_num in customer_invoices.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                                {% if customer_invoices.page == page_num %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('invoices.list_invoices', page=page_num) }}">{{ page_num }}</a></li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
                             {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <a href="{{ url_for('invoices.view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
-                            <a href="{{ url_for('invoices.download_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary" title="Download"><i class="bi bi-download"></i></a>
-                            <a href="{{ url_for('invoices.email_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-success" title="Email to Customer" onclick="return confirm('Are you sure you want to email this invoice to the customer?');"><i class="bi bi-envelope"></i></a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center">No invoices found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
         </div>
-        <nav>
-            <ul class="pagination">
-                {% for page_num in invoices.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-                    {% if page_num %}
-                        {% if invoices.page == page_num %}
-                            <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
-                        {% else %}
-                            <li class="page-item"><a class="page-link" href="{{ url_for('invoices.list_invoices', page=page_num) }}">{{ page_num }}</a></li>
-                        {% endif %}
-                    {% else %}
-                        <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </nav>
+    </div>
+    <div class="tab-pane fade" id="supplier-invoices" role="tabpanel">
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Supplier</th>
+                                <th>Order Date</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in supplier_invoices %}
+                            <tr>
+                                <td>{{ order.invoice_number }}</td>
+                                <td>{{ order.supplier.shop_name }}</td>
+                                <td>{{ order.order_date.strftime('%d-%b-%Y') }}</td>
+                                <td class="text-end">₹{{ "%.2f"|format(order.total_amount) }}</td>
+                                <td class="text-center"><span class="badge bg-info">{{ order.status }}</span></td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('manager.view_procurement_invoice', order_id=order.id) }}" class="btn btn-sm btn-outline-info">View Invoice</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No supplier invoices found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

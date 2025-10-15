@@ -1,0 +1,1013 @@
+# Hindi translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-14 14:13+0530\n"
+"PO-Revision-Date: 2025-10-14 14:00+0530\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: hi\n"
+"Language-Team: hi <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/admin/routes.py:53
+msgid "This coupon code already exists."
+msgstr "यह कूपन कोड पहले से मौजूद है।"
+
+#: app/admin/routes.py:91 app/admin/routes.py:148
+msgid "This username is already taken."
+msgstr "यह उपयोगकर्ता नाम पहले ही लिया जा चुका है।"
+
+#: app/admin/routes.py:97 app/admin/routes.py:154
+msgid "This mobile number is already registered."
+msgstr "यह मोबाइल नंबर पहले से ही पंजीकृत है।"
+
+#: app/admin/routes.py:122
+msgid "Please use a different username."
+msgstr "कृपया एक अलग उपयोगकर्ता नाम का उपयोग करें।"
+
+#: app/admin/routes.py:164 app/templates/base.html:65
+msgid "Admin Dashboard"
+msgstr "एडमिन डैशबोर्ड"
+
+#: app/admin/routes.py:182
+msgid "Your profile has been updated."
+msgstr "आपकी प्रोफ़ाइल अपडेट कर दी गई है।"
+
+#: app/admin/routes.py:186 app/templates/base.html:67
+msgid "My Profile"
+msgstr "मेरी प्रोफ़ाइल"
+
+#: app/admin/routes.py:198
+#, python-format
+msgid "Business \"%(name)s\" created successfully."
+msgstr "व्यवसाय \"%(name)s\" सफलतापूर्वक बनाया गया।"
+
+#: app/admin/routes.py:200
+msgid "Create New Business"
+msgstr "नया व्यवसाय बनाएं"
+
+#: app/admin/routes.py:218
+#, python-format
+msgid "Business \"%(name)s\" details have been updated."
+msgstr "व्यवसाय \"%(name)s\" का विवरण अपडेट कर दिया गया है।"
+
+#: app/admin/routes.py:235
+#, python-format
+msgid "Subscription updated for \"%(name)s\"."
+msgstr "\"%(name)s\" के लिए सदस्यता अपडेट की गई।"
+
+#: app/admin/routes.py:240
+#, python-format
+msgid "Subscription removed for \"%(name)s\". Status set to expired."
+msgstr "\"%(name)s\" के लिए सदस्यता हटा दी गई। स्थिति समाप्त हो गई है।"
+
+#: app/admin/routes.py:245
+msgid "Edit Business"
+msgstr "व्यवसाय संपादित करें"
+
+#: app/admin/routes.py:256
+#, python-format
+msgid "Stock for \"%(name)s\" has been reset to zero."
+msgstr "\"%(name)s\" के लिए स्टॉक शून्य पर रीसेट कर दिया गया है।"
+
+#: app/admin/routes.py:278
+#, python-format
+msgid "User \"%(username)s\" has been created."
+msgstr "उपयोगकर्ता \"%(username)s\" बनाया गया है।"
+
+#: app/admin/routes.py:280
+msgid "Add New User"
+msgstr "नया उपयोगकर्ता जोड़ें"
+
+#: app/admin/routes.py:317
+#, python-format
+msgid "User \"%(username)s\" has been updated."
+msgstr "उपयोगकर्ता \"%(username)s\" को अपडेट कर दिया गया है।"
+
+#: app/admin/routes.py:320
+msgid "Edit User"
+msgstr "उपयोगकर्ता संपादित करें"
+
+#: app/admin/routes.py:329
+msgid "Cannot delete the admin user."
+msgstr "एडमिन उपयोगकर्ता को नहीं हटा सकते।"
+
+#: app/admin/routes.py:331
+#, python-format
+msgid "User \"%(username)s\" has been deleted."
+msgstr "उपयोगकर्ता \"%(username)s\" को हटा दिया गया है।"
+
+#: app/admin/routes.py:345
+msgid "Subscription Plans"
+msgstr "सदस्यता योजनाएं"
+
+#: app/admin/routes.py:357
+msgid "New subscription plan has been created."
+msgstr "नई सदस्यता योजना बनाई गई है।"
+
+#: app/admin/routes.py:359
+msgid "Add New Plan"
+msgstr "नई योजना जोड़ें"
+
+#: app/admin/routes.py:373
+msgid "Subscription plan has been updated."
+msgstr "सदस्यता योजना अपडेट कर दी गई है।"
+
+#: app/admin/routes.py:375
+msgid "Edit Plan"
+msgstr "योजना संपादित करें"
+
+#: app/admin/routes.py:383
+msgid "Cannot delete plan. It is currently assigned to one or more businesses."
+msgstr "योजना को नहीं हटा सकते। यह वर्तमान में एक या अधिक व्यवसायों को सौंपा गया है।"
+
+#: app/admin/routes.py:387
+#, python-format
+msgid "Plan \"%(name)s\" has been deleted."
+msgstr "योजना \"%(name)s\" हटा दी गई है।"
+
+#: app/admin/routes.py:397
+msgid "Manage Coupons"
+msgstr "कूपन प्रबंधित करें"
+
+#: app/admin/routes.py:409
+msgid "New coupon has been created."
+msgstr "नया कूपन बनाया गया है।"
+
+#: app/admin/routes.py:411
+msgid "Add New Coupon"
+msgstr "नया कूपन जोड़ें"
+
+#: app/admin/routes.py:425
+msgid "Coupon has been updated."
+msgstr "कूपन अपडेट कर दिया गया है।"
+
+#: app/admin/routes.py:427
+msgid "Edit Coupon"
+msgstr "कूपन संपादित करें"
+
+#: app/admin/routes.py:436
+#, python-format
+msgid "Coupon \"%(code)s\" has been deleted."
+msgstr "कूपन \"%(code)s\" हटा दिया गया है।"
+
+#: app/admin/routes.py:449
+#, python-format
+msgid ""
+"Business \"%(name)s\" and all of its associated data have been "
+"permanently deleted."
+msgstr "व्यवसाय \"%(name)s\" और इससे जुड़े सभी डेटा स्थायी रूप से हटा दिए गए हैं।"
+
+#: app/admin/routes.py:452
+#, python-format
+msgid "Error deleting business: %(error)s"
+msgstr "व्यवसाय हटाने में त्रुटि: %(error)s"
+
+#: app/auth/routes.py:55
+msgid "Invalid username/mobile or password"
+msgstr "अमान्य उपयोगकर्ता नाम/मोबाइल या पासवर्ड"
+
+#: app/auth/routes.py:58 app/templates/auth/login.html:7
+msgid "Sign In"
+msgstr "साइन इन करें"
+
+#: app/templates/base.html:10
+msgid ""
+"The all-in-one solution for managing your water jar supply business. "
+"Streamline deliveries, track inventory, and manage staff with ease."
+msgstr ""
+"आपके पानी के जार आपूर्ति व्यवसाय के प्रबंधन के लिए ऑल-इन-वन समाधान। डिलीवरी को सुव्यवस्थित करें, इन्वेंट्री ट्रैक करें, और कर्मचारियों को आसानी से प्रबंधित करें।"
+
+#: app/templates/base.html:12
+msgid "The all-in-one solution for managing your water jar supply business."
+msgstr "आपके पानी के जार आपूर्ति व्यवसाय के प्रबंधन के लिए ऑल-इन-वन समाधान।"
+
+#: app/templates/base.html:62
+msgid "Admin Menu"
+msgstr "एडमिन मेनू"
+
+#: app/templates/base.html:75
+msgid "Manager Menu"
+msgstr "मैनेजर मेनू"
+
+#: app/templates/base.html:78
+msgid "Dashboard"
+msgstr "डैशबोर्ड"
+
+#: app/templates/base.html:79
+msgid "Customers"
+msgstr "ग्राहक"
+
+#: app/templates/base.html:80
+msgid "Manage Staff"
+msgstr "कर्मचारियों का प्रबंधन करें"
+
+#: app/templates/base.html:82 app/templates/customer/dashboard.html:46
+msgid "Invoices"
+msgstr "चालान"
+
+#: app/templates/base.html:87
+msgid "My Account & Subscription"
+msgstr "मेरा खाता और सदस्यता"
+
+#: app/templates/base.html:93
+msgid "My Dashboard"
+msgstr "मेरा डैशबोर्ड"
+
+#: app/templates/base.html:98
+msgid "Logout"
+msgstr "लॉग आउट"
+
+#: app/templates/base.html:103 app/templates/base.html:162
+msgid "How to Use"
+msgstr "कैसे उपयोग करें"
+
+#: app/templates/base.html:106 app/templates/base.html:160
+msgid "About Us"
+msgstr "हमारे बारे में"
+
+#: app/templates/base.html:109
+msgid "Contact Us"
+msgstr "हमसे संपर्क करें"
+
+#: app/templates/base.html:112 app/templates/public/index.html:22
+msgid "Login"
+msgstr "लॉग इन करें"
+
+#: app/templates/base.html:115
+msgid "Register"
+msgstr "रजिस्टर करें"
+
+#: app/templates/base.html:154
+msgid "The complete solution for managing your water supply business efficiently and effectively."
+msgstr "आपके जल आपूर्ति व्यवसाय को कुशलतापूर्वक और प्रभावी ढंग से प्रबंधित करने के लिए संपूर्ण समाधान।"
+
+#: app/templates/base.html:159
+msgid "Quick Links"
+msgstr "त्वरित लिंक"
+
+#: app/templates/base.html:164
+msgid "FAQ"
+msgstr "अक्सर पूछे जाने वाले प्रश्न"
+
+#: app/templates/base.html:168
+msgid "Contact"
+msgstr "संपर्क"
+
+#: app/templates/auth/login.html:23
+msgid "Forgot Password?"
+msgstr "पासवर्ड भूल गए?"
+
+#: app/templates/auth/login.html:28
+msgid "New Supplier?"
+msgstr "नए आपूर्तिकर्ता?"
+
+#: app/templates/auth/login.html:28
+msgid "Start your trial here!"
+msgstr "अपना ट्रायल यहाँ शुरू करें!"
+
+#: app/templates/customer/dashboard.html:4
+msgid "Welcome,"
+msgstr "स्वागत है,"
+
+#: app/templates/customer/dashboard.html:9
+msgid "Outstanding Balance"
+msgstr "बकाया राशि"
+
+#: app/templates/customer/dashboard.html:10
+msgid "You have a due amount of"
+msgstr "आपकी देय राशि है"
+
+#: app/templates/customer/dashboard.html:10
+msgid "Please clear it with the delivery staff by the end of the month to avoid any interruptions in service."
+msgstr "सेवा में किसी भी रुकावट से बचने के लिए कृपया महीने के अंत तक डिलीवरी स्टाफ से इसे चुका दें।"
+
+#: app/templates/customer/dashboard.html:16
+msgid "Quick Actions"
+msgstr "त्वरित कार्रवाइयां"
+
+#: app/templates/customer/dashboard.html:19
+msgid "Request Daily Jars"
+msgstr "दैनिक जार का अनुरोध करें"
+
+#: app/templates/customer/dashboard.html:29
+msgid "Book for an Event"
+msgstr "एक कार्यक्रम के लिए बुक करें"
+
+#: app/templates/customer/dashboard.html:43
+msgid "My Activity"
+msgstr "मेरी गतिविधि"
+
+#: app/templates/customer/dashboard.html:58
+#: app/templates/delivery/dashboard.html:142
+msgid "jar(s)"
+msgstr "जार"
+
+#: app/templates/customer/dashboard.html:58
+msgid "delivered on"
+msgstr "को डिलीवर किया गया"
+
+#: app/templates/customer/dashboard.html:62
+#: app/templates/customer/dashboard.html:122
+msgid "Amount:"
+msgstr "राशि:"
+
+#: app/templates/customer/dashboard.html:64
+msgid "Due"
+msgstr "बकाया"
+
+#: app/templates/customer/dashboard.html:66
+msgid "Paid"
+msgstr "भुगतान किया गया"
+
+#: app/templates/customer/dashboard.html:73
+msgid "Booked"
+msgstr "बुक किया गया"
+
+#: app/templates/customer/dashboard.html:73
+#: app/templates/customer/dashboard.html:89
+msgid "Jar(s)"
+msgstr "जार"
+
+#: app/templates/customer/dashboard.html:74
+#: app/templates/customer/dashboard.html:90
+#: app/templates/delivery/dashboard.html:98
+#: app/templates/delivery/dashboard.html:169
+msgid "Dispenser(s)"
+msgstr "डिस्पेंसर"
+
+#: app/templates/customer/dashboard.html:75
+msgid "for event on"
+msgstr "पर कार्यक्रम के लिए"
+
+#: app/templates/customer/dashboard.html:76
+msgid "Booking Delivery"
+msgstr "बुकिंग डिलीवरी"
+
+#: app/templates/customer/dashboard.html:83
+msgid "Returned:"
+msgstr "वापस किया गया:"
+
+#: app/templates/customer/dashboard.html:83
+#: app/templates/delivery/dashboard.html:95
+#: app/templates/delivery/dashboard.html:167
+msgid "Jars"
+msgstr "जार"
+
+#: app/templates/customer/dashboard.html:83
+msgid "Dispensers"
+msgstr "डिस्पेंसर"
+
+#: app/templates/customer/dashboard.html:88
+msgid "Lost:"
+msgstr "खो गया:"
+
+#: app/templates/customer/dashboard.html:94
+msgid "Final Settled Amount:"
+msgstr "अंतिम निपटान राशि:"
+
+#: app/templates/customer/dashboard.html:96
+msgid "Confirmed Amount:"
+msgstr "पुष्टि की गई राशि:"
+
+#: app/templates/customer/dashboard.html:101
+msgid "No recent activity found."
+msgstr "कोई हाल की गतिविधि नहीं मिली।"
+
+#: app/templates/customer/dashboard.html:121
+msgid "Issued:"
+msgstr "जारी किया गया:"
+
+#: app/templates/customer/dashboard.html:125
+msgid "View"
+msgstr "देखें"
+
+#: app/templates/customer/dashboard.html:126
+msgid "Download"
+msgstr "डाउनलोड करें"
+
+#: app/templates/customer/dashboard.html:130
+msgid "No invoices found."
+msgstr "कोई चालान नहीं मिला।"
+
+#: app/templates/delivery/dashboard.html:7
+msgid "Book Jars for Event"
+msgstr "कार्यक्रम के लिए जार बुक करें"
+
+#: app/templates/delivery/dashboard.html:10
+msgid "Sell New Jar / Dispenser"
+msgstr "नया जार / डिस्पेंसर बेचें"
+
+#: app/templates/delivery/dashboard.html:16
+msgid "Supply Jar"
+msgstr "जार की आपूर्ति करें"
+
+#: app/templates/delivery/dashboard.html:18
+msgid "Start typing a name or mobile number..."
+msgstr "नाम या मोबाइल नंबर टाइप करना शुरू करें..."
+
+#: app/templates/delivery/dashboard.html:30
+msgid "Your Current Cash Balance"
+msgstr "आपकी वर्तमान नकद शेष राशि"
+
+#: app/templates/delivery/dashboard.html:38
+msgid "Add an Expense"
+msgstr "एक व्यय जोड़ें"
+
+#: app/templates/delivery/dashboard.html:42
+msgid "Amount"
+msgstr "राशि"
+
+#: app/templates/delivery/dashboard.html:45
+msgid "Description"
+msgstr "विवरण"
+
+#: app/templates/delivery/dashboard.html:58
+msgid "Customers with Dues"
+msgstr "बकाया वाले ग्राहक"
+
+#: app/templates/delivery/dashboard.html:66
+msgid "Due:"
+msgstr "बकाया:"
+
+#: app/templates/delivery/dashboard.html:71
+msgid "Confirm you have received"
+msgstr "पुष्टि करें कि आपको प्राप्त हुआ है"
+
+#: app/templates/delivery/dashboard.html:71
+msgid "from"
+msgstr "से"
+
+#: app/templates/delivery/dashboard.html:75
+msgid "Mark as Paid"
+msgstr "भुगतान के रूप में चिह्नित करें"
+
+#: app/templates/delivery/dashboard.html:82
+msgid "No customers have outstanding dues."
+msgstr "किसी भी ग्राहक का बकाया नहीं है।"
+
+#: app/templates/delivery/dashboard.html:87
+msgid "Event Jars to Collect"
+msgstr "एकत्र करने के लिए इवेंट जार"
+
+#: app/templates/delivery/dashboard.html:106
+msgid "Jars Ret:"
+msgstr "जार वापसी:"
+
+#: app/templates/delivery/dashboard.html:112
+msgid "Dispen Ret:"
+msgstr "डिस्पेंसर वापसी:"
+
+#: app/templates/delivery/dashboard.html:119
+msgid "Collect"
+msgstr "एकत्र करें"
+
+#: app/templates/delivery/dashboard.html:126
+msgid "No event items pending collection."
+msgstr "संग्रह के लिए कोई इवेंट आइटम लंबित नहीं है।"
+
+#: app/templates/delivery/dashboard.html:135
+msgid "Pending Jar Requests"
+msgstr "लंबित जार अनुरोध"
+
+#: app/templates/delivery/dashboard.html:142
+msgid "Wants"
+msgstr "चाहता है"
+
+#: app/templates/delivery/dashboard.html:146
+#, python-format
+msgid "Confirm delivery of %(qty)s jar(s) to %(name)s?"
+msgstr "%(name)s को %(qty)s जार की डिलीवरी की पुष्टि करें?"
+
+#: app/templates/delivery/dashboard.html:147
+#: app/templates/delivery/dashboard.html:177
+msgid "Delivered"
+msgstr "डिलीवर किया गया"
+
+#: app/templates/delivery/dashboard.html:153
+msgid "No pending jar requests."
+msgstr "कोई लंबित जार अनुरोध नहीं है।"
+
+#: app/templates/delivery/dashboard.html:158
+msgid "Today's Event Deliveries"
+msgstr "आज की इवेंट डिलीवरी"
+
+#: app/templates/delivery/dashboard.html:170
+msgid "for event. Amount:"
+msgstr "कार्यक्रम के लिए। राशि:"
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Pre-Paid to Manager"
+msgstr "प्रबंधक को पूर्व-भुगतान"
+
+#: app/templates/delivery/dashboard.html:173
+msgid "Collect Payment"
+msgstr "भुगतान एकत्र करें"
+
+#: app/templates/delivery/dashboard.html:176
+#, python-format
+msgid "Confirm EVENT delivery to %(name)s?"
+msgstr "%(name)s को इवेंट डिलीवरी की पुष्टि करें?"
+
+#: app/templates/delivery/dashboard.html:183
+msgid "No event deliveries for today."
+msgstr "आज के लिए कोई इवेंट डिलीवरी नहीं है।"
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Default:"
+msgstr "डिफ़ॉल्ट:"
+
+#: app/templates/delivery/dashboard.html:219
+msgid "Jar(s) at"
+msgstr "जार पर"
+
+#: app/templates/delivery/dashboard.html:224
+msgid "Jars:"
+msgstr "जार:"
+
+#: app/templates/delivery/dashboard.html:232
+msgid "Mark as Due"
+msgstr "बकाया के रूप में चिह्नित करें"
+
+#: app/templates/delivery/dashboard.html:236
+msgid "Deliver"
+msgstr "डिलीवर करें"
+
+#: app/templates/delivery/dashboard.html:245
+msgid "No customers found."
+msgstr "कोई ग्राहक नहीं मिला।"
+
+#: app/templates/manager/add_staff_form.html:32
+msgid "Set initial password"
+msgstr "प्रारंभिक पासवर्ड सेट करें"
+
+#: app/templates/manager/add_staff_form.html:54
+#: app/templates/manager/edit_staff_form.html:49
+msgid "Cancel"
+msgstr "रद्द करें"
+
+#: app/templates/manager/edit_staff_form.html:42
+msgid "Current ID Proof:"
+msgstr "वर्तमान आईडी प्रूफ:"
+
+#: app/templates/manager/list_staff.html:5
+msgid "Manage Your Staff"
+msgstr "अपने कर्मचारियों का प्रबंधन करें"
+
+#: app/templates/manager/list_staff.html:7
+msgid "Add New Staff"
+msgstr "नया स्टाफ जोड़ें"
+
+#: app/templates/manager/list_staff.html:17
+msgid "Username"
+msgstr "उपयोगकर्ता नाम"
+
+#: app/templates/manager/list_staff.html:18
+msgid "Mobile"
+msgstr "मोबाइल"
+
+#: app/templates/manager/list_staff.html:19
+msgid "Daily Wage"
+msgstr "दैनिक मजदूरी"
+
+#: app/templates/manager/list_staff.html:20
+msgid "Actions"
+msgstr "कार्रवाइयां"
+
+#: app/templates/manager/list_staff.html:27
+msgid "N/A"
+msgstr "लागू नहीं"
+
+#: app/templates/manager/list_staff.html:32
+msgid "Not Set"
+msgstr "सेट नहीं है"
+
+#: app/templates/manager/list_staff.html:37
+msgid "Edit Details"
+msgstr "विवरण संपादित करें"
+
+#: app/templates/manager/list_staff.html:43
+msgid "No staff members found for your business."
+msgstr "आपके व्यवसाय के लिए कोई स्टाफ सदस्य नहीं मिला।"
+
+#: app/templates/public/about.html:7
+msgid "About Aquajal"
+msgstr "एक्वाजल के बारे में"
+
+#: app/templates/public/about.html:8
+msgid ""
+"Aquajal is a modern, web-based solution designed to streamline the "
+"operations of water jar supply businesses. Our mission is to empower "
+"business owners with the tools they need to manage their daily tasks "
+"efficiently, from tracking deliveries to managing staff and inventory."
+msgstr ""
+"एक्वाजल एक आधुनिक, वेब-आधारित समाधान है जिसे पानी के जार आपूर्ति व्यवसायों के संचालन को सुव्यवस्थित करने के लिए डिज़ाइन किया गया है। हमारा मिशन व्यापार मालिकों को उन उपकरणों के साथ सशक्त बनाना है जिनकी उन्हें अपने दैनिक कार्यों को कुशलतापूर्वक प्रबंधित करने की आवश्यकता है, डिलीवरी पर नज़र रखने से लेकर कर्मचारियों और इन्वेंट्री के प्रबंधन तक।"
+
+#: app/templates/public/about.html:11
+msgid "Our Story"
+msgstr "हमारी कहानी"
+
+#: app/templates/public/about.html:12
+msgid ""
+"The idea for Aquajal was born from a simple observation: many local water"
+" suppliers rely on manual, paper-based methods to manage their complex "
+"daily operations. This often leads to inefficiencies, lost revenue, and a"
+" lack of clear insight into the business's performance. We saw an "
+"opportunity to change that."
+msgstr ""
+"एक्वाजल का विचार एक साधारण अवलोकन से पैदा हुआ था: कई स्थानीय जल आपूर्तिकर्ता अपने जटिल दैनिक कार्यों के प्रबंधन के लिए मैनुअल, कागज-आधारित तरीकों पर भरोसा करते हैं। इससे अक्सर अक्षमताएं, राजस्व की हानि और व्यवसाय के प्रदर्शन में स्पष्ट अंतर्दृष्टि की कमी होती है। हमने इसे बदलने का एक अवसर देखा।"
+
+#: app/templates/public/about.html:13
+msgid ""
+"We set out to create a user-friendly, affordable, and powerful "
+"application that automates routine tasks, provides valuable insights "
+"through reports, and brings all aspects of the business—sales, stock, "
+"staff, and customers—into one centralized platform."
+msgstr ""
+"हमने एक उपयोगकर्ता-अनुकूल, सस्ती और शक्तिशाली एप्लिकेशन बनाने का लक्ष्य रखा है जो नियमित कार्यों को स्वचालित करता है, रिपोर्ट के माध्यम से मूल्यवान अंतर्दृष्टि प्रदान करता है, और व्यवसाय के सभी पहलुओं - बिक्री, स्टॉक, कर्मचारी और ग्राहकों - को एक केंद्रीकृत मंच पर लाता है।"
+
+#: app/templates/public/about.html:17
+msgid "Our Vision"
+msgstr "हमारा दृष्टिकोण"
+
+#: app/templates/public/about.html:18
+msgid ""
+"Our vision is to become the go-to management software for water supply "
+"businesses everywhere. We are committed to continuous improvement, adding"
+" new features, and providing exceptional support to our users. We believe"
+" that by simplifying business management, we can help our clients grow "
+"and succeed."
+msgstr ""
+"हमारा दृष्टिकोण हर जगह जल आपूर्ति व्यवसायों के लिए पसंदीदा प्रबंधन सॉफ्टवेयर बनना है। हम निरंतर सुधार, नई सुविधाएँ जोड़ने और अपने उपयोगकर्ताओं को असाधारण सहायता प्रदान करने के लिए प्रतिबद्ध हैं। हमारा मानना है कि व्यवसाय प्रबंधन को सरल बनाकर, हम अपने ग्राहकों को बढ़ने और सफल होने में मदद कर सकते हैं।"
+
+#: app/templates/public/how_to_use.html:5
+msgid "How to Use Aquajal"
+msgstr "एक्वाजल का उपयोग कैसे करें"
+
+#: app/templates/public/how_to_use.html:9
+msgid "For Managers"
+msgstr "प्रबंधकों के लिए"
+
+#: app/templates/public/how_to_use.html:12
+msgid "Setting Up Your Business"
+msgstr "अपना व्यवसाय स्थापित करना"
+
+#: app/templates/public/how_to_use.html:14
+msgid "Initial Setup:"
+msgstr "प्रारंभिक सेटअप:"
+
+#: app/templates/public/how_to_use.html:14
+msgid ""
+"After registering, your first step is to set your business's default "
+"prices and attendance rules. Go to `Manager Menu > Price Settings` to set"
+" prices for new jars/dispensers and define the minimum jar deliveries for"
+" a full or half day's wage."
+msgstr ""
+"पंजीकरण के बाद, आपका पहला कदम अपने व्यवसाय की डिफ़ॉल्ट कीमतें और उपस्थिति नियम निर्धारित करना है। नए जार/डिस्पेंसर के लिए कीमतें निर्धारित करने और पूरे या आधे दिन के वेतन के लिए न्यूनतम जार डिलीवरी को परिभाषित करने के लिए `मैनेजर मेनू > मूल्य सेटिंग्स` पर जाएं।"
+
+#: app/templates/public/how_to_use.html:15
+msgid "Manage Staff:"
+msgstr "कर्मचारियों का प्रबंधन:"
+
+#: app/templates/public/how_to_use.html:15
+msgid ""
+"Use the `Manager Menu > Manage Staff` option to add your delivery "
+"personnel. You can set their daily wages and even upload ID proofs."
+msgstr ""
+"अपने डिलीवरी कर्मियों को जोड़ने के लिए `मैनेजर मेनू > कर्मचारियों का प्रबंधन करें` विकल्प का उपयोग करें। आप उनकी दैनिक मजदूरी निर्धारित कर सकते हैं और आईडी प्रूफ भी अपलोड कर सकते हैं।"
+
+#: app/templates/public/how_to_use.html:16
+msgid "Add Customers:"
+msgstr "ग्राहक जोड़ें:"
+
+#: app/templates/public/how_to_use.html:16
+msgid ""
+"From the `Manager Menu`, select `Customers` to build your customer list. "
+"Here you can set custom jar prices and add special notes for each "
+"customer."
+msgstr ""
+"अपनी ग्राहक सूची बनाने के लिए `मैनेजर मेनू` से `ग्राहक` चुनें। यहां आप प्रत्येक ग्राहक के लिए कस्टम जार की कीमतें निर्धारित कर सकते हैं और विशेष नोट्स जोड़ सकते हैं।"
+
+#: app/templates/public/how_to_use.html:18
+msgid "Daily Operations"
+msgstr "दैनिक संचालन"
+
+#: app/templates/public/how_to_use.html:20
+msgid "Stock Management:"
+msgstr "स्टॉक प्रबंधन:"
+
+#: app/templates/public/how_to_use.html:20
+msgid ""
+"Keep your inventory updated from the `Manager Dashboard` by clicking on "
+"`Manage Stock`. Stock is automatically deducted for sales and confirmed "
+"event bookings."
+msgstr ""
+"`मैनेजर डैशबोर्ड` से `स्टॉक प्रबंधित करें` पर क्लिक करके अपनी इन्वेंट्री को अपडेट रखें। बिक्री और पुष्टि की गई इवेंट बुकिंग के लिए स्टॉक स्वचालित रूप से काट लिया जाता है।"
+
+#: app/templates/public/how_to_use.html:21
+msgid "Confirm Bookings:"
+msgstr "बुकिंग की पुष्टि करें:"
+
+#: app/templates/public/how_to_use.html:21
+msgid ""
+"New event bookings will appear on your dashboard. Confirm them to "
+"allocate stock and set the final amount."
+msgstr ""
+"नई इवेंट बुकिंग आपके डैशबोर्ड पर दिखाई देगी। स्टॉक आवंटित करने और अंतिम राशि निर्धारित करने के लिए उनकी पुष्टि करें।"
+
+#: app/templates/public/how_to_use.html:22
+msgid "Receive Cash:"
+msgstr "नकद प्राप्त करें:"
+
+#: app/templates/public/how_to_use.html:22
+msgid ""
+"At the end of the day, use the `Receive Cash` button on your dashboard to"
+" record cash received from staff and reset their balance."
+msgstr ""
+"दिन के अंत में, कर्मचारियों से प्राप्त नकदी को रिकॉर्ड करने और उनकी शेष राशि को रीसेट करने के लिए अपने डैशबोर्ड पर `नकद प्राप्त करें` बटन का उपयोग करें।"
+
+#: app/templates/public/how_to_use.html:24
+msgid "Invoicing & Reports"
+msgstr "चालान और रिपोर्ट"
+
+#: app/templates/public/how_to_use.html:26
+msgid "View All Invoices:"
+msgstr "सभी चालान देखें:"
+
+#: app/templates/public/how_to_use.html:26
+msgid ""
+"Go to `Manager Menu > Invoices` to see a list of all invoices generated. "
+"You can view, download as PDF, or email them to customers directly."
+msgstr ""
+"उत्पन्न सभी चालानों की सूची देखने के लिए `मैनेजर मेनू > चालान` पर जाएं। आप उन्हें देख सकते हैं, पीडीएफ के रूप में डाउनलोड कर सकते हैं, या सीधे ग्राहकों को ईमेल कर सकते हैं।"
+
+#: app/templates/public/how_to_use.html:27
+msgid "Generate Reports:"
+msgstr "रिपोर्ट बनाएं:"
+
+#: app/templates/public/how_to_use.html:27
+msgid ""
+"The `Reports` button on your dashboard takes you to a powerful reporting "
+"tool. View monthly summaries of your income, expenses, and staff "
+"attendance, or drill down into daily transaction logs."
+msgstr ""
+"आपके डैशबोर्ड पर `रिपोर्ट` बटन आपको एक शक्तिशाली रिपोर्टिंग टूल पर ले जाता है। अपनी आय, व्यय और कर्मचारियों की उपस्थिति के मासिक सारांश देखें, या दैनिक लेनदेन लॉग में ड्रिल डाउन करें।"
+
+#: app/templates/public/how_to_use.html:34
+msgid "For Staff (Delivery Personnel)"
+msgstr "कर्मचारियों के लिए (डिलीवरी कर्मी)"
+
+#: app/templates/public/how_to_use.html:37
+msgid "Your Dashboard is Your Hub"
+msgstr "आपका डैशबोर्ड आपका केंद्र है"
+
+#: app/templates/public/how_to_use.html:38
+msgid ""
+"Your dashboard is designed for quick actions. You can see your current "
+"cash balance, log deliveries, record expenses, and see pending event "
+"deliveries for the day."
+msgstr ""
+"आपका डैशबोर्ड त्वरित कार्रवाइयों के लिए डिज़ाइन किया गया है। आप अपनी वर्तमान नकद शेष राशि देख सकते हैं, डिलीवरी लॉग कर सकते हैं, खर्च रिकॉर्ड कर सकते हैं और दिन के लिए लंबित इवेंट डिलीवरी देख सकते हैं।"
+
+#: app/templates/public/how_to_use.html:39
+msgid "Logging a Delivery"
+msgstr "डिलीवरी लॉग करना"
+
+#: app/templates/public/how_to_use.html:40
+msgid ""
+"Use the search bar to find a customer by name or mobile number. Once they"
+" appear, enter the number of jars delivered. If the customer isn't paying"
+" immediately, check the \"Mark as Due\" box before clicking `Deliver`."
+msgstr ""
+"नाम या मोबाइल नंबर से ग्राहक खोजने के लिए खोज बार का उपयोग करें। एक बार जब वे दिखाई दें, तो डिलीवर किए गए जार की संख्या दर्ज करें। यदि ग्राहक तुरंत भुगतान नहीं कर रहा है, तो `डिलीवर` पर क्लिक करने से पहले \"बकाया के रूप में चिह्नित करें\" बॉक्स को चेक करें।"
+
+#: app/templates/public/how_to_use.html:41
+msgid "Selling New Products"
+msgstr "नए उत्पाद बेचना"
+
+#: app/templates/public/how_to_use.html:42
+msgid ""
+"You can sell a new jar or dispenser to a walk-in customer using the `Sell"
+" New Jar / Dispenser` button. The amount will be added to your cash "
+"balance and stock will be updated automatically."
+msgstr ""
+"`नया जार / डिस्पेंसर बेचें` बटन का उपयोग करके आप वॉक-इन ग्राहक को एक नया जार या डिस्पेंसर बेच सकते हैं। राशि आपकी नकद शेष राशि में जोड़ दी जाएगी और स्टॉक स्वचालित रूप से अपडेट हो जाएगा।"
+
+#: app/templates/public/how_to_use.html:48
+msgid "For Customers"
+msgstr "ग्राहकों के लिए"
+
+#: app/templates/public/how_to_use.html:51
+msgid ""
+"As a customer, your personal dashboard allows you to manage your account "
+"easily. You can:"
+msgstr ""
+"एक ग्राहक के रूप में, आपका व्यक्तिगत डैशबोर्ड आपको आसानी से अपना खाता प्रबंधित करने की अनुमति देता है। आप कर सकते हैं:"
+
+#: app/templates/public/how_to_use.html:53
+msgid ""
+"View your complete activity history, including past deliveries and event "
+"bookings."
+msgstr ""
+"पिछली डिलीवरी और इवेंट बुकिंग सहित अपनी पूरी गतिविधि का इतिहास देखें।"
+
+#: app/templates/public/how_to_use.html:54
+msgid "See any outstanding due amounts."
+msgstr "कोई भी बकाया देय राशि देखें।"
+
+#: app/templates/public/how_to_use.html:55
+msgid "View and download all your past invoices from the `Invoices` tab."
+msgstr "`चालान` टैब से अपने सभी पिछले चालान देखें और डाउनलोड करें।"
+
+#: app/templates/public/how_to_use.html:56
+msgid ""
+"Quickly request extra jars for daily use or book jars in bulk for an "
+"upcoming event."
+msgstr ""
+"दैनिक उपयोग के लिए अतिरिक्त जार का अनुरोध करें या आगामी कार्यक्रम के लिए थोक में जार बुक करें।"
+
+#: app/templates/public/index.html:10
+msgid "The All-in-One Platform to Run Your Water Supply Business"
+msgstr "अपने जल आपूर्ति व्यवसाय को चलाने के लिए ऑल-इन-वन प्लेटफ़ॉर्म"
+
+#: app/templates/public/index.html:11
+msgid ""
+"Aquajal is a complete SaaS solution that helps you automate sales, manage"
+" subscriptions, generate invoices, track inventory, and monitor staff "
+"performance effortlessly."
+msgstr ""
+"एक्वाजल एक संपूर्ण सास समाधान है जो आपको बिक्री को स्वचालित करने, सदस्यता का प्रबंधन करने, चालान बनाने, इन्वेंट्री को ट्रैक करने और कर्मचारियों के प्रदर्शन की सहजता से निगरानी करने में मदद करता है।"
+
+#: app/templates/public/index.html:14
+msgid "Full SaaS Platform:"
+msgstr "पूर्ण सास प्लेटफ़ॉर्म:"
+
+#: app/templates/public/index.html:14
+msgid ""
+"Manage your business with a 40-day free trial and flexible subscription "
+"plans."
+msgstr ""
+"40-दिवसीय निःशुल्क परीक्षण और लचीली सदस्यता योजनाओं के साथ अपने व्यवसाय का प्रबंधन करें।"
+
+#: app/templates/public/index.html:15
+msgid "Automated Invoicing:"
+msgstr "स्वचालित चालान:"
+
+#: app/templates/public/index.html:15
+msgid ""
+"Generate, download, and email PDF invoices to your customers "
+"automatically."
+msgstr ""
+"अपने ग्राहकों को स्वचालित रूप से पीडीएफ चालान बनाएं, डाउनलोड करें और ईमेल करें।"
+
+#: app/templates/public/index.html:16
+msgid "Advanced Reporting:"
+msgstr "उन्नत रिपोर्टिंग:"
+
+#: app/templates/public/index.html:16
+msgid "Get daily and monthly insights on sales, expenses, and staff attendance."
+msgstr "बिक्री, व्यय और कर्मचारियों की उपस्थिति पर दैनिक और मासिक जानकारी प्राप्त करें।"
+
+#: app/templates/public/index.html:17
+msgid "Customer & Staff Portals:"
+msgstr "ग्राहक और कर्मचारी पोर्टल:"
+
+#: app/templates/public/index.html:17
+msgid "Empower customers to view history and staff to log deliveries on the go."
+msgstr "ग्राहकों को इतिहास देखने और कर्मचारियों को चलते-फिरते डिलीवरी लॉग करने के लिए सशक्त बनाएं।"
+
+#: app/templates/public/index.html:21
+msgid "Start Your 40-Day Free Trial"
+msgstr "अपना 40-दिवसीय निःशुल्क परीक्षण शुरू करें"
+
+#: app/templates/public/index.html:29
+msgid "A Modern Platform Built for Growth"
+msgstr "विकास के लिए बनाया गया एक आधुनिक मंच"
+
+#: app/templates/public/index.html:35
+msgid "Professional Invoicing"
+msgstr "पेशेवर चालान"
+
+#: app/templates/public/index.html:36
+msgid ""
+"Automate invoice creation for every transaction, including monthly "
+"summaries and event bookings. Email professional PDF invoices directly to"
+" clients."
+msgstr ""
+"मासिक सारांश और इवेंट बुकिंग सहित हर लेनदेन के लिए चालान निर्माण को स्वचालित करें। ग्राहकों को सीधे पेशेवर पीडीएफ चालान ईमेल करें।"
+
+#: app/templates/public/index.html:42
+msgid "Subscription Management"
+msgstr "सदस्यता प्रबंधन"
+
+#: app/templates/public/index.html:43
+msgid ""
+"Offer flexible subscription plans with a 40-day free trial. Securely "
+"accept online payments with our integrated Razorpay checkout system."
+msgstr ""
+"40-दिवसीय निःशुल्क परीक्षण के साथ लचीली सदस्यता योजनाएं प्रदान करें। हमारे एकीकृत रेजरपे चेकआउट सिस्टम के साथ सुरक्षित रूप से ऑनलाइन भुगतान स्वीकार करें।"
+
+#: app/templates/public/index.html:49
+msgid "Insightful Reports"
+msgstr "अंतर्दृष्टिपूर्ण रिपोर्ट"
+
+#: app/templates/public/index.html:50
+msgid ""
+"Make data-driven decisions with comprehensive reports on sales, expenses,"
+" staff performance, and even new customer leads."
+msgstr ""
+"बिक्री, व्यय, कर्मचारियों के प्रदर्शन और यहां तक कि नए ग्राहक लीड पर व्यापक रिपोर्ट के साथ डेटा-संचालित निर्णय लें।"
+
+#: app/templates/public/index.html:57
+msgid "Pricing"
+msgstr "मूल्य निर्धारण"
+
+#: app/templates/public/index.html:58
+msgid ""
+"Choose a plan that fits your needs. Our monthly subscription costs less "
+"than a single day's labor, and all plans start with a 40-day free trial."
+msgstr ""
+"एक ऐसी योजना चुनें जो आपकी आवश्यकताओं के अनुरूप हो। हमारी मासिक सदस्यता की लागत एक दिन के श्रम से कम है, और सभी योजनाएं 40-दिवसीय निःशुल्क परीक्षण के साथ शुरू होती हैं।"
+
+#: app/templates/public/index.html:68
+msgid "days"
+msgstr "दिन"
+
+#: app/templates/public/index.html:70
+msgid "Regular Price:"
+msgstr "नियमित मूल्य:"
+
+#: app/templates/public/index.html:71
+msgid "Manage Unlimited Staff"
+msgstr "असीमित कर्मचारियों का प्रबंधन करें"
+
+#: app/templates/public/index.html:72
+msgid "Manage Unlimited Customers"
+msgstr "असीमित ग्राहकों का प्रबंधन करें"
+
+#: app/templates/public/index.html:73
+msgid "Automated Invoicing & Reports"
+msgstr "स्वचालित चालान और रिपोर्ट"
+
+#: app/templates/public/index.html:74
+msgid "Email Support"
+msgstr "ईमेल सहायता"
+
+#: app/templates/public/index.html:76
+msgid "After the initial offer, renewals are at the regular price."
+msgstr "प्रारंभिक प्रस्ताव के बाद, नवीनीकरण नियमित मूल्य पर होते हैं।"
+
+#: app/templates/public/index.html:77
+msgid "Start Free Trial"
+msgstr "निःशुल्क परीक्षण शुरू करें"
+
+#: app/templates/public/index.html:86
+msgid "Frequently Asked Questions"
+msgstr "अक्सर पूछे जाने वाले प्रश्न"
+
+#: app/templates/public/index.html:91
+msgid "What happens after my 40-day free trial ends?"
+msgstr "मेरे 40-दिवसीय निःशुल्क परीक्षण के समाप्त होने के बाद क्या होता है?"
+
+#: app/templates/public/index.html:96
+msgid ""
+"After your trial, you will be prompted to choose a subscription plan to "
+"continue using the service. All your data—staff, customers, and "
+"reports—will be saved and waiting for you. We accept online payments "
+"through Razorpay."
+msgstr ""
+"आपके परीक्षण के बाद, आपको सेवा का उपयोग जारी रखने के लिए एक सदस्यता योजना चुनने के लिए कहा जाएगा। आपका सारा डेटा — कर्मचारी, ग्राहक और रिपोर्ट — सहेजा जाएगा और आपका इंतजार करेगा। हम रेजरपे के माध्यम से ऑनलाइन भुगतान स्वीकार करते हैं।"
+
+#: app/templates/public/index.html:103
+msgid "How does the automated invoicing work?"
+msgstr "स्वचालित चालान कैसे काम करता है?"
+
+#: app/templates/public/index.html:108
+msgid ""
+"Aquajal automatically generates an invoice for every transaction, such as"
+" a daily delivery or an event booking. Managers can also generate "
+"consolidated monthly invoices for customers, download them as PDFs, or "
+"email them directly from the dashboard."
+msgstr ""
+"एक्वाजल स्वचालित रूप से हर लेनदेन के लिए एक चालान बनाता है, जैसे कि दैनिक डिलीवरी या इवेंट बुकिंग। प्रबंधक ग्राहकों के लिए समेकित मासिक चालान भी बना सकते हैं, उन्हें पीडीएफ के रूप में डाउनलोड कर सकते हैं, या उन्हें सीधे डैशबोर्ड से ईमेल कर सकते हैं।"
+
+#: app/templates/public/index.html:115
+msgid "Can I use this on my phone?"
+msgstr "क्या मैं इसे अपने फोन पर उपयोग कर सकता हूं?"
+
+#: app/templates/public/index.html:120
+msgid ""
+"Yes! Aquajal is a Progressive Web App (PWA), which means you can add it "
+"to your phone's home screen and use it just like a native application. "
+"It's designed to be fully responsive and works great on any device."
+msgstr ""
+"हाँ! एक्वाजल एक प्रोग्रेसिव वेब ऐप (PWA) है, जिसका अर्थ है कि आप इसे अपने फोन की होम स्क्रीन पर जोड़ सकते हैं और इसे एक देशी एप्लिकेशन की तरह ही उपयोग कर सकते हैं। इसे पूरी तरह से उत्तरदायी होने के लिए डिज़ाइन किया गया है और यह किसी भी डिवाइस पर बहुत अच्छा काम करता है।"

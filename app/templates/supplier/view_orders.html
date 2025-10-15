@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Ordered By</th>
+                            <th class="text-end">Total Amount</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.order_date.strftime('%d-%b-%Y') }}</td>
+                            <td>{{ order.business.name }}</td>
+                            <td class="text-end">₹{{ "%.2f"|format(order.total_amount) }}</td>
+                            <td class="text-center"><span class="badge bg-primary">{{ order.status }}</span></td>
+                            <td class="text-end">
+                                <a href="{{ url_for('supplier.order_details', order_id=order.id) }}" class="btn btn-sm btn-outline-info">View Details</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">You have no incoming orders.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

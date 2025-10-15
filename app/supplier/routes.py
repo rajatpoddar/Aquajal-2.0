@@ -1,148 +1,204 @@
-# File: app/__init__.py
-from flask import Flask, redirect, url_for, session, request, current_app
-from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-# The missing 'login_required' has been re-added here.
-from flask_login import LoginManager, current_user, login_required
-from flask_apscheduler import APScheduler
-from sqlalchemy import MetaData
-from zoneinfo import ZoneInfo
-import os
-import calendar
-from flask_mail import Mail
-from flask_babel import Babel, _
-from flask_moment import Moment
+from flask import render_template, flash, redirect, url_for, request, session, current_app
+from flask_login import login_required, current_user
+from app import db
+from app.supplier import bp
+from app.models import SupplierProduct, PurchaseOrder, PurchaseOrderItem, Business, Supplier
+from app.decorators import manager_required, supplier_required
+import razorpay
+from datetime import datetime
 
-# --- Naming convention for database constraints ---
-metadata = MetaData(naming_convention={
-    "ix": 'ix_%(column_0_label)s',
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(constraint_name)s",
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s"
-})
+# --- HELPER FUNCTIONS ---
+def get_cart():
+    return session.get('procurement_cart', {})
 
-# --- Initialize extensions ---
-db = SQLAlchemy(metadata=metadata)
-migrate = Migrate()
-login = LoginManager()
-scheduler = APScheduler()
-mail = Mail()
-babel = Babel()
-moment = Moment()
+def clear_cart():
+    session.pop('procurement_cart', None)
 
-# --- Set the single, unified login view ---
-login.login_view = 'auth.login'
+# --- ROUTES FOR MANAGER PROCUREMENT ---
+@bp.route('/procurement/browse')
+@login_required
+@manager_required
+def browse_products():
+    products = SupplierProduct.query.order_by(SupplierProduct.supplier_id, SupplierProduct.name).all()
+    return render_template('supplier/browse_products.html', title="Browse Supplier Products", products=products)
 
-# This function selects the language for the user
-def get_locale():
-    return session.get('language', 'en')
+@bp.route('/procurement/add_to_cart', methods=['POST'])
+@login_required
+@manager_required
+def add_to_cart():
+    cart = get_cart()
+    product_id = request.form.get('product_id')
+    quantity = request.form.get('quantity', 1, type=int)
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
-
-    db.init_app(app)
-    migrate.init_app(app, db)
-    login.init_app(app)
-    mail.init_app(app)
-    # Correctly initialize Babel with the locale_selector function
-    babel.init_app(app, locale_selector=get_locale)
-    moment.init_app(app)
-
-    with app.app_context():
-        if not os.path.exists(app.config['UPLOAD_FOLDER']):
-            os.makedirs(app.config['UPLOAD_FOLDER'])
-
-    from .wages import deduct_daily_wages
+    if product_id and quantity > 0:
+        cart[product_id] = cart.get(product_id, 0) + quantity
+        session['procurement_cart'] = cart
+        flash(f'Item added to cart.')
+    else:
+        flash('Invalid item or quantity.', 'danger')
     
-    # Your original scheduler logic is preserved
-    if not scheduler.running:
-        scheduler.init_app(app)
-        if not scheduler.get_job('deduct-wages'):
-            scheduler.add_job(id='deduct-wages', func=deduct_daily_wages, args=[app], trigger='cron', hour=20, minute=0)
-        scheduler.start()
+    return redirect(url_for('supplier.browse_products'))
 
-    # --- Register Blueprints ---
-    from app.errors import bp as errors_bp
-    app.register_blueprint(errors_bp)
-    
-    from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    
-    from app.customers import bp as customers_bp
-    app.register_blueprint(customers_bp, url_prefix='/customers')
-    
-    from app.admin import bp as admin_bp
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-    
-    from app.delivery import bp as delivery_bp
-    app.register_blueprint(delivery_bp)
-    
-    from app.manager import bp as manager_bp
-    app.register_blueprint(manager_bp, url_prefix='/manager')
-    
-    from app.sales import bp as sales_bp
-    app.register_blueprint(sales_bp, url_prefix='/sales')
-    
-    from app.customer import bp as customer_bp
-    app.register_blueprint(customer_bp, url_prefix='/customer')
-    
-    from app.billing import bp as billing_bp
-    app.register_blueprint(billing_bp, url_prefix='/billing')
-    
-    from app.public import bp as public_bp
-    app.register_blueprint(public_bp)
-    
-    from app.invoices import bp as invoices_bp
-    app.register_blueprint(invoices_bp, url_prefix='/invoices')
+@bp.route('/procurement/cart')
+@login_required
+@manager_required
+def view_cart():
+    cart = get_cart()
+    if not cart:
+        flash('Your cart is empty.')
+        return redirect(url_for('supplier.browse_products'))
 
-    from app.supplier import bp as supplier_bp
-    app.register_blueprint(supplier_bp, url_prefix='/supplier')
+    cart_items = []
+    total_amount = 0.0
+    for product_id, quantity in cart.items():
+        product = SupplierProduct.query.get(product_id)
+        if product:
+            subtotal = product.price * quantity
+            total_amount += subtotal
+            cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
     
-    from app.models import User, Customer
-    from datetime import datetime
+    return render_template('supplier/cart.html', title="Your Shopping Cart", cart_items=cart_items, total_amount=total_amount)
 
-    @app.context_processor
-    def inject_now():
-        return {'now': datetime.utcnow()}
+@bp.route('/procurement/checkout', methods=['GET'])
+@login_required
+@manager_required
+def procurement_checkout():
+    cart = get_cart()
+    if not cart:
+        return redirect(url_for('supplier.view_cart'))
 
-    @app.route('/home')
-    @login_required
-    def home():
-        if isinstance(current_user, Customer):
-            return redirect(url_for('customer.dashboard'))
+    cart_items = []
+    total_amount = 0.0
+    for product_id, quantity in cart.items():
+        product = SupplierProduct.query.get(product_id)
+        if product:
+            subtotal = product.price * quantity
+            total_amount += subtotal
+            cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
 
-        if isinstance(current_user, User):
-            if current_user.role == 'admin':
-                return redirect(url_for('admin.dashboard'))
-            elif current_user.role == 'manager':
-                return redirect(url_for('manager.dashboard'))
-            elif current_user.role == 'staff':
-                return redirect(url_for('delivery.dashboard'))
-            elif current_user.role == 'supplier':
-                return redirect(url_for('supplier.dashboard'))
+    client = razorpay.Client(auth=(current_app.config['RAZORPAY_KEY_ID'], current_app.config['RAZORPAY_KEY_SECRET']))
+    payment_data = {
+        'amount': int(total_amount * 100),
+        'currency': 'INR',
+        'receipt': f'procure_rcptid_{current_user.business_id}_{datetime.now().timestamp()}'
+    }
+    order = client.order.create(data=payment_data)
 
-        return redirect(url_for('auth.login'))
+    return render_template(
+        'manager/procurement_checkout.html', 
+        title="Checkout", 
+        cart_items=cart_items, 
+        total_amount=total_amount,
+        order=order,
+        razorpay_key_id=current_app.config['RAZORPAY_KEY_ID']
+    )
 
-    from . import seeder
-    seeder.init_app(app)
+@bp.route('/procurement/checkout/cod', methods=['POST'])
+@login_required
+@manager_required
+def procurement_cod_checkout():
+    cart = get_cart()
+    if not cart:
+        flash('Your session expired or cart is empty.', 'warning')
+        return redirect(url_for('supplier.browse_products'))
+    
+    total_amount = 0
+    supplier_id = None
+    items_to_add = []
+    
+    for product_id, quantity in cart.items():
+        product = SupplierProduct.query.get(product_id)
+        if product:
+            if not supplier_id:
+                supplier_id = product.supplier_id
+            elif supplier_id != product.supplier_id:
+                flash('Cannot order from multiple suppliers at once.', 'danger')
+                return redirect(url_for('supplier.view_cart'))
+            
+            price_at_purchase = product.price
+            total_amount += quantity * price_at_purchase
+            items_to_add.append(PurchaseOrderItem(product_id=product_id, quantity=quantity, price_at_purchase=price_at_purchase))
 
-    # --- CUSTOM TEMPLATE FILTERS ---
-    @app.template_filter('to_ist')
-    def to_ist_filter(utc_dt):
-        if utc_dt is None:
-            return ''
-        return utc_dt.replace(tzinfo=ZoneInfo("UTC")).astimezone(ZoneInfo("Asia/Kolkata"))
+    if items_to_add:
+        order = PurchaseOrder(
+            business_id=current_user.business_id,
+            supplier_id=supplier_id,
+            total_amount=total_amount,
+            status='COD - Placed'
+        )
+        order.items.extend(items_to_add)
+        db.session.add(order)
+        db.session.commit()
+        clear_cart()
+        flash('Your order has been placed successfully via Cash on Delivery!', 'success')
+        return redirect(url_for('manager.dashboard'))
 
-    @app.template_filter('month_name')
-    def month_name_filter(month_number):
-        try:
-            return calendar.month_name[month_number]
-        except (IndexError, TypeError):
-            return ''
+    flash('Something went wrong with your order.', 'danger')
+    return redirect(url_for('supplier.view_cart'))
 
-    return app
+@bp.route('/procurement/payment-success', methods=['POST'])
+@login_required
+@manager_required
+def procurement_payment_success():
+    cart = get_cart()
+    if not cart:
+        flash('Your session expired or cart is empty.', 'warning')
+        return redirect(url_for('supplier.browse_products'))
 
-from app import models
+    data = request.form
+    razorpay_order_id = data.get('razorpay_order_id')
+    razorpay_payment_id = data.get('razorpay_payment_id')
+    razorpay_signature = data.get('razorpay_signature')
+    
+    client = razorpay.Client(auth=(current_app.config['RAZORPAY_KEY_ID'], current_app.config['RAZORPAY_KEY_SECRET']))
+    
+    try:
+        params_dict = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature
+        }
+        client.utility.verify_payment_signature(params_dict)
+
+        total_amount = 0
+        supplier_id = None
+        items_to_add = []
+
+        for product_id, quantity in cart.items():
+            product = SupplierProduct.query.get(product_id)
+            if product:
+                if not supplier_id:
+                    supplier_id = product.supplier_id
+                price_at_purchase = product.price
+                total_amount += quantity * price_at_purchase
+                items_to_add.append(PurchaseOrderItem(product_id=product_id, quantity=quantity, price_at_purchase=price_at_purchase))
+        
+        if items_to_add:
+            order = PurchaseOrder(
+                business_id=current_user.business_id,
+                supplier_id=supplier_id,
+                total_amount=total_amount,
+                status='Paid - Online'
+            )
+            order.items.extend(items_to_add)
+            db.session.add(order)
+            db.session.commit()
+            clear_cart()
+            flash('Payment successful and your order has been placed!', 'success')
+            return redirect(url_for('manager.dashboard'))
+
+    except Exception as e:
+        flash(f'Payment verification failed: {e}. Please try again or contact support.', 'danger')
+        return redirect(url_for('supplier.procurement_checkout'))
+
+    flash('Something went wrong with your order.', 'danger')
+    return redirect(url_for('supplier.view_cart'))
+
+# --- NEW ROUTE FOR SUPPLIER DASHBOARD ---
+@bp.route('/supplier/dashboard')
+@login_required
+@supplier_required
+def dashboard():
+    supplier_profile = Supplier.query.filter_by(user_id=current_user.id).first_or_404()
+    orders = PurchaseOrder.query.filter_by(supplier_id=supplier_profile.id).order_by(PurchaseOrder.order_date.desc()).all()
+    return render_template('supplier/dashboard.html', title="Supplier Dashboard", orders=orders)

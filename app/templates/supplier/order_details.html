@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Order Items</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Price at Purchase</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">₹{{ "%.2f"|format(item.price_at_purchase) }}</td>
+                                <td class="text-end">₹{{ "%.2f"|format(item.price_at_purchase * item.quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Total</td>
+                                <td class="text-end fw-bold">₹{{ "%.2f"|format(order.total_amount) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Order Details</div>
+                <div class="card-body">
+                    <p><strong>Ordered By:</strong><br>
+                       {{ order.business.name }}<br>
+                       <small>{{ order.business.location }}</small><br>
+                       {% if manager %}
+                           <strong>Manager:</strong> {{ manager.username }} ({{ manager.mobile_number }})
+                       {% endif %}
+                    </p>
+                    <p><strong>Status:</strong> <span class="badge bg-primary">{{ order.status }}</span></p>
+                    {% if order.invoice_number %}
+                    <p><strong>Invoice #:</strong> {{ order.invoice_number }} <a href="{{ url_for('supplier.view_procurement_invoice', order_id=order.id) }}" class="btn btn-sm btn-outline-secondary">View</a></p>
+                    {% endif %}
+                    <hr>
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.status.label(class="form-label") }}
+                            {{ form.status(class="form-select") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.delivery_date.label(class="form-label") }}
+                            {{ form.delivery_date(class="form-control") }}
+                        </div>
+                        {{ form.submit(class="btn btn-success") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

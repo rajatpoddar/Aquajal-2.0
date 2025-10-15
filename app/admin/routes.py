@@ -4,7 +4,7 @@ from flask import render_template, flash, redirect, url_for, abort, current_app
 from flask_login import login_required, current_user, login_user
 from app import db
 from app.admin import bp
-from app.models import User, Business, SubscriptionPlan, Coupon, Customer
+from app.models import User, Business, SubscriptionPlan, Coupon, Customer, SupplierProfile
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, IntegerField, BooleanField, DateField, TextAreaField
@@ -99,10 +99,11 @@ class AdminProfileForm(FlaskForm):
 
 class UserForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    shop_name = StringField(_l('Shop Name (for Suppliers)'), validators=[Optional(), Length(max=120)])
     mobile_number = StringField(_l('Mobile Number'), validators=[Optional(), Length(max=15)])
     address = TextAreaField(_l('Address'), validators=[Optional(), Length(max=200)])
     role = SelectField(_l('Role'), choices=[('staff', 'Staff'), ('manager', 'Manager'), ('supplier', 'Supplier')], validators=[DataRequired()])
-    business_id = SelectField(_l('Assign to Business'), coerce=int, validators=[DataRequired()])
+    business_id = SelectField(_l('Assign to Business (for Staff/Manager)'), coerce=int, validators=[Optional()])
     daily_wage = FloatField(_l('Daily Wage (₹)'), validators=[Optional()])
     password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
     password2 = PasswordField(_l('Repeat Password'), validators=[DataRequired(), EqualTo('password')])
@@ -114,7 +115,7 @@ class UserForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
-        self.business_id.choices = [(b.id, b.name) for b in Business.query.order_by('name').all()]
+        self.business_id.choices = [(0, 'N/A')] + [(b.id, b.name) for b in Business.query.order_by('name').all()]
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -123,10 +124,11 @@ class UserForm(FlaskForm):
 
 class EditUserForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    shop_name = StringField(_l('Shop Name (for Suppliers)'), validators=[Optional(), Length(max=120)])
     mobile_number = StringField(_l('Mobile Number'), validators=[Optional(), Length(max=15)])
     address = StringField(_l('Address'), validators=[Optional(), Length(max=200)])
     role = SelectField(_l('Role'), choices=[('staff', 'Staff'), ('manager', 'Manager'), ('supplier', 'Supplier')], validators=[DataRequired()])
-    business_id = SelectField(_l('Assign to Business'), coerce=int, validators=[DataRequired()])
+    business_id = SelectField(_l('Assign to Business (for Staff/Manager)'), coerce=int, validators=[Optional()])
     daily_wage = FloatField(_l('Daily Wage (₹) (for Staff only)'), validators=[Optional()])
     password = PasswordField(_l('New Password (leave blank to keep current)'), validators=[Optional(), Length(min=6)])
     id_proof = FileField(_l('ID Proof Image (JPG, PNG)'), validators=[
@@ -139,7 +141,7 @@ class EditUserForm(FlaskForm):
         super(EditUserForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
         self.original_mobile_number = original_mobile_number
-        self.business_id.choices = [(b.id, b.name) for b in Business.query.order_by('name').all()]
+        self.business_id.choices = [(0, 'N/A')] + [(b.id, b.name) for b in Business.query.order_by('name').all()]
 
     def validate_username(self, username):
         if username.data != self.original_username:
@@ -160,7 +162,7 @@ class EditUserForm(FlaskForm):
 @admin_required
 def dashboard():
     businesses = Business.query.order_by(Business.name).all()
-    users = User.query.filter(User.role.in_(['manager', 'staff'])).order_by(User.business_id, User.role, User.username).all()
+    users = User.query.filter(User.role.in_(['manager', 'staff', 'supplier'])).order_by(User.business_id, User.role, User.username).all()
     return render_template('admin/dashboard.html', businesses=businesses, users=users, title=_("Admin Dashboard"))
 
 # --- Admin Profile ---
@@ -266,18 +268,31 @@ def add_user():
         user = User(
             username=form.username.data,
             role=form.role.data,
-            business_id=form.business_id.data,
             mobile_number=form.mobile_number.data,
             address=form.address.data
         )
+        if form.role.data in ['staff', 'manager']:
+            user.business_id = form.business_id.data
         if form.role.data == 'staff':
             user.daily_wage = form.daily_wage.data
+
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+
+        if form.role.data == 'supplier':
+            supplier_profile = SupplierProfile(
+                user_id=user.id,
+                shop_name=form.shop_name.data if form.shop_name.data else f"{user.username}'s Shop",
+                address=form.address.data
+            )
+            db.session.add(supplier_profile)
+            db.session.commit()
+
         flash(_('User "%(username)s" has been created.', username=user.username))
         return redirect(url_for('admin.dashboard'))
     return render_template('admin/user_form.html', form=form, title=_("Add New User"), user=None)
+
 
 @bp.route('/user/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -292,11 +307,15 @@ def edit_user(id):
         user.mobile_number = form.mobile_number.data
         user.address = form.address.data
         user.role = form.role.data
-        user.business_id = form.business_id.data
+        
+        if user.role in ['staff', 'manager']:
+            user.business_id = form.business_id.data if form.business_id.data != 0 else None
+        else:
+            user.business_id = None
 
         if user.role == 'staff':
             user.daily_wage = form.daily_wage.data
-        else: # Manager
+        else:
             user.daily_wage = None
 
         if form.password.data:
@@ -313,9 +332,25 @@ def edit_user(id):
             f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             user.id_proof_filename = filename
 
+        if user.role == 'supplier':
+            if user.supplier_profile:
+                user.supplier_profile.shop_name = form.shop_name.data
+                user.supplier_profile.address = form.address.data
+            else: # If a user is switched to supplier, create a profile
+                supplier_profile = SupplierProfile(
+                    user_id=user.id,
+                    shop_name=form.shop_name.data if form.shop_name.data else f"{user.username}'s Shop",
+                    address=form.address.data
+                )
+                db.session.add(supplier_profile)
+        
         db.session.commit()
         flash(_('User "%(username)s" has been updated.', username=user.username))
         return redirect(url_for('admin.dashboard'))
+    
+    # Pre-populate shop_name if editing a supplier
+    if user.role == 'supplier' and user.supplier_profile:
+        form.shop_name.data = user.supplier_profile.shop_name
 
     return render_template('admin/user_form.html', form=form, user=user, title=_("Edit User"))
 

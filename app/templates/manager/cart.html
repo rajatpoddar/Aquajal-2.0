@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Your Shopping Cart</h2>
+    {% if cart_items %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Supplier</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.product.supplier.shop_name }}</td>
+                            <td class="text-center">
+                                <form action="{{ url_for('manager.update_cart', product_id=item.product.id) }}" method="post" class="d-inline-flex">
+                                    <input type="number" name="quantity" class="form-control form-control-sm" value="{{ item.quantity }}" min="1" style="width: 80px;">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary ms-2" title="Update Quantity"><i class="bi bi-arrow-repeat"></i></button>
+                                </form>
+                            </td>
+                            <td class="text-end">₹{{ "%.2f"|format(item.final_price) }}</td>
+                            <td class="text-end">₹{{ "%.2f"|format(item.subtotal) }}</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('manager.remove_from_cart', product_id=item.product.id) }}" class="btn btn-sm btn-outline-danger" title="Remove Item"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold"><h4>Total</h4></td>
+                            <td class="text-end"><h4>₹{{ "%.2f"|format(total_amount) }}</h4></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end">
+                <a href="{{ url_for('manager.browse_products') }}" class="btn btn-secondary me-2">Continue Shopping</a>
+                <a href="{{ url_for('manager.checkout_cart') }}" class="btn btn-primary">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Your cart is empty. <a href="{{ url_for('manager.browse_products') }}">Start shopping now!</a>
+    </div>
+    {% endif %}
+{% endblock %}

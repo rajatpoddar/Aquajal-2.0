@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Supplier Dashboard</h2>
+    <p>Welcome, {{ current_user.username }}!</p>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Recent Purchase Orders</h4>
+        </div>
+        <div class="card-body">
+            {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Business</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ order.business.name }}</td>
+                            <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+                            <td><span class="badge bg-info text-dark">{{ order.status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>You have no purchase orders yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

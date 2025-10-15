@@ -1,10 +1,12 @@
 # /water_supply_app/app/manager/routes.py
 
-from flask import render_template, flash, redirect, url_for, request, abort, current_app
+from flask import render_template, flash, redirect, url_for, request, abort, current_app, session
 from flask_login import login_required, current_user
 from app import db
 from app.manager import bp
-from app.models import User, DailyLog, Expense, CashHandover, ProductSale, Customer, Business, JarRequest, EventBooking, Invoice, InvoiceItem
+from app.models import (User, DailyLog, Expense, CashHandover, ProductSale, Customer, 
+                        Business, JarRequest, EventBooking, Invoice, InvoiceItem, 
+                        SupplierProduct, SupplierProfile, PurchaseOrder, PurchaseOrderItem)
 from functools import wraps
 from datetime import date, datetime, timedelta
 from sqlalchemy import func, cast, Date
@@ -12,10 +14,12 @@ from zoneinfo import ZoneInfo
 import os
 import calendar
 from werkzeug.utils import secure_filename
+import razorpay
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, FloatField, SubmitField, IntegerField, BooleanField, TextAreaField
+from wtforms import (StringField, PasswordField, FloatField, SubmitField, 
+                     IntegerField, BooleanField, TextAreaField, RadioField)
 from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo
 
 # Import the form from the delivery blueprint
@@ -36,7 +40,6 @@ class AddStaffForm(FlaskForm):
     submit = SubmitField('Create Staff Member')
 
     def validate_username(self, username):
-        # Check if username exists in either User or Customer table to prevent login conflicts
         if User.query.filter_by(username=username.data).first() or Customer.query.filter_by(username=username.data).first():
             raise ValidationError('This username is already taken. Please choose a different one.')
 
@@ -84,6 +87,10 @@ class EventConfirmationForm(FlaskForm):
     paid_to_manager = BooleanField('Payment received directly by you (Manager)?')
     submit = SubmitField('Confirm Booking')
 
+class CheckoutForm(FlaskForm):
+    payment_method = RadioField('Payment Method', choices=[('cod', 'Cash on Delivery'), ('razorpay', 'Pay Online with Razorpay')], default='cod', validators=[DataRequired()])
+    submit = SubmitField('Place Order')
+
 
 # --- Custom Decorators ---
 def manager_required(f):
@@ -95,44 +102,33 @@ def manager_required(f):
     return decorated_function
 
 def subscription_required(f):
-    """
-    Ensures the manager's business has an active subscription or is in a trial period.
-    This decorator should be placed AFTER @login_required and @manager_required.
-    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Admins are not subject to subscription checks
         if current_user.role == 'admin':
             return f(*args, **kwargs)
-
         business = Business.query.get(current_user.business_id)
         if not business:
             flash("You are not associated with a business.", "danger")
             return redirect(url_for('auth.logout'))
-
         is_active = False
         now = datetime.utcnow()
-
-        # Check 1: Is there an active subscription?
         if business.subscription_status == 'active' and business.subscription_ends_at and business.subscription_ends_at > now:
             is_active = True
-        # Check 2: Are they still in the trial period?
         elif business.subscription_status == 'trial' and business.trial_ends_at and business.trial_ends_at > now:
             is_active = True
-
         if not is_active:
-            # If trial has ended and status hasn't been updated, update it now
             if business.subscription_status == 'trial':
                 business.subscription_status = 'expired'
                 db.session.commit()
-            # Redirect to a page that tells them to subscribe
             return redirect(url_for('billing.expired'))
-            
         return f(*args, **kwargs)
     return decorated_function
 
 
 # --- Routes ---
+# ... (existing dashboard, receive_cash, clear_dues, reports, etc. routes are here)
+# ... (make sure they remain unchanged)
+
 @bp.route('/dashboard')
 @login_required
 @manager_required
@@ -201,10 +197,7 @@ def clear_dues(customer_id):
     amount_cleared = customer.due_amount
     customer.due_amount = 0.0
     
-    # Mark all 'Due' logs as 'Paid' for this customer
     DailyLog.query.filter_by(customer_id=customer.id, payment_status='Due').update({'payment_status': 'Paid'})
-    
-    # Mark all 'Unpaid' invoices as 'Paid' for this customer
     Invoice.query.filter_by(customer_id=customer.id, status='Unpaid').update({'status': 'Paid'})
     
     db.session.commit()
@@ -225,7 +218,6 @@ def reports():
     business_id = current_user.business_id
     IST = ZoneInfo("Asia/Kolkata")
 
-    # --- Monthly Report Logic ---
     try:
         report_year = int(request.args.get('year', today.year))
         report_month = int(request.args.get('month', today.month))
@@ -238,7 +230,6 @@ def reports():
     start_utc_month = start_of_month.replace(tzinfo=IST).astimezone(ZoneInfo("UTC"))
     end_utc_month = end_of_month.replace(tzinfo=IST).astimezone(ZoneInfo("UTC"))
 
-    # --- Monthly Sales Calculations ---
     monthly_jar_sales = db.session.query(func.sum(DailyLog.amount_collected)).join(Customer).filter(
         Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_month, end_utc_month)
     ).scalar() or 0.0
@@ -255,12 +246,10 @@ def reports():
     
     total_monthly_sales = monthly_jar_sales + monthly_product_sales_total + monthly_event_sales
 
-    # --- Monthly Expense & Wage Calculation ---
     monthly_expenses_total = db.session.query(func.sum(Expense.amount)).join(User).filter(
         User.business_id == business_id, Expense.timestamp.between(start_utc_month, end_utc_month)
     ).scalar() or 0.0
     
-    # --- Monthly Summaries ---
     customer_summary = db.session.query(
         Customer.name, func.sum(DailyLog.jars_delivered).label('total_jars'), func.sum(DailyLog.amount_collected).label('total_amount')
     ).join(DailyLog).filter(
@@ -306,7 +295,6 @@ def reports():
             'absent_days': absent_days, 'total_wages': total_wages
         })
 
-    # --- Daily Report Logic ---
     report_date_str = request.args.get('report_date', today.isoformat())
     try: report_date = datetime.strptime(report_date_str, '%Y-%m-%d').date()
     except ValueError: report_date = today
@@ -347,7 +335,6 @@ def reports():
         CashHandover.timestamp.between(start_utc_month, end_utc_month)
     ).order_by(CashHandover.timestamp.desc()).all()
 
-    # --- Monthly Leads from Product Sales ---
     monthly_leads = db.session.query(ProductSale).filter(
         ProductSale.business_id == business_id,
         ProductSale.timestamp.between(start_utc_month, end_utc_month)
@@ -366,7 +353,7 @@ def reports():
         attendance=attendance,
         total_daily_sales=total_daily_sales, total_daily_expenses=total_daily_expenses,
         cash_handover_logs=cash_handover_logs,
-        monthly_leads=monthly_leads,  # Add this line
+        monthly_leads=monthly_leads,
         current_year=today.year)
 
 
@@ -396,7 +383,6 @@ def stock_management():
     business = Business.query.filter_by(id=current_user.business_id).first_or_404()
     form = StockForm()
 
-    # Query for jars that are out with customers for events
     outstanding_bookings = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id,
         EventBooking.status == 'Delivered'
@@ -456,7 +442,7 @@ def add_staff():
         )
         user.set_password(form.password.data)
         db.session.add(user)
-        db.session.commit() # Commit to get user.id for the filename
+        db.session.commit() 
 
         if form.id_proof.data:
             f = form.id_proof.data
@@ -517,7 +503,6 @@ def confirm_booking(booking_id):
     if form.validate_on_submit():
         business = Business.query.get(current_user.business_id)
         
-        # Check stock for both jars and dispensers
         if business.jar_stock < booking.quantity:
             flash(f'Not enough jar stock to confirm. Only {business.jar_stock} jars available.', 'danger')
             return redirect(url_for('manager.dashboard'))
@@ -525,7 +510,6 @@ def confirm_booking(booking_id):
             flash(f'Not enough dispenser stock to confirm. Only {business.dispenser_stock} dispensers available.', 'danger')
             return redirect(url_for('manager.dashboard'))
             
-        # Deduct stock for both
         business.jar_stock -= booking.quantity
         business.dispenser_stock -= (booking.dispensers_booked or 0)
         
@@ -557,7 +541,6 @@ def account():
     return render_template('manager/account.html', title="My Account", password_form=password_form, business=business)
 
 # --- EVENT BOOKING FOR MANAGERS ---
-# This route reuses the logic and template from the delivery blueprint
 @bp.route('/book_event', methods=['GET', 'POST'])
 @login_required
 @manager_required
@@ -574,8 +557,6 @@ def list_invoices():
     invoices = Invoice.query.filter_by(business_id=current_user.business_id).order_by(Invoice.issue_date.desc()).paginate(page=page, per_page=10)
     return render_template('manager/list_invoices.html', invoices=invoices, title="All Invoices")
 
-# /water_supply_app/app/manager/routes.py
-
 @bp.route('/generate_invoice/<int:customer_id>', methods=['GET', 'POST'])
 @login_required
 @manager_required
@@ -588,11 +569,9 @@ def generate_invoice(customer_id):
         start_date = date(year, month, 1)
         end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
         
-        # --- Gather Data for Invoice ---
         total_amount = 0
         invoice_items_data = []
         
-        # 1. Daily Jar Deliveries (that were marked as 'Due' in the selected month)
         due_logs = DailyLog.query.filter(
             DailyLog.customer_id == customer.id,
             DailyLog.payment_status == 'Due',
@@ -611,7 +590,6 @@ def generate_invoice(customer_id):
             })
             total_amount += outstanding_balance
 
-        # 2. Event Bookings
         event_bookings = EventBooking.query.filter(
             EventBooking.customer_id == customer.id,
             EventBooking.status == 'Completed',
@@ -628,12 +606,10 @@ def generate_invoice(customer_id):
             })
             total_amount += booking.final_amount
 
-        # --- Create Invoice ---
         if not invoice_items_data:
             flash('No billable activity found for this customer in the selected month.', 'warning')
             return redirect(url_for('manager.generate_invoice', customer_id=customer_id))
 
-        # Determine final status
         status = 'Unpaid' if outstanding_balance > 0 else 'Paid'
 
         last_invoice_num = Invoice.query.filter_by(business_id=current_user.business_id).count()
@@ -653,7 +629,6 @@ def generate_invoice(customer_id):
             item = InvoiceItem(**item_data)
             new_invoice.items.append(item)
             
-        # If an invoice is generated, we can consider the previous 'due_amount' cleared
         customer.due_amount = outstanding_balance if status == 'Unpaid' else 0.0
 
         db.session.commit()
@@ -661,3 +636,202 @@ def generate_invoice(customer_id):
         return redirect(url_for('invoices.list_invoices'))
 
     return render_template('manager/generate_invoice_form.html', customer=customer, title="Generate Invoice")
+
+# --- PROCUREMENT (SHOPPING) ROUTES ---
+
+@bp.route('/procurement/browse')
+@login_required
+@manager_required
+@subscription_required
+def browse_products():
+    """Allows managers to browse products from all suppliers."""
+    subquery = db.session.query(
+        SupplierProduct.name,
+        SupplierProduct.supplier_id,
+        func.max(SupplierProduct.id).label('max_id')
+    ).group_by(SupplierProduct.name, SupplierProduct.supplier_id).subquery()
+
+    products = db.session.query(
+        SupplierProduct,
+        SupplierProfile
+    ).join(subquery, (SupplierProduct.id == subquery.c.max_id)
+    ).join(SupplierProfile, (SupplierProduct.supplier_id == SupplierProfile.id)
+    ).order_by(SupplierProduct.name, SupplierProduct.price).all()
+
+    products_by_name = {}
+    for product, supplier in products:
+        if product.name not in products_by_name:
+            products_by_name[product.name] = []
+        
+        final_price = product.price
+        if product.discount_percentage and product.discount_percentage > 0:
+            final_price = product.price - (product.price * product.discount_percentage / 100)
+            
+        products_by_name[product.name].append({
+            'product': product, 
+            'supplier': supplier,
+            'final_price': final_price
+        })
+
+    return render_template('manager/browse_products.html', title='Browse Products', products_by_name=products_by_name)
+
+@bp.route('/procurement/add_to_cart/<int:product_id>', methods=['POST'])
+@login_required
+@manager_required
+@subscription_required
+def add_to_cart(product_id):
+    product = SupplierProduct.query.get_or_404(product_id)
+    try:
+        quantity = int(request.form.get('quantity', 1))
+        if quantity < 1:
+            raise ValueError
+    except ValueError:
+        flash('Invalid quantity.', 'danger')
+        return redirect(url_for('manager.browse_products'))
+
+    cart = session.get('cart', {})
+    cart_item = cart.get(str(product_id))
+
+    if cart_item:
+        cart_item['quantity'] += quantity
+    else:
+        cart[str(product_id)] = {'quantity': quantity}
+    
+    session['cart'] = cart
+    flash(f'Added {quantity} x {product.name} to your cart.', 'success')
+    return redirect(url_for('manager.browse_products'))
+
+@bp.route('/procurement/cart')
+@login_required
+@manager_required
+@subscription_required
+def view_cart():
+    cart = session.get('cart', {})
+    cart_items = []
+    total_amount = 0
+    
+    for product_id, item in cart.items():
+        product = SupplierProduct.query.get(product_id)
+        if product:
+            final_price = product.price
+            if product.discount_percentage > 0:
+                final_price = product.price - (product.price * product.discount_percentage / 100)
+            
+            subtotal = final_price * item['quantity']
+            total_amount += subtotal
+            
+            cart_items.append({
+                'product': product,
+                'quantity': item['quantity'],
+                'final_price': final_price,
+                'subtotal': subtotal
+            })
+            
+    return render_template('manager/cart.html', title='Shopping Cart', cart_items=cart_items, total_amount=total_amount)
+
+@bp.route('/procurement/update_cart/<int:product_id>', methods=['POST'])
+@login_required
+@manager_required
+def update_cart(product_id):
+    cart = session.get('cart', {})
+    try:
+        quantity = int(request.form['quantity'])
+        if quantity > 0:
+            cart[str(product_id)]['quantity'] = quantity
+        else: # Remove if quantity is 0 or less
+            del cart[str(product_id)]
+    except (ValueError, KeyError):
+        pass # Ignore errors
+        
+    session['cart'] = cart
+    return redirect(url_for('manager.view_cart'))
+
+@bp.route('/procurement/remove_from_cart/<int:product_id>')
+@login_required
+@manager_required
+def remove_from_cart(product_id):
+    cart = session.get('cart', {})
+    if str(product_id) in cart:
+        del cart[str(product_id)]
+    session['cart'] = cart
+    return redirect(url_for('manager.view_cart'))
+
+@bp.route('/procurement/checkout', methods=['GET', 'POST'])
+@login_required
+@manager_required
+@subscription_required
+def checkout_cart():
+    cart = session.get('cart', {})
+    if not cart:
+        flash('Your cart is empty.', 'warning')
+        return redirect(url_for('manager.browse_products'))
+
+    cart_items = []
+    total_amount = 0
+    
+    for product_id, item in cart.items():
+        product = SupplierProduct.query.get(product_id)
+        if product:
+            final_price = product.price * (1 - (product.discount_percentage or 0) / 100)
+            subtotal = final_price * item['quantity']
+            total_amount += subtotal
+            cart_items.append({
+                'product': product,
+                'quantity': item['quantity'],
+                'price_at_purchase': final_price
+            })
+
+    form = CheckoutForm()
+    if form.validate_on_submit():
+        if form.payment_method.data == 'cod':
+            order = PurchaseOrder(
+                business_id=current_user.business_id,
+                supplier_id=cart_items[0]['product'].supplier_id,
+                total_amount=total_amount,
+                status='COD - Pending'
+            )
+            db.session.add(order)
+            for item in cart_items:
+                order_item = PurchaseOrderItem(
+                    order=order,
+                    product_id=item['product'].id,
+                    quantity=item['quantity'],
+                    price_at_purchase=item['price_at_purchase']
+                )
+                db.session.add(order_item)
+            
+            session.pop('cart', None)
+            db.session.commit()
+            flash('Your order has been placed successfully (Cash on Delivery)!', 'success')
+            return redirect(url_for('manager.view_orders'))
+        
+        elif form.payment_method.data == 'razorpay':
+            client = razorpay.Client(auth=(current_app.config['RAZORPAY_KEY_ID'], current_app.config['RAZORPAY_KEY_SECRET']))
+            payment_data = {
+                'amount': int(total_amount * 100),
+                'currency': 'INR',
+            }
+            order_data = client.order.create(data=payment_data)
+            
+            return render_template('manager/checkout.html', title='Checkout', form=form, cart_items=cart_items, total_amount=total_amount, order=order_data, razorpay_key_id=current_app.config['RAZORPAY_KEY_ID'])
+
+    return render_template('manager/checkout.html', title='Checkout', form=form, cart_items=cart_items, total_amount=total_amount, order=None)
+
+@bp.route('/procurement/orders')
+@login_required
+@manager_required
+@subscription_required
+def view_orders():
+    """Lists all purchase orders placed by the manager's business."""
+    orders = PurchaseOrder.query.filter_by(business_id=current_user.business_id).order_by(PurchaseOrder.order_date.desc()).all()
+    return render_template('manager/view_orders.html', title='My Orders', orders=orders)
+
+@bp.route('/procurement/invoice/<int:order_id>')
+@login_required
+@manager_required
+def view_procurement_invoice(order_id):
+    order = PurchaseOrder.query.get_or_404(order_id)
+    if order.business_id != current_user.business_id:
+        abort(403)
+    manager = User.query.filter_by(business_id=order.business_id, role='manager').first()
+    return render_template('procurement/invoice_template.html', order=order, manager=manager)

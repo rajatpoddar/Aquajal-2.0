@@ -1,5 +1,3 @@
-
-
 # File: app/models.py
 
 from app import db, login
@@ -115,6 +113,8 @@ class PurchaseOrder(db.Model):
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier_profile.id'), nullable=False)
     order_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    delivery_date = db.Column(db.Date, nullable=True)
+    invoice_number = db.Column(db.String(50), unique=True, nullable=True)
     total_amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(20), default='Pending') # e.g., Pending, Confirmed, Delivered
     items = db.relationship('PurchaseOrderItem', backref='order', lazy='dynamic', cascade="all, delete-orphan")
@@ -269,3 +269,10 @@ def load_user(user_id_string):
     if user_type == 'user': return User.query.get(user_id)
     elif user_type == 'customer': return Customer.query.get(user_id)
     return None
+
+class Supplier(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    shop_name = db.Column(db.String(120), nullable=False)
+    address = db.Column(db.String(250), nullable=True)
+    user = db.relationship('User', backref='supplier', uselist=False)

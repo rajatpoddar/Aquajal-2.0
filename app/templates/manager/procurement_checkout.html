@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Checkout</h2>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    Order Summary
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>{{ item.product.name }}<br><small class="text-muted">from {{ item.product.supplier.shop_name }}</small></td>
+                                <td>{{ item.quantity }}</td>
+                                <td class="text-end">₹{{ "%.2f"|format(item.subtotal) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="2" class="text-end">Total</th>
+                                <th class="text-end">₹{{ "%.2f"|format(total_amount) }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    Payment
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                Cash on Delivery
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
+                            <label class="form-check-label" for="razorpay">
+                                Pay Online with Razorpay
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="checkout-button" class="btn btn-primary w-100">Place Order</button>
+
+                    <form id="cod-form" action="{{ url_for('supplier.procurement_cod_checkout') }}" method="post" style="display: none;"></form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkoutButton = document.getElementById('checkout-button');
+    const codForm = document.getElementById('cod-form');
+    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+    let rzp;
+
+    const razorpayOptions = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ order.amount }}", // in paise
+        "currency": "INR",
+        "name": "Aquajal Procurement",
+        "description": "Purchase Order",
+        "order_id": "{{ order.id }}",
+        "handler": function (response){
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('supplier.procurement_payment_success') }}";
+
+            function addHiddenField(name, value) {
+                let field = document.createElement('input');
+                field.type = 'hidden';
+                field.name = name;
+                field.value = value;
+                form.appendChild(field);
+            }
+
+            addHiddenField('razorpay_order_id', response.razorpay_order_id);
+            addHiddenField('razorpay_payment_id', response.razorpay_payment_id);
+            addHiddenField('razorpay_signature', response.razorpay_signature);
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        "prefill": {
+            "name": "{{ current_user.business.owner_name or current_user.username }}",
+            "email": "{{ current_user.business.email or '' }}",
+            "contact": "{{ current_user.mobile_number or '' }}"
+        },
+        "theme": {
+            "color": "#0d6efd"
+        }
+    };
+
+    function updateButtonState() {
+        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        if (selectedMethod === 'cod') {
+            checkoutButton.textContent = 'Place Order';
+        } else {
+            checkoutButton.textContent = 'Pay ₹{{ "%.2f"|format(total_amount) }}';
+        }
+    }
+
+    paymentMethods.forEach(radio => {
+        radio.addEventListener('change', updateButtonState);
+    });
+
+    checkoutButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (selectedMethod === 'cod') {
+            codForm.submit();
+        } else {
+            if (!rzp) {
+                rzp = new Razorpay(razorpayOptions);
+            }
+            rzp.open();
+        }
+    });
+
+    // Initial state
+    updateButtonState();
+});
+</script>
+{% endblock %}
