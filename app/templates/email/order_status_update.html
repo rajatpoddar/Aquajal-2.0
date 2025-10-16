@@ -1,0 +1,16 @@
+<p>Hi {{ manager.username }},</p>
+<p>
+    The status of your purchase order <strong>#{{ order.id }}</strong> with <strong>{{ order.supplier.shop_name }}</strong> has been updated.
+</p>
+<p>
+    <strong>New Status:</strong> <span style="font-weight: bold; color: #0d6efd;">{{ order.status }}</span>
+</p>
+{% if order.delivery_date %}
+<p>
+    <strong>Estimated Delivery Date:</strong> {{ order.delivery_date.strftime('%d-%b-%Y') }}
+</p>
+{% endif %}
+<p>
+    You can view the full order details in your manager dashboard under "My Orders".
+</p>
+<p>Sincerely,<br>The Aquajal Team</p>

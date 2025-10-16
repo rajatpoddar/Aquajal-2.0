@@ -74,15 +74,17 @@ class BusinessForm(FlaskForm):
 
 class AdminProfileForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
+    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
     mobile_number = StringField(_l('Mobile Number'), validators=[Optional(), Length(max=15)])
     password = PasswordField(_l('New Password (leave blank to keep current)'), validators=[Optional(), Length(min=6)])
     password2 = PasswordField(_l('Repeat New Password'), validators=[EqualTo('password', message=_l('Passwords must match.'))])
     submit = SubmitField(_l('Update Profile'))
 
-    def __init__(self, original_username, original_mobile_number, *args, **kwargs):
+    def __init__(self, original_username, original_mobile_number, original_email, *args, **kwargs):
         super(AdminProfileForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
         self.original_mobile_number = original_mobile_number
+        self.original_email = original_email
 
     def validate_username(self, username):
         if username.data != self.original_username:
@@ -96,6 +98,11 @@ class AdminProfileForm(FlaskForm):
             if user is not None:
                 raise ValidationError(_('This mobile number is already registered.'))
 
+    def validate_email(self, email):
+        if email.data and email.data != self.original_email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('This email address is already registered.')
 
 class UserForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
@@ -173,11 +180,13 @@ def profile():
     form = AdminProfileForm(
         original_username=current_user.username, 
         original_mobile_number=current_user.mobile_number, 
+        original_email=current_user.email,
         obj=current_user
     )
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.mobile_number = form.mobile_number.data
+        current_user.email = form.email.data
         if form.password.data:
             current_user.set_password(form.password.data)
         db.session.commit()

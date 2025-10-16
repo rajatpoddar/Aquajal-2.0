@@ -24,6 +24,11 @@
                             {{ profile_form.mobile_number(class="form-control") }}
                         </div>
                     </div>
+                    <div class="mb-3">
+                        {{ profile_form.email.label(class="form-label") }}
+                        {{ profile_form.email(class="form-control") }}
+                        {% for error in profile_form.email.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
                     <hr>
                     <div class="row">
                         <div class="col-md-6 mb-3">

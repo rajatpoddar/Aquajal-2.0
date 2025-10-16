@@ -1,27 +1,33 @@
 {% extends "base.html" %}
+
 {% block content %}
 <h2>{{ title }}</h2>
 <div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">Booking for {{ booking.customer.name }} on {{ booking.event_date.strftime('%d-%b-%Y') }}</h5>
+    </div>
     <div class="card-body">
-        <p><strong>Customer:</strong> {{ booking.customer.name }} ({{ booking.customer.mobile_number }})</p>
-        <p><strong>Quantity:</strong> {{ booking.quantity }} Jars</p>
-        {% if booking.dispensers_booked > 0 %}
-        <p><strong>Dispensers:</strong> {{ booking.dispensers_booked }}</p>
-        {% endif %}
-        <p><strong>Event Date:</strong> {{ booking.event_date.strftime('%A, %d %B %Y') }}</p>
-        <hr>
         <form method="post">
             {{ form.hidden_tag() }}
-            <div class="mb-3">
-                {{ form.amount.label(class="form-label") }}
-                {{ form.amount(class="form-control") }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.quantity.label(class="form-label") }}
+                    {{ form.quantity(class="form-control", value=booking.quantity) }}
+                    {% for error in form.quantity.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.amount.label(class="form-label") }}
+                    {{ form.amount(class="form-control", value=(booking.amount or (booking.quantity * booking.customer.price_per_jar))) }}
+                    {% for error in form.amount.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                </div>
             </div>
-            <div class="form-check mb-3">
+            <div class="mb-3 form-check">
                 {{ form.paid_to_manager(class="form-check-input") }}
                 {{ form.paid_to_manager.label(class="form-check-label") }}
             </div>
+            <hr>
             <div>
-                {{ form.submit(class="btn btn-primary") }}
+                {{ form.submit(class="btn btn-success") }}
                 <a href="{{ url_for('manager.dashboard') }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>

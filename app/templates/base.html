@@ -147,9 +147,26 @@
                             </ul>
                         </li>
 
+                        {% elif current_user.role == 'staff' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                My Menu
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('delivery.dashboard') }}">My Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('delivery.account') }}">My Account</a></li>
+                            </ul>
+                        </li>
+
                         {% elif current_user.role == 'customer' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('customer.dashboard') }}">{{ _('My Dashboard') }}</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                My Menu
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('customer.dashboard') }}">My Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('customer.account') }}">My Account</a></li>
+                            </ul>
                         </li>
                         {% endif %}
 

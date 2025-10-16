@@ -8,12 +8,13 @@ import razorpay
 from datetime import date, datetime  # Correctly imported here
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, SelectField, TextAreaField, FloatField, IntegerField, PasswordField
-from wtforms.validators import DataRequired, Optional, NumberRange, Length, EqualTo
+from wtforms.validators import DataRequired, Optional, NumberRange, Length, EqualTo, Email, ValidationError
 from flask_wtf.file import FileField, FileAllowed
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import func, cast, Date
 import calendar
+from app.email import send_order_status_update_email
 
 class OrderStatusForm(FlaskForm):
     status = SelectField('Order Status', choices=[('Pending', 'Pending'), ('Confirmed', 'Confirmed'), ('Shipped', 'Shipped'), ('Delivered', 'Delivered'), ('Cancelled', 'Cancelled')], validators=[DataRequired()])
@@ -31,6 +32,7 @@ class ProductForm(FlaskForm):
 
 class SupplierProfileForm(FlaskForm):
     shop_name = StringField('Shop Name', validators=[DataRequired(), Length(max=120)])
+    email = StringField('Email Address', validators=[Optional(), Email()])
     address = TextAreaField('Address', validators=[Optional(), Length(max=250)])
     mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
     id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
@@ -38,6 +40,16 @@ class SupplierProfileForm(FlaskForm):
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
     submit_profile = SubmitField('Update Profile')
+    
+    def __init__(self, original_email=None, *args, **kwargs):
+        super(SupplierProfileForm, self).__init__(*args, **kwargs)
+        self.original_email = original_email
+
+    def validate_email(self, email):
+        if email.data and email.data != self.original_email:
+            user = User.query.filter(User.email == email.data, User.id != current_user.id).first()
+            if user:
+                raise ValidationError('This email address is already registered.')
 
 class ChangePasswordForm(FlaskForm):
     password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
@@ -239,7 +251,7 @@ def procurement_payment_success():
 def dashboard():
     supplier_profile = SupplierProfile.query.filter_by(user_id=current_user.id).first_or_404()
     orders = PurchaseOrder.query.filter_by(supplier_id=supplier_profile.id).order_by(PurchaseOrder.order_date.desc()).all()
-    return render_template('supplier/dashboard.html', title="Supplier Dashboard", orders=orders)
+    return render_template('supplier/dashboard.html', title="Supplier Dashboard", orders=orders, user=current_user)
 
 @bp.route('/products')
 @login_required
@@ -339,6 +351,12 @@ def order_details(order_id):
         
         db.session.commit()
         flash('Order status updated.', 'success')
+
+        # --- EMAIL NOTIFICATION TO MANAGER ---
+        if original_status != new_status:
+            send_order_status_update_email(order)
+        # --- END EMAIL ---
+
         return redirect(url_for('supplier.order_details', order_id=order.id))
 
     form.status.data = order.status
@@ -363,8 +381,11 @@ def account():
     user = User.query.get(current_user.id)
     profile = user.supplier_profile
     
-    profile_form = SupplierProfileForm(obj=profile)
-    profile_form.mobile_number.data = user.mobile_number
+    profile_form = SupplierProfileForm(original_email=user.email, obj=profile)
+    # Pre-populate the form with user's current data on GET request
+    if request.method == 'GET':
+        profile_form.mobile_number.data = user.mobile_number
+        profile_form.email.data = user.email
     
     password_form = ChangePasswordForm()
 
@@ -372,6 +393,7 @@ def account():
         profile.shop_name = profile_form.shop_name.data
         profile.address = profile_form.address.data
         user.mobile_number = profile_form.mobile_number.data
+        user.email = profile_form.email.data
 
         if profile_form.id_proof.data:
             if user.id_proof_filename:

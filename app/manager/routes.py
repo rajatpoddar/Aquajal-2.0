@@ -19,10 +19,11 @@ import razorpay
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, FloatField, SubmitField, IntegerField, BooleanField, TextAreaField, RadioField
-from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo, NumberRange
+from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo, NumberRange, Email
 
-# Import the form from the delivery blueprint
+# Import the form from the delivery blueprint and new email functions
 from app.delivery.routes import EventBookingByStaffForm
+from app.email import send_booking_confirmed_email_to_staff, send_booking_confirmed_email_to_customer, send_new_order_to_supplier_email
 
 # --- Forms ---
 class AddStaffForm(FlaskForm):
@@ -88,6 +89,7 @@ class EditStaffByManagerForm(FlaskForm):
                 raise ValidationError('Please use a different username.')
             
 class EventConfirmationForm(FlaskForm):
+    quantity = IntegerField('Number of Jars', validators=[DataRequired(), NumberRange(min=1)])
     amount = FloatField('Total Amount (₹)', validators=[DataRequired()])
     paid_to_manager = BooleanField('Payment received directly by you (Manager)?')
     submit = SubmitField('Confirm Booking')
@@ -99,6 +101,7 @@ class CheckoutForm(FlaskForm):
 class ManagerProfileForm(FlaskForm):
     # User fields
     username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email Address', validators=[Optional(), Email()])
     mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
     id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
         Optional(),
@@ -112,16 +115,22 @@ class ManagerProfileForm(FlaskForm):
 
     submit_profile = SubmitField('Update Profile')
 
-    def __init__(self, original_username, *args, **kwargs):
+    def __init__(self, original_username, original_email, *args, **kwargs):
         super(ManagerProfileForm, self).__init__(*args, **kwargs)
         self.original_username = original_username
+        self.original_email = original_email
 
     def validate_username(self, username):
         if username.data != self.original_username:
             user = User.query.filter_by(username=self.username.data).first()
             if user is not None:
                 raise ValidationError('Please use a different username.')
-
+                
+    def validate_email(self, email):
+        if email.data and email.data != self.original_email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('This email address is already registered.')
 
 # --- Custom Decorators ---
 def manager_required(f):
@@ -562,30 +571,42 @@ def confirm_booking(booking_id):
         Customer.business_id == current_user.business_id, EventBooking.id == booking_id
     ).first_or_404()
     
-    form = EventConfirmationForm()
+    form = EventConfirmationForm(obj=booking)
     if form.validate_on_submit():
         business = Business.query.get(current_user.business_id)
         
-        if business.jar_stock < booking.quantity:
+        # Use the quantity from the form, not the original booking
+        jars_to_book = form.quantity.data
+        
+        if business.jar_stock < jars_to_book:
             flash(f'Not enough jar stock to confirm. Only {business.jar_stock} jars available.', 'danger')
             return redirect(url_for('manager.dashboard'))
         if business.dispenser_stock < (booking.dispensers_booked or 0):
             flash(f'Not enough dispenser stock to confirm. Only {business.dispenser_stock} dispensers available.', 'danger')
             return redirect(url_for('manager.dashboard'))
             
-        business.jar_stock -= booking.quantity
+        business.jar_stock -= jars_to_book
         business.dispenser_stock -= (booking.dispensers_booked or 0)
         
+        booking.quantity = jars_to_book  # Update the booking's quantity
         booking.amount = form.amount.data
         booking.paid_to_manager = form.paid_to_manager.data
         booking.status = 'Confirmed'
         booking.confirmed_by_id = current_user.id
         db.session.commit()
         flash('Event booking confirmed and stock updated.')
+
+        # --- EMAIL NOTIFICATION TO STAFF & CUSTOMER ---
+        staff_users = User.query.filter_by(business_id=current_user.business_id, role='staff').all()
+        for staff_member in staff_users:
+            send_booking_confirmed_email_to_staff(booking, staff_member)
+            
+        send_booking_confirmed_email_to_customer(booking)
+        # --- END EMAIL ---
+
         return redirect(url_for('manager.dashboard'))
         
     return render_template('manager/confirm_booking.html', title='Confirm Event Booking', form=form, booking=booking)
-
 
 # --- ACCOUNT MANAGEMENT ROUTE ---
 @bp.route('/account', methods=['GET', 'POST'])
@@ -595,7 +616,7 @@ def account():
     user = User.query.get(current_user.id)
     business = Business.query.get(current_user.business_id)
     
-    profile_form = ManagerProfileForm(original_username=user.username, obj=user)
+    profile_form = ManagerProfileForm(original_username=user.username, original_email=user.email, obj=user)
     profile_form.name.data = business.name
     profile_form.owner_name.data = business.owner_name
     profile_form.location.data = business.location
@@ -605,6 +626,7 @@ def account():
     if profile_form.submit_profile.data and profile_form.validate_on_submit():
         user.username = profile_form.username.data
         user.mobile_number = profile_form.mobile_number.data
+        user.email = profile_form.email.data
         
         business.name = profile_form.name.data
         business.owner_name = profile_form.owner_name.data

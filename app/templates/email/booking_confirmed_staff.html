@@ -1,0 +1,16 @@
+<p>Hi {{ staff.username }},</p>
+<p>
+    An event booking has been confirmed by the manager and is scheduled for delivery:
+</p>
+<p>
+    <strong>Customer:</strong> {{ booking.customer.name }}<br>
+    <strong>Quantity:</strong> {{ booking.quantity }} jar(s)<br>
+    <strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}<br>
+    <strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}<br>
+    <strong>Amount to Collect:</strong> ₹{{ "%.2f"|format(booking.amount) }}
+    {% if booking.paid_to_manager %}
+        (Already paid to manager)
+    {% endif %}
+</p>
+<p>Please ensure this delivery is completed on the event date.</p>
+<p>Sincerely,<br>The Aquajal Team</p>

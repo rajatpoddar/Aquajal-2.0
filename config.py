@@ -1,4 +1,3 @@
-# File: config.py
 import os
 from dotenv import load_dotenv
 
@@ -6,51 +5,43 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'a-very-secret-key'
-
-    # --- Database Configuration ---
-    # Attempt to load PostgreSQL credentials from environment variables
-    POSTGRES_USER = os.environ.get('POSTGRES_USER')
-    POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-    POSTGRES_HOSTNAME = os.environ.get('POSTGRES_HOSTNAME', 'db') # 'db' is the service name in docker-compose
-    POSTGRES_DB = os.environ.get('POSTGRES_DB')
-
-    # If PostgreSQL credentials are provided, use them. Otherwise, fall back to SQLite.
-    if all([POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOSTNAME, POSTGRES_DB]):
-        SQLALCHEMY_DATABASE_URI = (
-            f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@"
-            f"{POSTGRES_HOSTNAME}/{POSTGRES_DB}"
-        )
-    else:
-        # Fallback to your original SQLite configuration
-        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-            'sqlite:///' + os.path.join(basedir, 'app.db')
-
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'a-hard-to-guess-string'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # --- THIS LINE WAS MISSING AND IS NOW RESTORED ---
+    # --- Email Server Configuration ---
+    # Replace with your actual email server details.
+    # For Gmail, you might need to generate an "App Password".
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'your-email@gmail.com') # <-- IMPORTANT: REPLACE
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'your-app-password')   # <-- IMPORTANT: REPLACE
+    ADMINS = [os.environ.get('ADMINS', 'your-email@gmail.com')] # <-- IMPORTANT: REPLACE
+    # ------------------------------------
+    
+    # --- Other Configurations ---
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload size
     
     # --- Razorpay API Keys ---
     RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID')
     RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET')
 
-    # --- Email Configuration ---
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    ADMINS = ['your-email@example.com']
-    
-    # --- Supported languages (Preserved from your original file) ---
+    # --- Babel (Internationalization) ---
     LANGUAGES = {
         'en': 'English',
-        'hi': 'हिन्दी',       # Hindi
-        'bn': 'বাংলা',       # Bengali
-        'mr': 'मराठी',      # Marathi
-        'pa': 'ਪੰਜਾਬੀ',     # Punjabi
-        'ta': 'தமிழ்',      # Tamil
-        'te': 'తెలుగు',     # Telugu
-        'gu': 'ગુજરાતી'      # Gujarati
+        'hi': 'हिंदी',    # Hindi
+        'bn': 'বাংলা',   # Bengali
+        'mr': 'मराठी',  # Marathi
+        'te': 'తెలుగు',   # Telugu
+        'ta': 'தமிழ்',    # Tamil
+        'gu': 'ગુજરાતી', # Gujarati
+        'pa': 'ਪੰਜਾਬੀ'  # Punjabi
     }
+
+    @staticmethod
+    def init_app(app):
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])

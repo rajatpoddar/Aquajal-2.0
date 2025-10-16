@@ -1,0 +1,17 @@
+<p>Dear {{ booking.customer.name }},</p>
+<p>
+    We're pleased to confirm your event booking with <strong>{{ booking.customer.business.name }}</strong>.
+</p>
+<p>
+    <strong>Booking Details:</strong><br>
+    - Water Jars: {{ booking.quantity }}<br>
+    - Dispensers: {{ booking.dispensers_booked or 0 }}<br>
+    - Event Date: {{ booking.event_date.strftime('%d-%b-%Y') }}
+</p>
+<p>
+    <strong>Total Amount:</strong> ₹{{ "%.2f"|format(booking.amount) }}
+</p>
+<p>
+    Thank you for choosing us for your event. We look forward to serving you!
+</p>
+<p>Sincerely,<br>The {{ booking.customer.business.name }} Team</p>

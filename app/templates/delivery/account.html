@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<p class="text-muted">Username: {{ current_user.username }}</p>
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">My Profile</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ profile_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ profile_form.email.label(class="form-label") }}
+                        {{ profile_form.email(class="form-control") }}
+                        {% for error in profile_form.email.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ profile_form.mobile_number.label(class="form-label") }}
+                        {{ profile_form.mobile_number(class="form-control") }}
+                    </div>
+                    <div>
+                        {{ profile_form.submit_profile(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ password_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ password_form.password.label(class="form-label") }}
+                        {{ password_form.password(class="form-control") }}
+                         {% for error in password_form.password.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                     <div class="mb-3">
+                        {{ password_form.password2.label(class="form-label") }}
+                        {{ password_form.password2(class="form-control") }}
+                         {% for error in password_form.password2.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div>
+                        {{ password_form.submit_password(class="btn btn-warning") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-4">
+    <a href="{{ url_for('delivery.dashboard') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+</div>
+{% endblock %}

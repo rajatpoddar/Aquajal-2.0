@@ -1,0 +1,14 @@
+<p>Hi {{ order.supplier.shop_name }},</p>
+<p>
+    You have received a new order from <strong>{{ order.business.name }}</strong>.
+</p>
+<p>
+    <strong>Order Details:</strong><br>
+    - Order ID: #{{ order.id }}<br>
+    - Total Amount: ₹{{ "%.2f"|format(order.total_amount) }}<br>
+    - Order Date: {{ order.order_date.strftime('%d-%b-%Y') }}
+</p>
+<p>
+    Please log in to your supplier dashboard to view the full order details and update the order status.
+</p>
+<p>Sincerely,<br>The Aquajal Team</p>

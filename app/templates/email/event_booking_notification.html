@@ -1,0 +1,12 @@
+<p>Hi Team,</p>
+<p>
+    A new event booking has been created and requires confirmation:
+</p>
+<p>
+    <strong>Customer:</strong> {{ booking.customer.name }}<br>
+    <strong>Quantity:</strong> {{ booking.quantity }} jar(s)<br>
+    <strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}<br>
+    <strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}
+</p>
+<p>The manager needs to log in to confirm this booking.</p>
+<p>Sincerely,<br>The Aquajal Team</p>

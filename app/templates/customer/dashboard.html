@@ -39,6 +39,9 @@
 
     <div class="col-md-8">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
+             <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button">{{ _('My Bookings') }}</button>
+            </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">{{ _('My Activity') }}</button>
             </li>
@@ -47,55 +50,51 @@
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
+             <div class="tab-pane fade show active" id="bookings" role="tabpanel">
+                <ul class="list-group list-group-flush">
+                    {% for booking in bookings %}
+                        <li class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <div>
+                                    {{ _('Booking for') }} <strong>{{ booking.event_date.strftime('%d-%b-%Y') }}</strong>
+                                    <small class="d-block text-muted">{{ booking.quantity }} {{ _('Jar(s)') }}{% if booking.dispensers_booked %} + {{ booking.dispensers_booked }} {{ _('Dispenser(s)') }}{% endif %}</small>
+                                </div>
+                                 <span class="badge fs-6 my-auto 
+                                    {% if booking.status == 'Confirmed' %} bg-success
+                                    {% elif booking.status == 'Pending' %} bg-warning text-dark
+                                    {% elif booking.status == 'Completed' %} bg-primary
+                                    {% elif booking.status == 'Delivered' %} bg-info text-dark
+                                    {% else %} bg-secondary {% endif %}">
+                                    {{ _(booking.status) }}
+                                </span>
+                            </div>
+                            {% if booking.amount %}
+                                <small class="d-block mt-1">{{ _('Confirmed Amount:') }} ₹{{ "%.2f"|format(booking.amount) }}</small>
+                            {% endif %}
+                        </li>
+                    {% else %}
+                        <li class="list-group-item">{{ _('You have no event bookings.') }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
             <div class="tab-pane fade" id="activity" role="tabpanel">
                 <ul class="list-group list-group-flush">
                     {% for activity in activity_log %}
                         {% set item = activity.item %}
                         <li class="list-group-item">
-                            {% if activity.type == 'Regular Delivery' or activity.type == 'Requested Delivery' %}
-                                <div class="d-flex w-100 justify-content-between">
-                                    <div>
-                                        <strong>{{ item.jars_delivered }} {{ _('jar(s)') }}</strong> {{ _('delivered on') }} {{(item.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
-                                        <small class="d-block text-muted">{{ _(activity.type) }}</small>
-                                    </div>
-                                    <div class="text-end">
-                                        {{ _('Amount:') }} ₹{{ "%.2f"|format(item.amount_collected) }}
-                                        {% if item.payment_status == 'Due' %}
-                                            <span class="badge bg-danger ms-1">{{ _('Due') }}</span>
-                                        {% else %}
-                                            <span class="badge bg-success ms-1">{{ _('Paid') }}</span>
-                                        {% endif %}
-                                    </div>
+                            <div class="d-flex w-100 justify-content-between">
+                                <div>
+                                    <strong>{{ item.jars_delivered }} {{ _('jar(s)') }}</strong> {{ _('delivered on') }} {{(item.timestamp | to_ist).strftime('%d-%b-%Y %I:%M %p')}}
                                 </div>
-                            {% elif activity.type == 'Booking Delivery' %}
-                                <div class="d-flex w-100 justify-content-between">
-                                    <div>
-                                        {{ _('Booked') }} <strong>{{ item.quantity }} {{ _('Jar(s)') }}</strong>
-                                        {% if item.dispensers_booked > 0 %}+ <strong>{{ item.dispensers_booked }} {{ _('Dispenser(s)') }}</strong>{% endif %}
-                                        {{ _('for event on') }} {{ item.event_date.strftime('%d-%b-%Y') }}
-                                        <small class="d-block text-muted">{{ _('Booking Delivery') }}</small>
-                                    </div>
-                                    <span class="badge bg-warning my-auto">{{ _(item.status) }}</span>
+                                <div class="text-end">
+                                    {{ _('Amount:') }} ₹{{ "%.2f"|format(item.amount_collected) }}
+                                    {% if item.payment_status == 'Due' %}
+                                        <span class="badge bg-danger ms-1">{{ _('Due') }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success ms-1">{{ _('Paid') }}</span>
+                                    {% endif %}
                                 </div>
-                                {% if item.status == 'Completed' %}
-                                    <hr class="my-2">
-                                    <small class="d-block">
-                                        {{ _('Returned:') }} {{ item.jars_returned }} {{ _('Jars') }}, {{ item.dispensers_returned or 0 }} {{ _('Dispensers') }}.
-                                        {% set lost_jars = item.quantity - item.jars_returned %}
-                                        {% set lost_dispensers = (item.dispensers_booked or 0) - (item.dispensers_returned or 0) %}
-                                        {% if lost_jars > 0 or lost_dispensers > 0 %}
-                                            <span class="text-danger">
-                                                {{ _('Lost:') }}
-                                                {% if lost_jars > 0 %}{{ lost_jars }} {{ _('Jar(s)') }}{% endif %}
-                                                {% if lost_dispensers > 0 %}, {{ lost_dispensers }} {{ _('Dispenser(s)') }}{% endif %}
-                                            </span>
-                                        {% endif %}
-                                    </small>
-                                    <small class="d-block"><strong>{{ _('Final Settled Amount:') }} ₹{{ "%.2f"|format(item.final_amount) }}</strong></small>
-                                {% elif item.amount %}
-                                    <small class="d-block">{{ _('Confirmed Amount:') }} ₹{{ "%.2f"|format(item.amount) }}</small>
-                                {% endif %}
-                            {% endif %}
+                            </div>
                         </li>
                     {% else %}
                         <li class="list-group-item">{{ _('No recent activity found.') }}</li>

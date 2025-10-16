@@ -1,0 +1,17 @@
+<p>Dear {{ customer.name }},</p>
+<p>
+    This is a confirmation that your recent delivery has been completed.
+</p>
+<p>
+    <strong>Items Delivered:</strong><br>
+    - {{ jars_delivered }} water jar(s)
+</p>
+<p>
+    <strong>Total Amount:</strong> ₹{{ "%.2f"|format(amount) }}<br>
+    <strong>Status:</strong> {{ payment_status }}
+</p>
+<p>
+    An invoice for this transaction has been automatically generated and is available in your customer dashboard.
+</p>
+<p>Thank you for your business!</p>
+<p>Sincerely,<br>The {{ business.name }} Team</p>

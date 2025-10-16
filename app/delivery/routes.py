@@ -5,14 +5,40 @@ from flask_login import login_required, current_user
 from app import db
 from app.delivery import bp
 from app.models import Customer, DailyLog, Expense, User, JarRequest, EventBooking, Business, Invoice
+from app.email import send_delivery_confirmation_email, send_event_booking_notification
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, FloatField, DateField
-from wtforms.validators import DataRequired, NumberRange, ValidationError, Optional
+from wtforms import StringField, PasswordField, SubmitField, IntegerField, FloatField, DateField
+from wtforms.validators import DataRequired, NumberRange, ValidationError, Optional, Email, EqualTo, Length
 from sqlalchemy import or_
 from datetime import date, datetime, timedelta
 from app.invoices.routes import create_invoice_for_transaction
 
 # --- Forms ---
+
+class StaffProfileForm(FlaskForm):
+    """Form for staff to edit their own profile."""
+    email = StringField('Email Address', validators=[Optional(), Email()])
+    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
+    submit_profile = SubmitField('Update Profile')
+
+    def __init__(self, original_email=None, *args, **kwargs):
+        super(StaffProfileForm, self).__init__(*args, **kwargs)
+        self.original_email = original_email
+
+    def validate_email(self, email):
+        if email.data and email.data != self.original_email:
+            # Check if email is already taken by another user or customer
+            if User.query.filter(User.email == email.data).first() or \
+               Customer.query.filter(Customer.email == email.data).first():
+                raise ValidationError('This email address is already registered.')
+
+class ChangePasswordForm(FlaskForm):
+    """Form for users to change their password."""
+    password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
+    password2 = PasswordField('Repeat New Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
+    submit_password = SubmitField('Change Password')
+
+
 class EventBookingByStaffForm(FlaskForm):
     customer_id = IntegerField('Customer', validators=[DataRequired()])
     quantity = IntegerField('Number of Jars', validators=[DataRequired(), NumberRange(min=0)])
@@ -27,7 +53,6 @@ class EventBookingByStaffForm(FlaskForm):
     def validate(self, **kwargs):
         if not super().validate(**kwargs):
             return False
-        # Use .data to access the value, defaulting to 0 if None
         jars = self.quantity.data or 0
         dispensers = self.dispensers_booked.data or 0
         if jars <= 0 and dispensers <= 0:
@@ -91,6 +116,32 @@ def dashboard():
         today=today
     )
 
+@bp.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    """Account page for staff members."""
+    if current_user.role != 'staff':
+        abort(403)
+
+    profile_form = StaffProfileForm(original_email=current_user.email, obj=current_user)
+    password_form = ChangePasswordForm()
+
+    if profile_form.submit_profile.data and profile_form.validate_on_submit():
+        current_user.email = profile_form.email.data
+        current_user.mobile_number = profile_form.mobile_number.data
+        db.session.commit()
+        flash('Your profile has been updated.', 'success')
+        return redirect(url_for('delivery.account'))
+        
+    if password_form.submit_password.data and password_form.validate_on_submit():
+        current_user.set_password(password_form.password.data)
+        db.session.commit()
+        flash('Your password has been changed successfully.', 'success')
+        return redirect(url_for('delivery.account'))
+
+    return render_template('delivery/account.html', title="My Account", profile_form=profile_form, password_form=password_form)
+
+
 @bp.route('/book_event', methods=['GET', 'POST'])
 @login_required
 def book_event():
@@ -112,6 +163,14 @@ def book_event():
         db.session.commit()
         
         flash(f'Event booking created successfully for {customer.name}. The manager must now confirm it.', 'success')
+
+        # --- EMAIL NOTIFICATION ---
+        manager = User.query.filter_by(business_id=current_user.business_id, role='manager').first()
+        staff_users = User.query.filter_by(business_id=current_user.business_id, role='staff').all()
+        if manager and manager.email:
+            staff_emails = [staff.email for staff in staff_users if staff.email]
+            send_event_booking_notification(booking, manager.email, staff_emails)
+        # --- END EMAIL ---
         
         if current_user.role == 'manager':
              return redirect(url_for('manager.dashboard'))
@@ -146,14 +205,12 @@ def log_delivery(customer_id):
         customer_id=customer.id,
         user_id=user.id,
         payment_status=payment_status
-        # The 'origin' defaults to 'staff_log', so no change needed here
     )
     db.session.add(log)
     
     if user.cash_balance is None:
         user.cash_balance = 0.0
     
-    # Only add to cash balance if it's not a 'Due' transaction
     if payment_status == 'Paid':
         user.cash_balance += amount
     else:
@@ -163,15 +220,16 @@ def log_delivery(customer_id):
     
     db.session.commit()
 
-    # --- AUTOMATIC INVOICE GENERATION ---
     invoice_items = [{
         'description': f"Supply of {jars_delivered} water jar(s)",
         'quantity': jars_delivered,
         'unit_price': customer.price_per_jar,
         'total': amount
     }]
-    create_invoice_for_transaction(customer, customer.business, invoice_items, issue_date=log.timestamp.date(), status=invoice_status)
-    # --- END ---
+    invoice = create_invoice_for_transaction(customer, customer.business, invoice_items, issue_date=log.timestamp.date(), status=invoice_status)
+
+    if invoice:
+        send_delivery_confirmation_email(customer, customer.business, jars_delivered, amount, payment_status)
 
     flash(f'Successfully delivered {jars_delivered} jar(s) to {customer.name}. Status: {payment_status}.')
     return redirect(url_for('delivery.dashboard'))
