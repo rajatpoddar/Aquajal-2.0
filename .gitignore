@@ -20,3 +20,6 @@ app/static/uploads/
 # IDE files
 .idea/
 .vscode/
+
+# Ignore Deployment files
+deploy.sh
