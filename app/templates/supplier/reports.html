@@ -4,14 +4,14 @@
 <div class="container py-4">
     <div class="text-center mb-4">
         <h2>{{ title }}</h2>
-        <p class="text-muted">An overview of your sales and income for {{ month_name_filter(report_month) }} {{ report_year }}</p>
+        <p class="text-muted">An overview of your sales and income for {{ report_month | month_name }} {{ report_year }}</p>
     </div>
 
     <div class="d-flex justify-content-center mb-4">
         <form method="get" class="d-flex gap-2">
             <select name="month" class="form-select" onchange="this.form.submit()">
                 {% for i in range(1, 13) %}
-                <option value="{{ i }}" {% if i == report_month %}selected{% endif %}>{{ month_name_filter(i) }}</option>
+                <option value="{{ i }}" {% if i == report_month %}selected{% endif %}>{{ i | month_name }}</option>
                 {% endfor %}
             </select>
             <select name="year" class="form-select" onchange="this.form.submit()">
