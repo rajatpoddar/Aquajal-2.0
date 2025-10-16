@@ -29,6 +29,11 @@ class Config:
     RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID')
     RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET')
 
+    # --- VAPID Keys for Push Notifications ---
+    VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY')
+    VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY')
+    VAPID_ADMIN_EMAIL = os.environ.get('VAPID_ADMIN_EMAIL')
+
     # --- Babel (Internationalization) ---
     LANGUAGES = {
         'en': 'English',

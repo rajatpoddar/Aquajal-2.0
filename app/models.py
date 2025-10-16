@@ -69,6 +69,7 @@ class User(UserMixin, db.Model):
     handovers = db.relationship('CashHandover', foreign_keys='CashHandover.user_id', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
     product_sales = db.relationship('ProductSale', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
     supplier_profile = db.relationship('SupplierProfile', back_populates='user', uselist=False, cascade="all, delete-orphan")
+    subscriptions = db.relationship('PushSubscription', backref='user', lazy='dynamic', cascade="all, delete-orphan")
 
 
     def get_id(self): return f'user-{self.id}'
@@ -119,7 +120,8 @@ class PurchaseOrder(db.Model):
     delivery_date = db.Column(db.Date, nullable=True)
     invoice_number = db.Column(db.String(50), unique=True, nullable=True)
     total_amount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default='Pending') # e.g., Pending, Confirmed, Delivered
+    status = db.Column(db.String(20), default='Pending')
+    completion_date = db.Column(db.DateTime, nullable=True)
     items = db.relationship('PurchaseOrderItem', backref='order', lazy='dynamic', cascade="all, delete-orphan")
 
 class PurchaseOrderItem(db.Model):
@@ -153,6 +155,8 @@ class Customer(UserMixin, db.Model):
     requests = db.relationship('JarRequest', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     bookings = db.relationship('EventBooking', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     invoices = db.relationship('Invoice', back_populates='customer', lazy='dynamic', cascade="all, delete-orphan")
+    subscriptions = db.relationship('PushSubscription', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
+
     
     __table_args__ = (db.UniqueConstraint('mobile_number', 'business_id', name='uq_customer_mobile_business'),)
 
@@ -262,6 +266,12 @@ class EventBooking(db.Model):
     confirmed_by = db.relationship("User", foreign_keys=[confirmed_by_id])
     delivered_by = db.relationship("User", foreign_keys=[delivered_by_id])
     collected_by = db.relationship("User", foreign_keys=[collected_by_id])
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    subscription_json = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
 
 @login.user_loader
 def load_user(user_id_string):

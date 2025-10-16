@@ -18,6 +18,11 @@
                         {{ profile_form.shop_name(class="form-control") }}
                     </div>
                     <div class="mb-3">
+                        {{ profile_form.email.label(class="form-label") }}
+                        {{ profile_form.email(class="form-control") }}
+                        {% for error in profile_form.email.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div class="mb-3">
                         {{ profile_form.mobile_number.label(class="form-label") }}
                         {{ profile_form.mobile_number(class="form-control") }}
                     </div>

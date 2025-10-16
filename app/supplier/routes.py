@@ -5,7 +5,7 @@ from app.supplier import bp
 from app.models import SupplierProduct, PurchaseOrder, PurchaseOrderItem, Business, SupplierProfile, User
 from app.decorators import manager_required, supplier_required
 import razorpay
-from datetime import date, datetime  # Correctly imported here
+from datetime import date, datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, SelectField, TextAreaField, FloatField, IntegerField, PasswordField
 from wtforms.validators import DataRequired, Optional, NumberRange, Length, EqualTo, Email, ValidationError
@@ -234,6 +234,7 @@ def procurement_payment_success():
             db.session.add(order)
             db.session.commit()
             clear_cart()
+            send_new_order_to_supplier_email(order)
             flash('Payment successful and your order has been placed!', 'success')
             return redirect(url_for('manager.dashboard'))
 
@@ -337,6 +338,7 @@ def order_details(order_id):
         order.delivery_date = form.delivery_date.data
 
         if new_status == 'Delivered' and original_status != 'Delivered':
+            order.completion_date = datetime.utcnow() # <-- SET COMPLETION DATE
             business = Business.query.get(order.business_id)
             if business:
                 for item in order.items:
@@ -352,10 +354,8 @@ def order_details(order_id):
         db.session.commit()
         flash('Order status updated.', 'success')
 
-        # --- EMAIL NOTIFICATION TO MANAGER ---
         if original_status != new_status:
             send_order_status_update_email(order)
-        # --- END EMAIL ---
 
         return redirect(url_for('supplier.order_details', order_id=order.id))
 
@@ -381,9 +381,11 @@ def account():
     user = User.query.get(current_user.id)
     profile = user.supplier_profile
     
-    profile_form = SupplierProfileForm(original_email=user.email, obj=profile)
-    # Pre-populate the form with user's current data on GET request
+    profile_form = SupplierProfileForm(original_email=user.email)
+    
     if request.method == 'GET':
+        profile_form.shop_name.data = profile.shop_name
+        profile_form.address.data = profile.address
         profile_form.mobile_number.data = user.mobile_number
         profile_form.email.data = user.email
     
@@ -423,16 +425,20 @@ def account():
 @supplier_required
 def reports():
     supplier_profile = SupplierProfile.query.filter_by(user_id=current_user.id).first_or_404()
-    today = date.today()
+    today_utc = datetime.utcnow()
     
     try:
-        report_year = int(request.args.get('year', today.year))
-        report_month = int(request.args.get('month', today.month))
+        report_year = int(request.args.get('year', today_utc.year))
+        report_month = int(request.args.get('month', today_utc.month))
     except (ValueError, TypeError):
-        report_year, report_month = today.year, today.month
+        report_year, report_month = today_utc.year, today_utc.month
 
+    # Calculate start and end of the selected month in UTC
     start_of_month = datetime(report_year, report_month, 1)
-    end_of_month = start_of_month.replace(day=calendar.monthrange(report_year, report_month)[1])
+    if report_month == 12:
+        end_of_month = datetime(report_year + 1, 1, 1)
+    else:
+        end_of_month = datetime(report_year, report_month + 1, 1)
 
     sales_items = db.session.query(
         PurchaseOrderItem.quantity,
@@ -442,8 +448,8 @@ def reports():
     ).join(PurchaseOrder).join(SupplierProduct).filter(
         PurchaseOrder.supplier_id == supplier_profile.id,
         PurchaseOrder.status == 'Delivered',
-        cast(PurchaseOrder.order_date, Date) >= start_of_month.date(),
-        cast(PurchaseOrder.order_date, Date) <= end_of_month.date()
+        PurchaseOrder.completion_date >= start_of_month,  # <-- USE COMPLETION DATE
+        PurchaseOrder.completion_date < end_of_month    # <-- USE COMPLETION DATE
     ).all()
 
     total_sales_amount = 0
@@ -470,8 +476,9 @@ def reports():
                            title="Monthly Report",
                            report_month=report_month,
                            report_year=report_year,
-                           current_year=today.year,
+                           current_year=today_utc.year,
                            total_sales_amount=total_sales_amount,
                            total_cost=total_cost,
                            net_income=net_income,
                            product_summary=product_summary)
+

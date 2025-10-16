@@ -9,7 +9,7 @@
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
                         {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control", size=32) }}
+                        {{ form.username(id="username-field", class="form-control", size=32, autocapitalize="none", pattern="[a-z0-9@._-]*") }}
                     </div>
                     <div class="mb-3">
                         {{ form.password.label(class="form-label") }}
@@ -31,4 +31,16 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('username-field');
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            // This will convert the input to lowercase as the user types
+            this.value = this.value.toLowerCase();
+        });
+    }
+});
+</script>
 {% endblock %}

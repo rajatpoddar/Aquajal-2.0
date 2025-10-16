@@ -917,6 +917,7 @@ def checkout_cart():
             
             session.pop('procurement_cart', None)
             db.session.commit()
+            send_new_order_to_supplier_email(order)
             flash('Your order has been placed successfully (Cash on Delivery)!', 'success')
             return redirect(url_for('manager.view_orders'))
         

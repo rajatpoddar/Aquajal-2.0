@@ -100,6 +100,9 @@ def create_app(config_class=Config):
     from app.models import User, Customer
     from datetime import datetime
 
+    from app.push_notifications import bp as push_notifications_bp
+    app.register_blueprint(push_notifications_bp, url_prefix='/notifications')
+
     # --- CONTEXT PROCESSORS ---
     @app.context_processor
     def inject_now():

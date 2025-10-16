@@ -10,8 +10,13 @@
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
                         {{ form.owner_name.label(class="form-label") }}
-                        {{ form.owner_name(class="form-control") }}
+                        {{ form.owner_name(class="form-control", id="owner_name") }}
                         {% for error in form.owner_name.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", id="username") }}
+                        {% for error in form.username.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
                     </div>
                     <div class="mb-3">
                         {{ form.plant_name.label(class="form-label") }}
@@ -53,4 +58,18 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ownerNameInput = document.getElementById('owner_name');
+    const usernameInput = document.getElementById('username');
+
+    ownerNameInput.addEventListener('blur', function() {
+        if (usernameInput.value === '') {
+            let username = ownerNameInput.value.toLowerCase().replace(/\s+/g, '');
+            usernameInput.value = username;
+        }
+    });
+});
+</script>
 {% endblock %}

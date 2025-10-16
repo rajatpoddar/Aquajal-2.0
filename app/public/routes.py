@@ -5,7 +5,7 @@ from app.public import bp
 from app.models import User, Business, Customer, SubscriptionPlan
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationError
+from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationError, Regexp
 import random
 import string
 from app.email import send_password_reset_email, send_registration_email
@@ -13,6 +13,7 @@ from flask import current_app
 
 class RegistrationForm(FlaskForm):
     owner_name = StringField('Your Name', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64), Regexp('^[a-z0-9]+$', message='Username must be lowercase letters and numbers only.')])
     plant_name = StringField('Plant Name', validators=[DataRequired()])
     email = StringField('Email Address', validators=[DataRequired(), Email()])
     mobile_number = StringField('Mobile Number', validators=[DataRequired(), Length(min=10, max=15)])
@@ -20,6 +21,10 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Start Your Free Trial')
+
+    def validate_username(self, username):
+        if User.query.filter_by(username=username.data).first() or Customer.query.filter_by(username=username.data).first():
+            raise ValidationError('This username is already taken. Please choose a different one.')
 
     def validate_plant_name(self, plant_name):
         business = Business.query.filter_by(name=plant_name.data).first()
@@ -86,18 +91,10 @@ def register():
         )
         db.session.add(business)
         db.session.commit()
-
-        # Generate a unique username based on the owner's name
-        username_base = form.owner_name.data.lower().replace(" ", "")
-        username = username_base
-        counter = 1
-        while User.query.filter_by(username=username).first() or Customer.query.filter_by(username=username).first():
-            username = f"{username_base}{counter}"
-            counter += 1
         
         # Create a new user with the manager role
         user = User(
-            username=username,
+            username=form.username.data,
             email=form.email.data,
             mobile_number=form.mobile_number.data,
             role='manager',

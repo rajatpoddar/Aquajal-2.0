@@ -19,3 +19,4 @@ email-validator
 WeasyPrint
 Flask-Babel
 Flask-Moment
+pywebpush
