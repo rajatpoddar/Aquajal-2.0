@@ -4,12 +4,13 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies required by WeasyPrint
+# Install system dependencies required by WeasyPrint and postgresql-client
 RUN apt-get update && apt-get install -y \
     libpango-1.0-0 \
     libcairo2 \
     libgdk-pixbuf-xlib-2.0-0 \
     libpangoft2-1.0-0 \
+    postgresql-client \
     --no-install-recommends
 
 # Copy the requirements file into the container

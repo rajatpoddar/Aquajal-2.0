@@ -5,8 +5,8 @@ services:
   web:
     build: .
     ports:
-      # Changed host port from 8000 to 8001 to avoid conflicts
-      - "8001:5000"
+      # Mapped host port 2942 to the container's internal port 2942
+      - "2942:2942"
     env_file:
       - .env
     environment:
@@ -22,9 +22,7 @@ services:
     env_file:
       - .env
     ports:
-      # Changed host port from 5433 to 5434 to avoid conflicts
       - "5434:5432"
 
 volumes:
   postgres_data:
-
