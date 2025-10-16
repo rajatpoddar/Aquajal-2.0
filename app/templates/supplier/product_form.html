@@ -1,38 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container py-4">
     <h2>{{ title }}</h2>
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="post" novalidate>
+            <form method="post">
                 {{ form.hidden_tag() }}
                 <div class="mb-3">
                     {{ form.name.label(class="form-label") }}
                     {{ form.name(class="form-control") }}
                 </div>
-                 <div class="mb-3">
+                <div class="mb-3">
                     {{ form.category.label(class="form-label") }}
                     {{ form.category(class="form-select") }}
                 </div>
-                <div class="mb-3">
+                 <div class="mb-3">
                     {{ form.description.label(class="form-label") }}
-                    {{ form.description(class="form-control", rows=4) }}
+                    {{ form.description(class="form-control", rows=3) }}
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         {{ form.price.label(class="form-label") }}
                         {{ form.price(class="form-control") }}
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
+                        {{ form.manufacture_price.label(class="form-label") }}
+                        {{ form.manufacture_price(class="form-control") }}
+                        <div class="form-text">
+                            This price is not shown to buyers. It's used to calculate your income in reports.
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
                         {{ form.discount_percentage.label(class="form-label") }}
                         {{ form.discount_percentage(class="form-control") }}
                     </div>
                 </div>
                 <div>
                     {{ form.submit(class="btn btn-primary") }}
-                    <a href="{{ url_for('supplier.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ url_for('supplier.product_list') }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
+</div>
 {% endblock %}

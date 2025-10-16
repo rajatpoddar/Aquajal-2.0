@@ -28,7 +28,62 @@
     {% endif %}
 {% endif %}
 
+{# --- LOW STOCK ALERT --- #}
+{% if low_stock_jar %}
+<div class="alert alert-danger shadow-sm" role="alert">
+    <h4 class="alert-heading">Low Stock Alert!</h4>
+    <p>Your jar stock is at <strong>{{ business.jar_stock }}</strong>, which is below your threshold of <strong>{{ business.low_stock_threshold }}</strong>. Don't let your customers down, re-stock now!</p>
+    <hr>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Best Price Available:</strong>
+            {% if low_stock_jar.product.discount_percentage and low_stock_jar.product.discount_percentage > 0 %}
+                <del>₹{{ "%.2f"|format(low_stock_jar.product.price) }}</del>
+                <strong class="text-success">₹{{ "%.2f"|format(low_stock_jar.final_price) }}</strong>
+            {% else %}
+                ₹{{ "%.2f"|format(low_stock_jar.product.price) }}
+            {% endif %}
+            from {{ low_stock_jar.product.supplier.shop_name }}
+        </div>
+        <form action="{{ url_for('manager.add_to_cart', product_id=low_stock_jar.product.id) }}" method="post" class="d-flex">
+            {{ quick_order_form.hidden_tag() }}
+            <div class="input-group">
+                {{ quick_order_form.quantity(class="form-control", style="width: 80px;") }}
+                {{ quick_order_form.submit(class="btn btn-success") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
 
+{% if low_stock_dispenser %}
+<div class="alert alert-warning shadow-sm" role="alert">
+    <h4 class="alert-heading">Low Stock Alert!</h4>
+    <p>Your dispenser stock is at <strong>{{ business.dispenser_stock }}</strong>, which is below your threshold of <strong>{{ business.low_stock_threshold_dispenser }}</strong>.</p>
+    <hr>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Best Price Available:</strong>
+            {% if low_stock_dispenser.product.discount_percentage and low_stock_dispenser.product.discount_percentage > 0 %}
+                <del>₹{{ "%.2f"|format(low_stock_dispenser.product.price) }}</del>
+                <strong class="text-success">₹{{ "%.2f"|format(low_stock_dispenser.final_price) }}</strong>
+            {% else %}
+                ₹{{ "%.2f"|format(low_stock_dispenser.product.price) }}
+            {% endif %}
+            from {{ low_stock_dispenser.product.supplier.shop_name }}
+        </div>
+        <form action="{{ url_for('manager.add_to_cart', product_id=low_stock_dispenser.product.id) }}" method="post" class="d-flex">
+            {{ quick_order_form.hidden_tag() }}
+            <div class="input-group">
+                {{ quick_order_form.quantity(class="form-control", style="width: 80px;") }}
+                {{ quick_order_form.submit(class="btn btn-success") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{# --- DASHBOARD CONTENT --- #}
 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-3">
     <h2 class="mb-3 mb-md-0">Manager Dashboard</h2>
     <div class="d-grid gap-2 d-md-block">
@@ -42,7 +97,7 @@
             <i class="bi bi-box-seam"></i> Manage Stock
         </a>
         <a href="{{ url_for('manager.settings') }}" class="btn btn-secondary">
-            <i class="bi bi-gear"></i> Price Settings
+            <i class="bi bi-gear"></i> Settings
         </a>
         <a href="{{ url_for('manager.reports') }}" class="btn btn-primary">
             <i class="bi bi-file-earmark-text"></i> Reports

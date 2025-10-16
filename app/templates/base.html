@@ -94,66 +94,85 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if current_user.is_authenticated %}
 
-                    {% if current_user.role == 'admin' %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            {{ _('Admin Menu') }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">{{ _('Admin Dashboard') }}</a>
-                            </li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin.profile') }}">{{ _('My Profile') }}</a></li>
-                        </ul>
-                    </li>
+                        {% if current_user.role == 'admin' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                {{ _('Admin Menu') }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">{{ _('Admin Dashboard') }}</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('admin.profile') }}">{{ _('My Profile') }}</a></li>
+                            </ul>
+                        </li>
 
-                    {% elif current_user.role == 'manager' %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            {{ _('Manager Menu') }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('manager.dashboard') }}">{{ _('Dashboard') }}</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('customers.index') }}">{{ _('Customers') }}</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('manager.staff_list') }}">{{ _('Manage Staff') }}</a>
-                            </li>
-                            <li><a class="dropdown-item" href="{{ url_for('invoices.list_invoices') }}">{{ _('Invoices') }}</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="{{ url_for('manager.view_orders') }}">My Orders</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('manager.account') }}">{{ _('My Account & Subscription') }}</a></li>
-                        </ul>
-                    </li>
+                        {% elif current_user.role == 'manager' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                {{ _('Manager Menu') }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('manager.dashboard') }}">{{ _('Dashboard') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('customers.index') }}">{{ _('Customers') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('manager.staff_list') }}">{{ _('Manage Staff') }}</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('invoices.list_invoices') }}">{{ _('Invoices') }}</a>
+                                </li>
+                                
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('manager.browse_products') }}">{{ _('Procure Supplies') }}
+                                    {% if procurement_cart %}
+                                        <span class="badge rounded-pill bg-success ms-1">{{ procurement_cart|length }}</span>
+                                    {% endif %}
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('manager.view_orders') }}">My Orders</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('manager.account') }}">{{ _('My Account & Subscription') }}</a></li>
+                            </ul>
+                        </li>
 
-                    {% elif current_user.role == 'customer' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('customer.dashboard') }}">{{ _('My Dashboard') }}</a>
-                    </li>
-                    {% endif %}
+                        {% elif current_user.role == 'supplier' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Supplier Menu
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('supplier.dashboard') }}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('supplier.product_list') }}">Manage Products</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('supplier.reports') }}">Reports</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('supplier.account') }}">My Account</a></li>
+                            </ul>
+                        </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
-                    </li>
+                        {% elif current_user.role == 'customer' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('customer.dashboard') }}">{{ _('My Dashboard') }}</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
+                        </li>
 
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.how_to_use') }}">{{ _('How to Use') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.about') }}">{{ _('About Us') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.contact') }}">{{ _('Contact Us') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.register') }}">{{ _('Register') }}</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('public.how_to_use') }}">{{ _('How to Use') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('public.about') }}">{{ _('About Us') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('public.contact') }}">{{ _('Contact Us') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('public.register') }}">{{ _('Register') }}</a>
+                        </li>
                     {% endif %}
                     
                     <li class="nav-item dropdown">

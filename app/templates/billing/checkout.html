@@ -17,24 +17,7 @@
                         </div>
                     </form>
 
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
-                            <label class="form-check-label" for="cod">
-                                Cash on Delivery (COD)
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
-                            <label class="form-check-label" for="razorpay">
-                                Pay with Razorpay
-                            </label>
-                        </div>
-                    </div>
-
-                    <button id="checkout-button" class="btn btn-primary">Place Order</button>
-
-                    <form id="cod-form" action="{{ url_for('billing.cod_checkout', plan_id=plan.id) }}" method="post" style="display: none;"></form>
+                    <button id="checkout-button" class="btn btn-primary">Pay ₹{{ "%.2f"|format(final_amount) }}</button>
                 </div>
             </div>
         </div>
@@ -45,9 +28,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const checkoutButton = document.getElementById('checkout-button');
-    const codForm = document.getElementById('cod-form');
-    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
-
     let rzp;
 
     const razorpayOptions = {
@@ -93,35 +73,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    function updateButton() {
-        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-        if (selectedMethod === 'cod') {
-            checkoutButton.innerText = 'Place Order';
-        } else {
-            checkoutButton.innerText = 'Pay ₹{{ "%.2f"|format(final_amount) }}';
-        }
-    }
-
-    paymentMethods.forEach(radio => {
-        radio.addEventListener('change', updateButton);
-    });
-
     checkoutButton.addEventListener('click', function(e) {
         e.preventDefault();
-        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
-        if (selectedMethod === 'cod') {
-            codForm.submit();
-        } else {
-            if (!rzp) {
-                rzp = new Razorpay(razorpayOptions);
-            }
-            rzp.open();
+        if (!rzp) {
+            rzp = new Razorpay(razorpayOptions);
         }
+        rzp.open();
     });
-
-    // Initialize button text
-    updateButton();
 });
 </script>
 {% endblock %}

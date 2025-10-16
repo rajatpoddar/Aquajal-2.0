@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2>{{ title }}</h2>
+        <p class="text-muted">An overview of your sales and income for {{ month_name_filter(report_month) }} {{ report_year }}</p>
+    </div>
+
+    <div class="d-flex justify-content-center mb-4">
+        <form method="get" class="d-flex gap-2">
+            <select name="month" class="form-select" onchange="this.form.submit()">
+                {% for i in range(1, 13) %}
+                <option value="{{ i }}" {% if i == report_month %}selected{% endif %}>{{ month_name_filter(i) }}</option>
+                {% endfor %}
+            </select>
+            <select name="year" class="form-select" onchange="this.form.submit()">
+                {% for i in range(current_year, current_year - 5, -1) %}
+                <option value="{{ i }}" {% if i == report_year %}selected{% endif %}>{{ i }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="row g-3 text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Total Sales</h6>
+                    <p class="card-text fs-4 fw-bold">₹{{ "%.2f"|format(total_sales_amount) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Total Cost</h6>
+                    <p class="card-text fs-4 fw-bold">₹{{ "%.2f"|format(total_cost) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Net Income</h6>
+                    <p class="card-text fs-4 fw-bold text-success">₹{{ "%.2f"|format(net_income) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-5 mb-3">Product-wise Sales</h4>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if not product_summary %}
+            <p class="text-center text-muted">No sales data for this period.</p>
+            {% else %}
+            <ul class="list-group list-group-flush">
+                {% for name, data in product_summary.items() %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="my-0">{{ name }}</h6>
+                            <small class="text-muted">Quantity Sold: {{ data.quantity }}</small>
+                        </div>
+                        <div>
+                            <span class="d-block text-end">Sales: ₹{{ "%.2f"|format(data.sales) }}</span>
+                            <span class="d-block text-end text-success">Income: ₹{{ "%.2f"|format(data.income) }}</span>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

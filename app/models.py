@@ -35,6 +35,8 @@ class Business(db.Model):
     dispenser_stock = db.Column(db.Integer, default=0)
     full_day_jar_count = db.Column(db.Integer, default=50) 
     half_day_jar_count = db.Column(db.Integer, default=1) 
+    low_stock_threshold = db.Column(db.Integer, default=20)
+    low_stock_threshold_dispenser = db.Column(db.Integer, default=5)
 
     
     employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
@@ -53,7 +55,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     role = db.Column(db.String(10), index=True, default='staff') # Roles: staff, manager, admin, supplier
     daily_wage = db.Column(db.Float, nullable=True)
     cash_balance = db.Column(db.Float, default=0.0)
@@ -104,6 +106,7 @@ class SupplierProduct(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
+    manufacture_price = db.Column(db.Float, nullable=True)
     discount_percentage = db.Column(db.Integer, default=0)
     category = db.Column(db.String(50), nullable=True) # e.g., Jars, Dispensers, Chemicals, etc.
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier_profile.id'), nullable=False)
@@ -135,7 +138,7 @@ class Customer(UserMixin, db.Model):
     name = db.Column(db.String(120), nullable=False)
     mobile_number = db.Column(db.String(15), nullable=False, index=True)
     email = db.Column(db.String(120), index=True, unique=True, nullable=True)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     role = db.Column(db.String(10), default='customer')
     village = db.Column(db.String(100))
     area = db.Column(db.String(100))

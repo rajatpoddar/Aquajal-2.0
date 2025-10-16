@@ -1,37 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>{{ title }}</h2>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Date</th>
-                            <th>Supplier</th>
-                            <th class="text-end">Total Amount</th>
-                            <th class="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td>#{{ order.id }}</td>
-                            <td>{{ order.order_date.strftime('%d-%b-%Y') }}</td>
-                            <td>{{ order.supplier.shop_name }}</td>
-                            <td class="text-end">₹{{ "%.2f"|format(order.total_amount) }}</td>
-                            <td class="text-center"><span class="badge bg-primary">{{ order.status }}</span></td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center">You haven't placed any orders yet.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ title }}</h2>
+        <a href="{{ url_for('manager.browse_products') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Procurement
+        </a>
+    </div>
+
+    {% if not orders %}
+    <div class="text-center py-5">
+        <h4>You haven't placed any orders yet.</h4>
+        <p class="text-muted">Your past and current procurement orders will appear here.</p>
+        <a href="{{ url_for('manager.browse_products') }}" class="btn btn-primary mt-3">Browse Products to Order</a>
+    </div>
+    {% else %}
+        {% for order in orders %}
+        <div class="card shadow-sm mb-3">
+            {# Changed bg-light to bg-body-tertiary for better dark mode compatibility #}
+            <div class="card-header bg-body-tertiary d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <h5 class="mb-0">Order #{{ order.id }}</h5>
+                    <small class="text-muted">Placed on: {{ order.order_date.strftime('%d-%b-%Y') }}</small>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <span class="badge fs-6 
+                        {% if order.status in ['Delivered', 'Paid - Online'] %} bg-success
+                        {% elif order.status in ['Pending', 'COD - Placed'] %} bg-warning text-dark {# COD - Placed should also be visible #}
+                        {% elif order.status == 'Shipped' %} bg-info text-dark
+                        {% elif order.status == 'Cancelled' %} bg-danger
+                        {% else %} bg-secondary {% endif %}">
+                        {{ order.status }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>Items:</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for item in order.items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent"> {# Added bg-transparent for dark mode #}
+                                {{ item.product.name }} ({{ item.quantity }}x)
+                                <span>₹{{ "%.2f"|format(item.price_at_purchase * item.quantity) }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4 mt-3 mt-md-0">
+                        <h6>Summary:</h6>
+                        <p class="mb-1"><strong>Supplier:</strong> {{ order.supplier.shop_name }}</p>
+                        <p class="mb-1"><strong>Total:</strong> <span class="fw-bold">₹{{ "%.2f"|format(order.total_amount) }}</span></p>
+                        {% if order.invoice_number %}
+                            <a href="{{ url_for('manager.view_procurement_invoice', order_id=order.id) }}" class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="bi bi-receipt"></i> View Invoice
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+        {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}

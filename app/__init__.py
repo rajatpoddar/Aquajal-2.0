@@ -100,9 +100,15 @@ def create_app(config_class=Config):
     from app.models import User, Customer
     from datetime import datetime
 
+    # --- CONTEXT PROCESSORS ---
     @app.context_processor
     def inject_now():
         return {'now': datetime.utcnow()}
+
+    @app.context_processor
+    def inject_cart():
+        return dict(procurement_cart=session.get('procurement_cart', {}))
+
 
     @app.route('/home')
     @login_required

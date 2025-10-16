@@ -18,9 +18,8 @@ import razorpay
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import (StringField, PasswordField, FloatField, SubmitField, 
-                     IntegerField, BooleanField, TextAreaField, RadioField)
-from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo
+from wtforms import StringField, PasswordField, FloatField, SubmitField, IntegerField, BooleanField, TextAreaField, RadioField
+from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo, NumberRange
 
 # Import the form from the delivery blueprint
 from app.delivery.routes import EventBookingByStaffForm
@@ -48,11 +47,17 @@ class ChangePasswordForm(FlaskForm):
     password2 = PasswordField('Repeat New Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match.')])
     submit_password = SubmitField('Change Password')
 
+class AddToCartForm(FlaskForm):
+    quantity = IntegerField('Quantity', validators=[DataRequired(), NumberRange(min=1)], default=1)
+    submit = SubmitField('Order Now')
+
 class BusinessSettingsForm(FlaskForm):
     new_jar_price = FloatField('New Jar Price (₹)', validators=[DataRequired()])
     new_dispenser_price = FloatField('New Dispenser Price (₹)', validators=[DataRequired()])
     full_day_jar_count = IntegerField('Jars for Full Day Wage', validators=[DataRequired()])
     half_day_jar_count = IntegerField('Jars for Half Day Wage', validators=[DataRequired()])
+    low_stock_threshold = IntegerField('Low Stock Alert Threshold (Jars)', validators=[DataRequired(), NumberRange(min=0)], default=20)
+    low_stock_threshold_dispenser = IntegerField('Low Stock Alert Threshold (Dispensers)', validators=[DataRequired(), NumberRange(min=0)], default=5)
     submit = SubmitField('Save Settings')
 
 class StockForm(FlaskForm):
@@ -91,6 +96,32 @@ class CheckoutForm(FlaskForm):
     payment_method = RadioField('Payment Method', choices=[('cod', 'Cash on Delivery'), ('razorpay', 'Pay Online with Razorpay')], default='cod', validators=[DataRequired()])
     submit = SubmitField('Place Order')
 
+class ManagerProfileForm(FlaskForm):
+    # User fields
+    username = StringField('Username', validators=[DataRequired()])
+    mobile_number = StringField('Mobile Number', validators=[Optional(), Length(max=15)])
+    id_proof = FileField('ID Proof Image (JPG, PNG)', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+    ])
+    
+    # Business fields
+    name = StringField('Business Name', validators=[DataRequired()])
+    owner_name = StringField('Owner Name', validators=[DataRequired()])
+    location = TextAreaField('Business Location', validators=[Optional(), Length(max=200)])
+
+    submit_profile = SubmitField('Update Profile')
+
+    def __init__(self, original_username, *args, **kwargs):
+        super(ManagerProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = User.query.filter_by(username=self.username.data).first()
+            if user is not None:
+                raise ValidationError('Please use a different username.')
+
 
 # --- Custom Decorators ---
 def manager_required(f):
@@ -126,10 +157,7 @@ def subscription_required(f):
 
 
 # --- Routes ---
-# ... (existing dashboard, receive_cash, clear_dues, reports, etc. routes are here)
-# ... (make sure they remain unchanged)
-
-@bp.route('/dashboard')
+@bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 @manager_required
 @subscription_required
@@ -138,10 +166,14 @@ def dashboard():
     total_staff_balance = 0.0
     pending_bookings = []
     total_dues = 0.0
+    low_stock_jar = None
+    low_stock_dispenser = None
+    quick_order_form = None
 
     if not current_user.business_id:
         flash("You are not assigned to a business. Please contact the administrator.")
     else:
+        business = Business.query.get(current_user.business_id)
         staff_members = User.query.filter_by(role='staff', business_id=current_user.business_id).order_by(User.username).all()
         total_staff_balance = sum(staff.cash_balance for staff in staff_members if staff.cash_balance)
         pending_bookings = db.session.query(EventBooking).join(Customer).filter(
@@ -150,13 +182,42 @@ def dashboard():
         ).order_by(EventBooking.event_date).all()
         total_dues = db.session.query(func.sum(Customer.due_amount)).filter(Customer.business_id == current_user.business_id).scalar() or 0.0
 
+        if business.jar_stock is not None and business.low_stock_threshold is not None and business.jar_stock <= business.low_stock_threshold:
+            low_stock_jar_product = SupplierProduct.query.filter(SupplierProduct.name.ilike('%jar%')).order_by(SupplierProduct.price).first()
+            if low_stock_jar_product:
+                final_price = low_stock_jar_product.price
+                if low_stock_jar_product.discount_percentage and low_stock_jar_product.discount_percentage > 0:
+                    final_price = low_stock_jar_product.price - (low_stock_jar_product.price * low_stock_jar_product.discount_percentage / 100)
+                low_stock_jar = {
+                    'product': low_stock_jar_product,
+                    'final_price': final_price
+                }
+        
+        if business.dispenser_stock is not None and business.low_stock_threshold_dispenser is not None and business.dispenser_stock <= business.low_stock_threshold_dispenser:
+            low_stock_dispenser_product = SupplierProduct.query.filter(SupplierProduct.name.ilike('%dispenser%')).order_by(SupplierProduct.price).first()
+            if low_stock_dispenser_product:
+                final_price = low_stock_dispenser_product.price
+                if low_stock_dispenser_product.discount_percentage and low_stock_dispenser_product.discount_percentage > 0:
+                    final_price = low_stock_dispenser_product.price - (low_stock_dispenser_product.price * low_stock_dispenser_product.discount_percentage / 100)
+                low_stock_dispenser = {
+                    'product': low_stock_dispenser_product,
+                    'final_price': final_price
+                }
+
+        if low_stock_jar or low_stock_dispenser:
+            quick_order_form = AddToCartForm()
+
+
     return render_template(
         'manager/dashboard.html',
         title="Manager Dashboard",
         staff_members=staff_members,
         total_staff_balance=total_staff_balance,
         pending_bookings=pending_bookings,
-        total_dues=total_dues
+        total_dues=total_dues,
+        low_stock_jar=low_stock_jar,
+        low_stock_dispenser=low_stock_dispenser,
+        quick_order_form=quick_order_form
     )
 
 
@@ -369,6 +430,8 @@ def settings():
         business.new_dispenser_price = form.new_dispenser_price.data
         business.full_day_jar_count = form.full_day_jar_count.data
         business.half_day_jar_count = form.half_day_jar_count.data
+        business.low_stock_threshold = form.low_stock_threshold.data
+        business.low_stock_threshold_dispenser = form.low_stock_threshold_dispenser.data  # This line was missing
         db.session.commit()
         flash('Business settings have been updated.')
         return redirect(url_for('manager.dashboard'))
@@ -529,16 +592,46 @@ def confirm_booking(booking_id):
 @login_required
 @manager_required
 def account():
+    user = User.query.get(current_user.id)
+    business = Business.query.get(current_user.business_id)
+    
+    profile_form = ManagerProfileForm(original_username=user.username, obj=user)
+    profile_form.name.data = business.name
+    profile_form.owner_name.data = business.owner_name
+    profile_form.location.data = business.location
+    
     password_form = ChangePasswordForm()
+
+    if profile_form.submit_profile.data and profile_form.validate_on_submit():
+        user.username = profile_form.username.data
+        user.mobile_number = profile_form.mobile_number.data
+        
+        business.name = profile_form.name.data
+        business.owner_name = profile_form.owner_name.data
+        business.location = profile_form.location.data
+
+        if profile_form.id_proof.data:
+            if user.id_proof_filename:
+                try:
+                    os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], user.id_proof_filename))
+                except OSError:
+                    pass
+            f = profile_form.id_proof.data
+            filename = secure_filename(f"{user.id}_{user.username}_{f.filename}")
+            f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            user.id_proof_filename = filename
+
+        db.session.commit()
+        flash('Your profile and business details have been updated.', 'success')
+        return redirect(url_for('manager.account'))
+        
     if password_form.submit_password.data and password_form.validate_on_submit():
-        user = User.query.get(current_user.id)
         user.set_password(password_form.password.data)
         db.session.commit()
         flash('Your password has been changed successfully.', 'success')
         return redirect(url_for('manager.account'))
-        
-    business = Business.query.get(current_user.business_id)
-    return render_template('manager/account.html', title="My Account", password_form=password_form, business=business)
+
+    return render_template('manager/account.html', title="My Account", profile_form=profile_form, password_form=password_form, user=user, business=business)
 
 # --- EVENT BOOKING FOR MANAGERS ---
 @bp.route('/book_event', methods=['GET', 'POST'])
@@ -689,7 +782,7 @@ def add_to_cart(product_id):
         flash('Invalid quantity.', 'danger')
         return redirect(url_for('manager.browse_products'))
 
-    cart = session.get('cart', {})
+    cart = session.get('procurement_cart', {})
     cart_item = cart.get(str(product_id))
 
     if cart_item:
@@ -697,7 +790,7 @@ def add_to_cart(product_id):
     else:
         cart[str(product_id)] = {'quantity': quantity}
     
-    session['cart'] = cart
+    session['procurement_cart'] = cart
     flash(f'Added {quantity} x {product.name} to your cart.', 'success')
     return redirect(url_for('manager.browse_products'))
 
@@ -706,7 +799,7 @@ def add_to_cart(product_id):
 @manager_required
 @subscription_required
 def view_cart():
-    cart = session.get('cart', {})
+    cart = session.get('procurement_cart', {})
     cart_items = []
     total_amount = 0
     
@@ -733,7 +826,7 @@ def view_cart():
 @login_required
 @manager_required
 def update_cart(product_id):
-    cart = session.get('cart', {})
+    cart = session.get('procurement_cart', {})
     try:
         quantity = int(request.form['quantity'])
         if quantity > 0:
@@ -743,17 +836,17 @@ def update_cart(product_id):
     except (ValueError, KeyError):
         pass # Ignore errors
         
-    session['cart'] = cart
+    session['procurement_cart'] = cart
     return redirect(url_for('manager.view_cart'))
 
 @bp.route('/procurement/remove_from_cart/<int:product_id>')
 @login_required
 @manager_required
 def remove_from_cart(product_id):
-    cart = session.get('cart', {})
+    cart = session.get('procurement_cart', {})
     if str(product_id) in cart:
         del cart[str(product_id)]
-    session['cart'] = cart
+    session['procurement_cart'] = cart
     return redirect(url_for('manager.view_cart'))
 
 @bp.route('/procurement/checkout', methods=['GET', 'POST'])
@@ -761,7 +854,7 @@ def remove_from_cart(product_id):
 @manager_required
 @subscription_required
 def checkout_cart():
-    cart = session.get('cart', {})
+    cart = session.get('procurement_cart', {})
     if not cart:
         flash('Your cart is empty.', 'warning')
         return redirect(url_for('manager.browse_products'))
@@ -800,7 +893,7 @@ def checkout_cart():
                 )
                 db.session.add(order_item)
             
-            session.pop('cart', None)
+            session.pop('procurement_cart', None)
             db.session.commit()
             flash('Your order has been placed successfully (Cash on Delivery)!', 'success')
             return redirect(url_for('manager.view_orders'))

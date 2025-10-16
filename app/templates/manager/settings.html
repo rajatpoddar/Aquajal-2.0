@@ -29,6 +29,20 @@
                     <div class="form-text">Minimum jars a staff must deliver to be marked for a full day's wage.</div>
                 </div>
             </div>
+            <hr>
+            <h5>Stock Alerts</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.low_stock_threshold.label(class="form-label") }}
+                    {{ form.low_stock_threshold(class="form-control", type="number") }}
+                    <div class="form-text">Get an alert on your dashboard when jar stock falls to this level.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.low_stock_threshold_dispenser.label(class="form-label") }}
+                    {{ form.low_stock_threshold_dispenser(class="form-control", type="number") }}
+                    <div class="form-text">Get an alert on your dashboard when dispenser stock falls to this level.</div>
+                </div>
+            </div>
             <div>
                 {{ form.submit(class="btn btn-primary") }}
                 <a href="{{ url_for('manager.dashboard') }}" class="btn btn-secondary">Cancel</a>

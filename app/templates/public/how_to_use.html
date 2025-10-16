@@ -1,61 +1,90 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="display-4 text-center mb-5">{{ _('How to Use Aquajal') }}</h1>
-
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">{{ _('For Managers') }}</h3>
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">1. {{ _('Setting Up Your Business') }}</h5>
-            <ul>
-                <li><strong>{{ _('Initial Setup:') }}</strong> {{ _('After registering, your first step is to set your business\'s default prices and attendance rules. Go to `Manager Menu > Price Settings` to set prices for new jars/dispensers and define the minimum jar deliveries for a full or half day\'s wage.') }}</li>
-                <li><strong>{{ _('Manage Staff:') }}</strong> {{ _('Use the `Manager Menu > Manage Staff` option to add your delivery personnel. You can set their daily wages and even upload ID proofs.') }}</li>
-                <li><strong>{{ _('Add Customers:') }}</strong> {{ _('From the `Manager Menu`, select `Customers` to build your customer list. Here you can set custom jar prices and add special notes for each customer.') }}</li>
-            </ul>
-            <h5 class="card-title mt-4">2. {{ _('Daily Operations') }}</h5>
-            <ul>
-                <li><strong>{{ _('Stock Management:') }}</strong> {{ _('Keep your inventory updated from the `Manager Dashboard` by clicking on `Manage Stock`. Stock is automatically deducted for sales and confirmed event bookings.') }}</li>
-                <li><strong>{{ _('Confirm Bookings:') }}</strong> {{ _('New event bookings will appear on your dashboard. Confirm them to allocate stock and set the final amount.') }}</li>
-                <li><strong>{{ _('Receive Cash:') }}</strong> {{ _('At the end of the day, use the `Receive Cash` button on your dashboard to record cash received from staff and reset their balance.') }}</li>
-            </ul>
-            <h5 class="card-title mt-4">3. {{ _('Invoicing & Reports') }}</h5>
-            <ul>
-                <li><strong>{{ _('View All Invoices:') }}</strong> {{ _('Go to `Manager Menu > Invoices` to see a list of all invoices generated. You can view, download as PDF, or email them to customers directly.') }}</li>
-                <li><strong>{{ _('Generate Reports:') }}</strong> {{ _('The `Reports` button on your dashboard takes you to a powerful reporting tool. View monthly summaries of your income, expenses, and staff attendance, or drill down into daily transaction logs.') }}</li>
-            </ul>
-        </div>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">How to Use Aquajal</h1>
+        <p class="lead text-muted">A step-by-step guide for each role in the Aquajal ecosystem.</p>
     </div>
 
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-success text-white">
-            <h3 class="mb-0">{{ _('For Staff (Delivery Personnel)') }}</h3>
+    <div class="accordion" id="howToUseAccordion">
+        
+        <div class="accordion-item" data-aos="fade-up">
+            <h2 class="accordion-header" id="headingManager">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseManager" aria-expanded="true" aria-controls="collapseManager">
+                    <strong>For Business Owners & Managers</strong>
+                </button>
+            </h2>
+            <div id="collapseManager" class="accordion-collapse collapse show" aria-labelledby="headingManager" data-bs-parent="#howToUseAccordion">
+                <div class="accordion-body">
+                    <ol>
+                        <li><strong>Register Your Business:</strong> Sign up and create your business profile. You'll get a 40-day free trial to explore all features.</li>
+                        <li><strong>Set Up Your Business:</strong> From the Manager Dashboard, go to "Price Settings" to set prices for new jars and dispensers, and define your low-stock alert thresholds.</li>
+                        <li><strong>Add Staff:</strong> Navigate to "Manage Staff" to add your delivery personnel. Set their wages and upload ID proofs.</li>
+                        <li><strong>Manage Customers:</strong> Use the "Customers" menu to add or view your customer list, track their dues, and generate monthly invoices.</li>
+                        <li><strong>Oversee Operations:</strong> Your dashboard gives you a real-time overview of staff cash balances, pending event bookings, and total customer dues.</li>
+                        <li><strong>Procure Supplies:</strong> Running low on stock? Click "Procure Supplies" to browse products from various suppliers and place an order directly.</li>
+                    </ol>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <h5 class="card-title">1. {{ _('Your Dashboard is Your Hub') }}</h5>
-            <p>{{ _('Your dashboard is designed for quick actions. You can see your current cash balance, log deliveries, record expenses, and see pending event deliveries for the day.') }}</p>
-            <h5 class="card-title mt-4">2. {{ _('Logging a Delivery') }}</h5>
-            <p>{{ _('Use the search bar to find a customer by name or mobile number. Once they appear, enter the number of jars delivered. If the customer isn\'t paying immediately, check the "Mark as Due" box before clicking `Deliver`.') }}</p>
-             <h5 class="card-title mt-4">3. {{ _('Selling New Products') }}</h5>
-            <p>{{ _('You can sell a new jar or dispenser to a walk-in customer using the `Sell New Jar / Dispenser` button. The amount will be added to your cash balance and stock will be updated automatically.') }}</p>
-        </div>
-    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">
-            <h3 class="mb-0">{{ _('For Customers') }}</h3>
+        <div class="accordion-item" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="accordion-header" id="headingStaff">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStaff" aria-expanded="false" aria-controls="collapseStaff">
+                    <strong>For Delivery Staff</strong>
+                </button>
+            </h2>
+            <div id="collapseStaff" class="accordion-collapse collapse" aria-labelledby="headingStaff" data-bs-parent="#howToUseAccordion">
+                <div class="accordion-body">
+                    <ol>
+                        <li><strong>Log In:</strong> Use the credentials created for you by your manager.</li>
+                        <li><strong>Daily Logs:</strong> Your dashboard is your daily workspace. Here you can log jars delivered to customers and the amount collected.</li>
+                        <li><strong>Record Expenses:</strong> Incurred an expense during your delivery? Log it instantly through your dashboard.</li>
+                        <li><strong>Cash Handover:</strong> At the end of the day, your dashboard shows your total cash balance. Hand it over to your manager, who will mark it as received.</li>
+                        <li><strong>Event Deliveries:</strong> Your manager will assign you event deliveries. Once delivered, mark the status as "Delivered" from your dashboard.</li>
+                    </ol>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <p>{{ _('As a customer, your personal dashboard allows you to manage your account easily. You can:') }}</p>
-            <ul>
-                <li>{{ _('View your complete activity history, including past deliveries and event bookings.') }}</li>
-                <li>{{ _('See any outstanding due amounts.') }}</li>
-                <li>{{ _('View and download all your past invoices from the `Invoices` tab.') }}</li>
-                <li>{{ _('Quickly request extra jars for daily use or book jars in bulk for an upcoming event.') }}</li>
-            </ul>
+
+        <div class="accordion-item" data-aos="fade-up" data-aos-delay="200">
+            <h2 class="accordion-header" id="headingSupplier">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSupplier" aria-expanded="false" aria-controls="collapseSupplier">
+                    <strong>For Suppliers</strong>
+                </button>
+            </h2>
+            <div id="collapseSupplier" class="accordion-collapse collapse" aria-labelledby="headingSupplier" data-bs-parent="#howToUseAccordion">
+                <div class="accordion-body">
+                    <ol>
+                        <li><strong>Register & Set Up:</strong> Sign up as a supplier and complete your profile from the "My Account" page.</li>
+                        <li><strong>List Your Products:</strong> Navigate to "Manage Products" from your dashboard to add the items you sell, like jars, dispensers, etc. Set your prices and discounts.</li>
+                        <li><strong>Receive Orders:</strong> When a business manager places an order, it will appear on your dashboard.</li>
+                        <li><strong>Manage Orders:</strong> Click "View Details" on an order to update its status (e.g., Confirmed, Shipped, Delivered).</li>
+                        <li><strong>Automatic Invoicing:</strong> When you mark an order as "Delivered," an invoice is automatically generated.</li>
+                    </ol>
+                </div>
+            </div>
         </div>
+
+        <div class="accordion-item" data-aos="fade-up" data-aos-delay="300">
+            <h2 class="accordion-header" id="headingCustomer">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCustomer" aria-expanded="false" aria-controls="collapseCustomer">
+                    <strong>For End Customers</strong>
+                </button>
+            </h2>
+            <div id="collapseCustomer" class="accordion-collapse collapse" aria-labelledby="headingCustomer" data-bs-parent="#howToUseAccordion">
+                <div class="accordion-body">
+                    <ol>
+                        <li><strong>Get Added:</strong> Your water supply business manager will add you to their customer list.</li>
+                        <li><strong>Request Jars:</strong> From your personal dashboard, you can easily request the number of jars you need for your daily use.</li>
+                        <li><strong>Book for Events:</strong> Have a special occasion? Use the "Book for an Event" feature to order a larger quantity of jars and dispensers.</li>
+                        <li><strong>View History:</strong> Keep track of all your past deliveries and event bookings in one place.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
