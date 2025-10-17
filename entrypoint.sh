@@ -5,7 +5,7 @@ set -e
 
 # Wait for the database to be ready
 echo "Waiting for database..."
-while ! pg_isready -h "$POSTGRE_HOSTNAME" -p "5432" -q -U "$POSTGRE_USER"; do
+while ! pg_isready -h "$POSTGRES_HOSTNAME" -p "5432" -q -U "$POSTGRES_USER"; do
   >&2 echo "Postgres is unavailable - sleeping"
   sleep 1
 done
