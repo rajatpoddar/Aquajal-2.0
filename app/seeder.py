@@ -24,9 +24,20 @@ def seed_db_command():
     else:
         print("Subscription plans already exist.")
 
-    # Check if data already exists to prevent duplicates
-    if Business.query.first() or User.query.first():
-        print("Business and user data already exists. Aborting seed for business/users.")
+    # --- Seed Admin User ---
+    if not User.query.filter_by(role='admin').first():
+        print("Creating default admin user...")
+        u_admin = User(username='admin', role='admin')
+        u_admin.set_password('adminpass')
+        db.session.add(u_admin)
+        db.session.commit()
+        print("✅ Admin user created.")
+    else:
+        print("Admin user already exists.")
+
+    # Check if other data already exists to prevent duplicates
+    if Business.query.first() or User.query.filter(User.role != 'admin').first():
+        print("Business and other user data already exists. Aborting seed for business/users.")
         return
 
     print("Creating default business and users...")
@@ -35,11 +46,6 @@ def seed_db_command():
     b1 = Business(name='Main Plant', new_jar_price=150, new_dispenser_price=1500)
     db.session.add(b1)
     db.session.commit() # Commit here to get b1.id for the users
-
-    # Create an admin user
-    u_admin = User(username='admin', role='admin')
-    u_admin.set_password('adminpass')
-    db.session.add(u_admin)
 
     # Create a manager for the 'Main Plant'
     u_manager = User(username='manager', role='manager', business_id=b1.id)
@@ -52,7 +58,7 @@ def seed_db_command():
     db.session.add(u_staff)
 
     db.session.commit()
-    print("✅ Business, admin, manager, and staff created successfully!")
+    print("✅ Business, manager, and staff created successfully!")
 
 def init_app(app):
     """Register the CLI command with the Flask app."""
