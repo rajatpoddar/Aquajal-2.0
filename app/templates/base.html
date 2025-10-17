@@ -93,6 +93,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if current_user.is_authenticated %}
+                        
                         <li class="nav-item">
                             <button id="enable-notifications-btn" class="btn btn-outline-light btn-sm me-2" title="Enable Notifications"><i class="bi bi-bell"></i></button>
                         </li>
@@ -278,22 +279,20 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}")
-                    .then(reg => console.log('Service worker registered'))
-                    .catch(err => console.log('Service worker not registered', err));
+                    .then(reg => console.log('Service worker registered successfully.'))
+                    .catch(err => console.error('Service worker registration failed:', err));
             });
         }
-        
+
         // Initialize Push Notifications for logged-in users
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and config.VAPID_PUBLIC_KEY %}
         document.addEventListener('DOMContentLoaded', () => {
-            const vapidPublicKey = '{{ config.VAPID_PUBLIC_KEY }}';
             const enableBtn = document.getElementById('enable-notifications-btn');
-            
-            if (vapidPublicKey && enableBtn) {
-                 enableBtn.addEventListener('click', () => {
-                    initializePushNotifications(vapidPublicKey);
-                    alert('Notifications will be enabled if you grant permission.');
-                 });
+            if (enableBtn) {
+                // Pass the public key from the server config directly to the function
+                enableBtn.addEventListener('click', () => {
+                    initializePushNotifications('{{ config.VAPID_PUBLIC_KEY }}');
+                });
             }
         });
         {% endif %}
