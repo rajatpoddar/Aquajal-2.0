@@ -72,7 +72,7 @@ function subscribeUser() {
                 // A subscription already exists.
                 console.log('Existing subscription detected.');
                 sendSubscriptionToBackEnd(existedSubscription);
-                alert('You are already subscribed to notifications!');
+                // We don't need to alert the user if they are already subscribed.
             }
         });
     }).catch(function(e) {
@@ -92,25 +92,36 @@ function initializePushNotifications(publicKey) {
     }
     vapidPublicKey = publicKey;
 
-    if (!("Notification" in window)) {
-        console.log("This browser does not support desktop notification.");
-        alert("Sorry, your browser does not support notifications.");
-    } else if (Notification.permission === "granted") {
-        console.log("Permission to receive notifications has already been granted.");
+    // If permission is already granted, subscribe automatically on page load.
+    if ("Notification" in window && Notification.permission === "granted") {
+        console.log("Permission already granted. Subscribing user.");
         subscribeUser();
-    } else if (Notification.permission !== "denied") {
-        // We need to ask the user for permission.
-        Notification.requestPermission().then(function(permission) {
-            if (permission === "granted") {
-                console.log("Permission was granted.");
-                subscribeUser();
-            } else {
-                console.log("Permission was denied.");
-                alert("You have denied notification permissions. To enable them, please go to your browser settings.");
-            }
-        });
-    } else {
-        console.warn("Notification permissions have been permanently denied.");
-        alert("You have blocked notifications. To enable them, you must change the settings for this site in your browser.");
     }
 }
+
+/**
+ * This function is triggered by the "Enable Notifications" button click.
+ */
+function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        alert("Sorry, your browser does not support notifications.");
+        return;
+    }
+
+    if (Notification.permission === 'denied') {
+        alert("You have blocked notifications. To enable them, you must change the settings for this site in your browser.");
+        return;
+    }
+    
+    // If not denied, request permission. This will trigger the subscription if granted.
+    Notification.requestPermission().then(function(permission) {
+        if (permission === "granted") {
+            console.log("Permission was granted on click.");
+            subscribeUser();
+        } else {
+            console.log("Permission was denied on click.");
+            alert("You have denied notification permissions. To enable them, please go to your browser settings.");
+        }
+    });
+}
+
