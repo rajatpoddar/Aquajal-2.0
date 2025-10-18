@@ -17,7 +17,7 @@ from app.decorators import manager_required, subscription_required
 class CustomerForm(FlaskForm):
     name = StringField('Customer Name', validators=[DataRequired(), Length(min=3, max=120)])
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
-    mobile_number = StringField('Mobile Number', validators=[DataRequired(), Length(min=10, max=15)])
+    mobile_number = StringField('Mobile Number', validators=[DataRequired(), Length(min=10, max=10)])
     email = StringField('Email Address', validators=[Optional(), Email()])
     password = PasswordField('Set/Change Password', validators=[Optional(), Length(min=4)])
     customer_type = SelectField('Type', choices=[('customer', 'Customer'), ('dealer', 'Dealer')], default='customer', validators=[DataRequired()])
@@ -26,7 +26,7 @@ class CustomerForm(FlaskForm):
     landmark = StringField('Landmark', validators=[Optional()])
     note = TextAreaField('Note', validators=[Optional(), Length(max=300)])
     daily_jars = IntegerField('Daily Jars Required', validators=[DataRequired()], default=1)
-    price_per_jar = FloatField('Price per Jar (₹)', validators=[DataRequired()], default=20)
+    price_per_jar = FloatField('Price per Jar (₹)', validators=[DataRequired()], default=15)
     submit = SubmitField('Save Customer')
 
     def __init__(self, original_username=None, original_email=None, *args, **kwargs):

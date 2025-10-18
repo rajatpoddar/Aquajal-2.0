@@ -77,7 +77,7 @@ class BusinessForm(FlaskForm):
     email = StringField(_l('Business Email'), validators=[Optional(), Email()])
     location = StringField(_l('Location / Address'), validators=[Optional()])
     new_jar_price = FloatField(_l('Default New Jar Price (₹)'), default=150.0, validators=[DataRequired()])
-    new_dispenser_price = FloatField(_l('Default New Dispenser Price (₹)'), default=1500.0, validators=[DataRequired()])
+    new_dispenser_price = FloatField(_l('Default New Dispenser Price (₹)'), default=150.0, validators=[DataRequired()])
     submit = SubmitField(_l('Save Business'))
 
 class AdminProfileForm(FlaskForm):
