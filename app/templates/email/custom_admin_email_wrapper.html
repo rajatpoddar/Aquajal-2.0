@@ -1,0 +1,13 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}{{ subject or 'Notification from Aquajal' }}{% endblock %}
+{% block header_title %}Message from Aquajal Admin{% endblock %}
+
+{% block content %}
+    {# Render the raw HTML content provided by the admin #}
+    {{ email_body_content|safe }}
+
+    <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; font-size: 0.9em; color: #777;">
+        This is an automated message sent from the Aquajal platform admin panel.
+    </p>
+{% endblock %}

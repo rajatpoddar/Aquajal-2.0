@@ -1,11 +1,25 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}New Jar Request{% endblock %}
+{% block header_title %}New Jar Request Received{% endblock %}
+
+{% block content %}
 <p>Hi Team,</p>
-<p>
-    A new jar request has been submitted by a customer:
-</p>
-<p>
-    <strong>Customer:</strong> {{ customer.name }}<br>
-    <strong>Quantity:</strong> {{ quantity }} jar(s)<br>
-    <strong>Location:</strong> {{ customer.area }}, {{ customer.village }}
-</p>
-<p>Please log in to the delivery dashboard to confirm the delivery.</p>
+<p>A new jar request has been submitted by a customer:</p>
+
+<div class="details-box">
+    <p><strong>Customer:</strong> {{ customer.name }}</p>
+    <p><strong>Quantity:</strong> {{ quantity }} jar(s)</p>
+    <p><strong>Mobile:</strong> {{ customer.mobile_number }}</p>
+    <p><strong>Location:</strong> {{ customer.area }}, {{ customer.village }}</p>
+    {% if customer.note %}
+    <p><strong>Note:</strong> {{ customer.note }}</p>
+    {% endif %}
+</div>
+
+<p>Please log in to the delivery dashboard to view and confirm the delivery.</p>
+<div class="button-container">
+    <a href="{{ url_for('delivery.dashboard', _external=True) }}" class="button">Go to Delivery Dashboard</a>
+</div>
 <p>Sincerely,<br>The Aquajal Team</p>
+{% endblock %}

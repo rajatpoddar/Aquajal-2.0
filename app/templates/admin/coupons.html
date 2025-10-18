@@ -1,50 +1,56 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ title }}</h2>
-    <a href="{{ url_for('admin.add_coupon') }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle"></i> Add Coupon</a>
+<div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center mb-3">
+    <h2 class="mb-3 mb-sm-0">{{ title }}</h2>
+    <a href="{{ url_for('admin.add_coupon') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Add Coupon</a>
 </div>
 
-<div class="card">
+<div class="card shadow-sm">
     <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Discount</th>
-                    <th>Status</th>
-                    <th>Expires On</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for coupon in coupons %}
-                <tr>
-                    <td><code>{{ coupon.code }}</code></td>
-                    <td>{{ coupon.discount_percentage }}%</td>
-                    <td>
-                        {% if coupon.is_active %}
-                            <span class="badge bg-success">Active</span>
-                        {% else %}
-                            <span class="badge bg-secondary">Inactive</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ coupon.expiry_date.strftime('%d-%b-%Y') if coupon.expiry_date else 'N/A' }}</td>
-                    <td>
-                        <a href="{{ url_for('admin.edit_coupon', id=coupon.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
-                        <form action="{{ url_for('admin.delete_coupon', id=coupon.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="5" class="text-center">No coupons found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+         {# Makes table scrollable only on small screens (xs, sm) #}
+        <div class="table-responsive-sm">
+            <table class="table table-hover align-middle table-sm"> {# table-sm makes it more compact #}
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Code</th>
+                        <th scope="col" class="text-center">Discount</th>
+                        <th scope="col" class="text-center">Status</th>
+                        <th scope="col">Expires On</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coupon in coupons %}
+                    <tr>
+                        <td><code>{{ coupon.code }}</code></td>
+                        <td class="text-center">{{ coupon.discount_percentage }}%</td>
+                        <td class="text-center">
+                            {% if coupon.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ coupon.expiry_date.strftime('%d-%b-%Y') if coupon.expiry_date else 'N/A' }}</td>
+                        <td class="text-end">
+                            {# Use flex and gap for consistent button spacing #}
+                            <div class="d-flex flex-nowrap gap-1 justify-content-end">
+                                <a href="{{ url_for('admin.edit_coupon', id=coupon.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <form action="{{ url_for('admin.delete_coupon', id=coupon.id) }}" method="post" class="d-inline" onsubmit="return confirm('Delete this coupon?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted p-4">No coupons found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

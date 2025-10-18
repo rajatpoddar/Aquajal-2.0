@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<p class="text-muted">Compose and send emails for promotions, updates, or greetings.</p>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ form.recipient_type.label(class="form-label") }}
+                {{ form.recipient_type(class="form-select", id="recipient_type") }}
+            </div>
+
+            {# --- Fields revealed by JavaScript --- #}
+            <div class="mb-3" id="specific_users_field" style="display: none;">
+                {{ form.user_recipients.label(class="form-label") }}
+                <div class="checkbox-list border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                    {% for subfield in form.user_recipients %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                </div>
+                 <div class="form-text">Select specific staff, managers, or suppliers. Only those with emails are listed.</div>
+            </div>
+
+            <div class="mb-3" id="specific_customers_field" style="display: none;">
+                {{ form.customer_recipients.label(class="form-label") }}
+                 <div class="checkbox-list border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                    {% for subfield in form.customer_recipients %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="form-text">Select specific customers. Only those with emails are listed.</div>
+            </div>
+
+            <div class="mb-3" id="specific_emails_field" style="display: none;">
+                {{ form.specific_emails.label(class="form-label") }}
+                {{ form.specific_emails(class="form-control", rows=3, placeholder="e.g., user1@example.com, user2@example.com") }}
+                <div class="form-text">{{ form.specific_emails.description }}</div>
+            </div>
+            {# --- End of dynamic fields --- #}
+
+
+            <div class="mb-3">
+                {{ form.subject.label(class="form-label") }}<span class="text-danger">*</span>
+                {{ form.subject(class="form-control") }}
+                {% for error in form.subject.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.body.label(class="form-label") }}<span class="text-danger">*</span>
+                {{ form.body(class="form-control") }}
+                {% for error in form.body.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                 <div class="form-text">Basic HTML tags (like &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;a href="..."&gt;) can be used.</div>
+            </div>
+
+            <div>
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const recipientTypeSelect = document.getElementById('recipient_type');
+    const specificUsersField = document.getElementById('specific_users_field');
+    const specificCustomersField = document.getElementById('specific_customers_field');
+    const specificEmailsField = document.getElementById('specific_emails_field');
+
+    function toggleSpecificFields() {
+        const selectedType = recipientTypeSelect.value;
+        specificUsersField.style.display = (selectedType === 'specific_users') ? 'block' : 'none';
+        specificCustomersField.style.display = (selectedType === 'specific_customers') ? 'block' : 'none';
+        // Show manual email field for specific selections as an addition/alternative
+        specificEmailsField.style.display = (selectedType === 'specific_users' || selectedType === 'specific_customers') ? 'block' : 'none';
+    }
+
+    recipientTypeSelect.addEventListener('change', toggleSpecificFields);
+    // Initial call to set visibility based on default selection
+    toggleSpecificFields();
+});
+</script>
+
+{% endblock %}

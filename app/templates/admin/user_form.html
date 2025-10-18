@@ -8,44 +8,50 @@
             {{ form.hidden_tag() }}
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    {{ form.username.label(class="form-label") }}
-                    {{ form.username(class="form-control") }}
-                    {% for error in form.username.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {{ form.username.label(class="form-label") }}<span class="text-danger">*</span> {# Added asterisk #}
+                    {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else "")) }}
+                    {% for error in form.username.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6 mb-3">
                     {{ form.mobile_number.label(class="form-label") }}
-                    {{ form.mobile_number(class="form-control") }}
+                    {{ form.mobile_number(class="form-control" + (" is-invalid" if form.mobile_number.errors else "")) }}
+                     {% for error in form.mobile_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
             </div>
              <div class="mb-3" id="shop-name-field">
                 {{ form.shop_name.label(class="form-label") }}
-                {{ form.shop_name(class="form-control") }}
+                {{ form.shop_name(class="form-control" + (" is-invalid" if form.shop_name.errors else "")) }}
+                 {% for error in form.shop_name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
             </div>
             <div class="mb-3">
                 {{ form.address.label(class="form-label") }}
-                {{ form.address(class="form-control", rows=2) }}
+                {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else ""), rows=2) }}
+                 {% for error in form.address.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
             </div>
             <hr>
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    {{ form.role.label(class="form-label") }}
-                    {{ form.role(class="form-select") }}
+                    {{ form.role.label(class="form-label") }}<span class="text-danger">*</span> {# Added asterisk #}
+                    {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else "")) }}
+                    {% for error in form.role.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6 mb-3" id="business-id-field">
-                    {{ form.business_id.label(class="form-label") }}
-                    {{ form.business_id(class="form-select") }}
+                    {{ form.business_id.label(class="form-label") }} {# Mandatory based on role via JS #}
+                    {{ form.business_id(class="form-select" + (" is-invalid" if form.business_id.errors else "")) }}
+                    {% for error in form.business_id.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
             </div>
 
             <div class="mb-3" id="daily-wage-field">
-                {{ form.daily_wage.label(class="form-label") }}
-                {{ form.daily_wage(class="form-control") }}
+                {{ form.daily_wage.label(class="form-label") }} {# Mandatory based on role via JS #}
+                {{ form.daily_wage(class="form-control" + (" is-invalid" if form.daily_wage.errors else "")) }}
+                {% for error in form.daily_wage.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
             </div>
 
             <div class="mb-3">
                 {{ form.id_proof.label(class="form-label") }}
-                {{ form.id_proof(class="form-control") }}
-                {% for error in form.id_proof.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                {{ form.id_proof(class="form-control" + (" is-invalid" if form.id_proof.errors else "")) }}
+                {% for error in form.id_proof.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
             </div>
             {% if user and user.id_proof_filename %}
             <div class="mb-3">
@@ -55,17 +61,24 @@
             {% endif %}
             <hr>
             
-            <p class="text-muted">{% if user %}Update password (optional){% else %}Set initial password{% endif %}</p>
+            {# Password Section - adjusted placeholder and note #}
+            {% if user %}
+             <p class="text-muted">Update password (optional)</p>
+            {% else %}
+             <p class="text-muted">Set initial password (default is '123456' if left blank)</p>
+            {% endif %}
             <div class="row">
                 <div class="col-md-6 mb-3">
                     {{ form.password.label(class="form-label") }}
-                    {{ form.password(class="form-control") }}
-                    {% for error in form.password.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                    {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
-                {% if not user %} <div class="col-md-6 mb-3">
+                {# Only show Repeat Password field on Add form #}
+                {% if not user %}
+                <div class="col-md-6 mb-3">
                     {{ form.password2.label(class="form-label") }}
-                    {{ form.password2(class="form-control") }}
-                    {% for error in form.password2.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                    {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else "")) }}
+                    {% for error in form.password2.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 {% endif %}
             </div>

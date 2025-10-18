@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from datetime import datetime, timedelta, date
 from time import time
 from flask import current_app
+from sqlalchemy import CheckConstraint
 import jwt
 
 
@@ -150,15 +151,18 @@ class Customer(UserMixin, db.Model):
     price_per_jar = db.Column(db.Float, nullable=False, default=20.0)
     due_amount = db.Column(db.Float, default=0.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
+    customer_type = db.Column(db.String(10), default='customer', nullable=False)
     
     logs = db.relationship('DailyLog', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     requests = db.relationship('JarRequest', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     bookings = db.relationship('EventBooking', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
     invoices = db.relationship('Invoice', back_populates='customer', lazy='dynamic', cascade="all, delete-orphan")
     subscriptions = db.relationship('PushSubscription', backref='customer', lazy='dynamic', cascade="all, delete-orphan")
-
     
-    __table_args__ = (db.UniqueConstraint('mobile_number', 'business_id', name='uq_customer_mobile_business'),)
+    __table_args__ = (
+        db.UniqueConstraint('mobile_number', 'business_id', name='uq_customer_mobile_business'),
+        CheckConstraint(customer_type.in_(['customer', 'dealer']), name='ck_customer_type_values') # <-- Optional: Add constraint
+    )
 
     def get_id(self): return f'customer-{self.id}'
     def set_password(self, password): self.password_hash = generate_password_hash(password)

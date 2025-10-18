@@ -1,9 +1,16 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Invoice from {{ invoice.customer.business.name }}{% endblock %}
+{% block header_title %}Your Invoice is Attached{% endblock %}
+
+{% block content %}
 <p>Dear {{ invoice.customer.name }},</p>
-<p>
-    Please find attached your invoice ({{ invoice.invoice_number }}) from {{ invoice.customer.business.name }}.
-</p>
-<p>
-    The total amount due is <strong>₹{{ "%.2f"|format(invoice.total_amount) }}</strong>.
-</p>
+<p>Please find attached your invoice (<strong>{{ invoice.invoice_number }}</strong>) from <strong>{{ invoice.customer.business.name }}</strong>.</p>
+<p>The total amount for this invoice is <strong>₹{{ "%.2f"|format(invoice.total_amount) }}</strong>.</p>
+<p>You can also view and download all your invoices from your customer dashboard.</p>
+<div class="button-container">
+    <a href="{{ url_for('customer.dashboard', _external=True) }}" class="button">View My Dashboard</a>
+</div>
 <p>Thank you for your business!</p>
 <p>Sincerely,<br>The {{ invoice.customer.business.name }} Team</p>
+{% endblock %}

@@ -1,17 +1,28 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Delivery Confirmation{% endblock %}
+{% block header_title %}Your Delivery is Complete{% endblock %}
+
+{% block content %}
 <p>Dear {{ customer.name }},</p>
-<p>
-    This is a confirmation that your recent delivery has been completed.
-</p>
-<p>
-    <strong>Items Delivered:</strong><br>
-    - {{ jars_delivered }} water jar(s)
-</p>
-<p>
-    <strong>Total Amount:</strong> ₹{{ "%.2f"|format(amount) }}<br>
-    <strong>Status:</strong> {{ payment_status }}
-</p>
-<p>
-    An invoice for this transaction has been automatically generated and is available in your customer dashboard.
-</p>
+<p>This email confirms that your recent water jar delivery from <strong>{{ business.name }}</strong> has been completed.</p>
+
+<div class="details-box">
+    <p><strong>Items Delivered:</strong> {{ jars_delivered }} water jar(s)</p>
+    <p><strong>Total Amount:</strong> ₹{{ "%.2f"|format(amount) }}</p>
+    <p><strong>Payment Status:</strong>
+        {% if payment_status == 'Paid' %}
+            <strong style="color: green;">{{ payment_status }}</strong>
+        {% else %}
+            <strong style="color: red;">{{ payment_status }}</strong> (Please settle with delivery staff)
+        {% endif %}
+    </p>
+</div>
+
+<p>An invoice for this transaction is available in your customer dashboard.</p>
+<div class="button-container">
+    <a href="{{ url_for('customer.dashboard', _external=True) }}" class="button">View My Dashboard</a>
+</div>
 <p>Thank you for your business!</p>
 <p>Sincerely,<br>The {{ business.name }} Team</p>
+{% endblock %}

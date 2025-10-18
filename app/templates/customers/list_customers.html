@@ -1,41 +1,93 @@
 {% extends "base.html" %}
 
 {% block content %}
+    {# --- Summary Cards --- #}
+    <div class="row mb-4">
+        {# Total Count Card #}
+        <div class="col-md-4 mb-3">
+            <div class="card text-center text-white bg-secondary shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Entries</h5>
+                    <p class="card-text display-4">{{ total_count }}</p>
+                </div>
+            </div>
+        </div>
+        {# Customer Count Card #}
+        <div class="col-md-4 mb-3">
+            <div class="card text-center text-white bg-info shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Customers</h5>
+                    <p class="card-text display-4">{{ customer_count }}</p>
+                </div>
+            </div>
+        </div>
+         {# Dealer Count Card #}
+        <div class="col-md-4 mb-3">
+            <div class="card text-center text-white bg-warning shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Dealers</h5>
+                    <p class="card-text display-4">{{ dealer_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# --- Title and Add Button --- #}
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Customers List</h2>
+        <h2>Customers & Dealers List</h2>
         <a href="{{ url_for('customers.add_customer') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Add New
         </a>
     </div>
 
+    {# --- Filter/Sort Form --- #}
     <div class="card shadow-sm mb-4">
-        <div class="card-body">
+         <div class="card-body">
             <form method="get" action="{{ url_for('customers.index') }}">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <input type="text" name="search" class="form-control" placeholder="Search by name or mobile..." value="{{ search_term or '' }}">
-                    </div>
+                <div class="row g-3 align-items-end">
                     <div class="col-md-4">
-                        <select name="sort" class="form-select">
+                         <label for="search" class="form-label">Search</label>
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Search by name, mobile, or village..." value="{{ search_term or '' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter_type" class="form-label">Filter by Type</label>
+                        <select name="filter_type" id="filter_type" class="form-select">
+                            <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Types</option>
+                            <option value="customer" {% if filter_type == 'customer' %}selected{% endif %}>Customers Only</option>
+                            <option value="dealer" {% if filter_type == 'dealer' %}selected{% endif %}>Dealers Only</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sort" class="form-label">Sort By</label>
+                        <select name="sort" id="sort" class="form-select">
                             <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
                             <option value="area" {% if sort_by == 'area' %}selected{% endif %}>Sort by Area</option>
                             <option value="village" {% if sort_by == 'village' %}selected{% endif %}>Sort by Village</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        <button type="submit" class="btn btn-primary w-100">Filter/Sort</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="list-group">
-        {% for customer in customers %}
+    {# --- Customer/Dealer List --- #}
+    <div class="list-group mb-3"> {# Added mb-3 for spacing before pagination #}
+        {% for customer in customers %} {# Iterate over items for the current page #}
         <div class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
                 <div>
-                    <h5 class="mb-1">{{ customer.name }}</h5>
+                    <h5 class="mb-1">
+                        {{ customer.name }}
+                        {# Display Type Badge #}
+                        {% if customer.customer_type == 'dealer' %}
+                            <span class="badge bg-warning text-dark ms-2">Dealer</span>
+                        {% else %}
+                             <span class="badge bg-info text-dark ms-2">Customer</span>
+                        {% endif %}
+                    </h5>
                     <p class="mb-1"><i class="bi bi-telephone-fill"></i> {{ customer.mobile_number }} | <strong>{{ customer.daily_jars }} Jar(s)/Day</strong></p>
                     <small><i class="bi bi-geo-alt-fill"></i> {{ customer.area }}, {{ customer.village }}</small>
                     {% if customer.note %}
@@ -49,7 +101,7 @@
                         {% endif %}
                         <span class="badge bg-primary rounded-pill fs-6 mb-2">₹{{ "%.2f"|format(customer.price_per_jar) }}</span>
                     </div>
-                    <div>
+                    <div class="mt-2"> {# Added margin-top for spacing #}
                         {% if customer.due_amount and customer.due_amount > 0 %}
                         <form action="{{ url_for('manager.clear_dues', customer_id=customer.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to clear the due amount for this customer?');">
                             <button type="submit" class="btn btn-sm btn-success" title="Clear Dues"><i class="bi bi-check-circle-fill"></i></button>
@@ -66,12 +118,47 @@
         </div>
         {% else %}
             <div class="alert alert-secondary">
-                {% if search_term %}
-                    No customers found matching your search. <a href="{{ url_for('customers.index') }}">Clear search</a>.
+                {% if search_term or filter_type != 'all' %}
+                    No customers/dealers found matching your criteria. <a href="{{ url_for('customers.index') }}">Clear filters</a>.
                 {% else %}
-                    No customers found. Please add one!
+                    No customers or dealers found. Please add one!
                 {% endif %}
             </div>
         {% endfor %}
     </div>
+
+    {# --- PAGINATION CONTROLS (NEW) --- #}
+    {% if pagination and pagination.pages > 1 %}
+        <nav aria-label="Customer list navigation">
+            <ul class="pagination justify-content-center">
+                {# Previous Page Link #}
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('customers.index', page=pagination.prev_num, search=search_term, sort=sort_by, filter_type=filter_type) if pagination.has_prev else '#' }}">&laquo; Previous</a>
+                </li>
+
+                {# Page Number Links #}
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if pagination.page == page_num %}
+                            <li class="page-item active" aria-current="page"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('customers.index', page=page_num, search=search_term, sort=sort_by, filter_type=filter_type) }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {# Next Page Link #}
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('customers.index', page=pagination.next_num, search=search_term, sort=sort_by, filter_type=filter_type) if pagination.has_next else '#' }}">Next &raquo;</a>
+                </li>
+            </ul>
+        </nav>
+        <p class="text-center text-muted small">
+            Showing page {{ pagination.page }} of {{ pagination.pages }} ({{ pagination.total }} total entries)
+        </p>
+    {% endif %}
+    {# --- END PAGINATION CONTROLS --- #}
+
 {% endblock %}

@@ -1,69 +1,156 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Admin Dashboard</h2>
-    <div>
-        <a href="{{ url_for('admin.list_plans') }}" class="btn btn-info"><i class="bi bi-tags-fill"></i> Manage Plans</a>
-        <a href="{{ url_for('admin.list_coupons') }}" class="btn btn-warning"><i class="bi bi-scissors"></i> Manage Coupons</a>
+<div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-4">
+    <h2 class="mb-3 mb-md-0">{{ title }}</h2>
+    {# Action buttons - improved layout for mobile #}
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+        <a href="{{ url_for('admin.send_custom_email') }}" class="btn btn-info"><i class="bi bi-envelope-plus-fill me-1"></i> Send Email</a>
+        {# Use btn-group for related items, which stacks nicely on mobile #}
+        <div class="btn-group" role="group" aria-label="SaaS Management">
+             <a href="{{ url_for('admin.list_plans') }}" class="btn btn-outline-primary"><i class="bi bi-tags-fill me-1"></i> Plans</a>
+             <a href="{{ url_for('admin.list_coupons') }}" class="btn btn-outline-warning"><i class="bi bi-scissors me-1"></i> Coupons</a>
+        </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4>Businesses</h4>
-            <a href="{{ url_for('admin.add_business') }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle"></i> Add Business</a>
-        </div>
-        <div class="list-group">
-            {% for business in businesses %}
-                <div class="list-group-item">
-                    <div class="d-flex w-100 justify-content-between">
-                        <div>
-                            <h5 class="mb-1">{{ business.name }}</h5>
-                            <small>Stock: {{ business.jar_stock }} Jars, {{ business.dispenser_stock }} Dispensers</small><br>
-                            <small>Subscription: <span class="badge bg-primary">{{ business.subscription_status|capitalize }}</span></small>
+<div class="row g-4">
+    {# Businesses Section #}
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100" id="businesses-list"> {# Added ID for page anchor #}
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-building me-2"></i>Businesses</h4>
+                <a href="{{ url_for('admin.add_business') }}" class="btn btn-light btn-sm"><i class="bi bi-plus-circle me-1"></i> Add</a>
+            </div>
+            <div class="card-body p-0"> {# Remove padding for list group flush #}
+                <div class="list-group list-group-flush">
+                    {% for business in businesses_pagination.items %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="me-2" style="min-width: 0;"> {# Added wrapper for text wrapping #}
+                                    <h5 class="mb-1 text-truncate">{{ business.name }}</h5>
+                                    <small class="d-block text-muted">Stock: {{ business.jar_stock or 0 }} J, {{ business.dispenser_stock or 0 }} D</small> {# Shortened text #}
+                                    <small class="d-block">Sub:
+                                        {% if business.subscription_status == 'active' %}
+                                            <span class="badge bg-success">{{ business.subscription_status|capitalize }}</span>
+                                        {% elif business.subscription_status == 'trial' %}
+                                            <span class="badge bg-warning text-dark">{{ business.subscription_status|capitalize }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ business.subscription_status|capitalize or 'Expired' }}</span>
+                                        {% endif %}
+                                    </small>
+                                    {% if business.subscription_ends_at %}
+                                        <small class="d-block text-muted">(Ends: {{ business.subscription_ends_at.strftime('%d-%b-%y') }})</small>
+                                    {% elif business.trial_ends_at %}
+                                        <small class="d-block text-muted">(Ends: {{ business.trial_ends_at.strftime('%d-%b-%y') }})</small>
+                                    {% endif %}
+                                </div>
+                                {# Use flex-nowrap and gap for better spacing #}
+                                <div class="d-flex flex-nowrap gap-1">
+                                     <a href="{{ url_for('admin.edit_business', id=business.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                     <form action="{{ url_for('admin.reset_stock', id=business.id) }}" method="post" class="d-inline" onsubmit="return confirm('Reset stock for {{ business.name }} to zero?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset Stock"><i class="bi bi-arrow-counterclockwise"></i></button>
+                                    </form>
+                                    <form action="{{ url_for('admin.delete_business', id=business.id) }}" method="post" class="d-inline" onsubmit="return confirm('WARNING: Permanently delete \'{{ business.name }}\' and ALL its data?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Business"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                        <div class="my-auto">
-                            <a href="{{ url_for('admin.edit_business', id=business.id) }}" class="btn btn-sm btn-outline-secondary me-1" title="Edit"><i class="bi bi-pencil"></i></a>
-                            <form action="{{ url_for('admin.reset_stock', id=business.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to RESET ALL STOCK for {{ business.name }} to zero?');">
-                                <button type="submit" class="btn btn-sm btn-outline-warning me-1" title="Reset Stock"><i class="bi bi-arrow-counterclockwise"></i></button>
-                            </form>
-                            <form action="{{ url_for('admin.delete_business', id=business.id) }}" method="post" class="d-inline" onsubmit="return confirm('WARNING: Are you sure you want to permanently delete the business \'{{ business.name }}\' and ALL of its data, including users and customers? This action cannot be undone.');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Business"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
+                    {% else %}
+                        <div class="list-group-item text-center text-muted p-3">No businesses found.</div>
+                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="list-group-item">No businesses found.</div>
-            {% endfor %}
+            </div>
+            {# Business Pagination (Full Style) #}
+            {% if businesses_pagination and businesses_pagination.pages > 1 %}
+                <div class="card-footer bg-light-subtle"> {# Fixed dark mode white strip #}
+                    <nav aria-label="Business list navigation">
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            {# Previous Page Link #}
+                            <li class="page-item {% if not businesses_pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.dashboard', page_biz=businesses_pagination.prev_num, page_users=request.args.get('page_users', 1), _anchor='businesses-list') if businesses_pagination.has_prev else '#' }}">&laquo;</a>
+                            </li>
+                            {# Page Number Links #}
+                            {% for page_num in businesses_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if businesses_pagination.page == page_num %}active{% endif %}" aria-current="page">
+                                        <a class="page-link" href="{{ url_for('admin.dashboard', page_biz=page_num, page_users=request.args.get('page_users', 1), _anchor='businesses-list') }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+                            {# Next Page Link #}
+                            <li class="page-item {% if not businesses_pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.dashboard', page_biz=businesses_pagination.next_num, page_users=request.args.get('page_users', 1), _anchor='businesses-list') if businesses_pagination.has_next else '#' }}">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4>Managers & Staff</h4>
-            <a href="{{ url_for('admin.add_user') }}" class="btn btn-sm btn-primary"><i class="bi bi-person-plus"></i> Add User</a>
-        </div>
-        <div class="list-group">
-            {% for user in users %}
-                <div class="list-group-item">
-                    <div class="d-flex w-100 justify-content-between">
-                        <div>
-                            <h5 class="mb-1">{{ user.username }} <span class="badge bg-secondary">{{ user.role|capitalize }}</span></h5>
-                            <small>Business: {{ user.business.name if user.business else 'N/A' }}</small>
+
+    {# Users Section #}
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100" id="users-list"> {# Added ID for page anchor #}
+             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Managers, Staff & Suppliers</h4>
+                <a href="{{ url_for('admin.add_user') }}" class="btn btn-light btn-sm"><i class="bi bi-person-plus-fill me-1"></i> Add User</a>
+            </div>
+             <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for user in users_pagination.items %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="me-2" style="min-width: 0;"> {# Added wrapper for text wrapping #}
+                                    <h5 class="mb-1 text-truncate">{{ user.username }} <span class="badge bg-secondary">{{ user.role|capitalize }}</span></h5>
+                                    <small class="d-block text-muted">Business: {{ user.business.name if user.business else 'N/A' }}</small>
+                                    {# Fix for email overflow #}
+                                    {% if user.email %}<small class="d-block text-muted text-truncate" title="{{ user.email }}"><i class="bi bi-envelope-fill me-1"></i>{{ user.email }}</small>{% endif %}
+                                </div>
+                                {# Use flex-nowrap and gap for better spacing #}
+                                <div class="d-flex flex-nowrap gap-1">
+                                    <a href="{{ url_for('admin.edit_user', id=user.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <form action="{{ url_for('admin.delete_user', id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ user.username }}?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete User"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                        <div class="my-auto">
-                            <a href="{{ url_for('admin.edit_user', id=user.id) }}" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-pencil"></i> Edit</a>
-                            <form action="{{ url_for('admin.delete_user', id=user.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to DELETE {{ user.username }}?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
+                    {% else %}
+                         <div class="list-group-item text-center text-muted p-3">No users found.</div>
+                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="list-group-item">No users found.</div>
-            {% endfor %}
+            </div>
+             {# User Pagination (Full Style) #}
+            {% if users_pagination and users_pagination.pages > 1 %}
+                <div class="card-footer bg-light-subtle"> {# Fixed dark mode white strip #}
+                     <nav aria-label="User list navigation">
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            {# Previous Page Link #}
+                            <li class="page-item {% if not users_pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.dashboard', page_users=users_pagination.prev_num, page_biz=request.args.get('page_biz', 1), _anchor='users-list') if users_pagination.has_prev else '#' }}">&laquo;</a>
+                            </li>
+                            {# Page Number Links #}
+                            {% for page_num in users_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if users_pagination.page == page_num %}active{% endif %}" aria-current="page">
+                                         <a class="page-link" href="{{ url_for('admin.dashboard', page_users=page_num, page_biz=request.args.get('page_biz', 1), _anchor='users-list') }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+                            {# Next Page Link #}
+                            <li class="page-item {% if not users_pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.dashboard', page_users=users_pagination.next_num, page_biz=request.args.get('page_biz', 1), _anchor='users-list') if users_pagination.has_next else '#' }}">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

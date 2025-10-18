@@ -7,12 +7,14 @@ Your account has been created on our Aquajal platform. You can use it to manage 
 Your login details are:
 Username: {{ customer.username }}
 Password: {{ password }}
-(We recommend changing this password after your first login.)
+(We strongly recommend changing this password after your first login via the 'My Account' page.)
 
 Login here: {{ login_url }}
 
-If you have any questions, please contact {{ customer.business.name }} directly.
+If you have any service-related questions, please contact {{ customer.business.name }} directly.
 
+Best Regards,
+The {{ customer.business.name }} Team (via Aquajal)
 ---
 Powered by Aquajal | A Poddar Solutions Product
 {{ url_for('public.index', _external=True) }}

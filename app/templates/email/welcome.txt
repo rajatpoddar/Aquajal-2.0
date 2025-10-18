@@ -2,9 +2,15 @@ Dear {{ user.username }},
 
 Welcome to Aquajal!
 
-We are excited to have you on board. Your account has been created successfully, and your free trial has begun.
+We are excited to have you on board. Your business account has been created successfully, and your 40-day free trial has begun.
 
-You can now log in and start managing your water supply business with ease.
+Log in now to start managing your water supply business with ease:
+{{ url_for('auth.login', _external=True) }}
+
+If you have any questions, feel free to visit our How to Use page: {{ url_for('public.how_to_use', _external=True) }}
 
 Sincerely,
 The Aquajal Team
+---
+Powered by Aquajal | A Poddar Solutions Product
+{{ url_for('public.index', _external=True) }}

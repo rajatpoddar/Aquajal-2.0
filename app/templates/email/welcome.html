@@ -1,6 +1,16 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Welcome to Aquajal!{% endblock %}
+{% block header_title %}Welcome!{% endblock %}
+
+{% block content %}
 <p>Dear {{ user.username }},</p>
-<p>Welcome to <b>Aquajal</b>!</p>
-<p>We are excited to have you on board. Your account has been created successfully, and your free trial has begun.</p>
-<p>You can now log in and start managing your water supply business with ease.</p>
-<p>Sincerely,</p>
-<p>The Aquajal Team</p>
+<p>Welcome to <strong>Aquajal</strong>! We are excited to have you on board.</p>
+<p>Your business account has been created successfully, and your <strong>40-day free trial</strong> has begun. You can explore all features during this period.</p>
+<p>Log in now to start managing your water supply business with ease:</p>
+<div class="button-container">
+    <a href="{{ url_for('auth.login', _external=True) }}" class="button">Login to Your Dashboard</a>
+</div>
+<p>If you have any questions, feel free to visit our <a href="{{ url_for('public.how_to_use', _external=True) }}">How to Use</a> page or contact support.</p>
+<p>Sincerely,<br>The Aquajal Team</p>
+{% endblock %}

@@ -6,11 +6,21 @@
         <div class="card-body">
             <form action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
+                {# Customer Name #}
                 <div class="mb-3">
                     {{ form.name.label(class="form-label") }}<span class="text-danger">*</span>
                     {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
                     {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
+
+                {# Type Dropdown (NEW) #}
+                <div class="mb-3">
+                    {{ form.customer_type.label(class="form-label") }}<span class="text-danger">*</span>
+                    {{ form.customer_type(class="form-select" + (" is-invalid" if form.customer_type.errors else "")) }}
+                    {% for error in form.customer_type.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
+
+                {# Username and Mobile #}
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         {{ form.username.label(class="form-label") }}<span class="text-danger">*</span>
@@ -26,6 +36,8 @@
                         {% for error in form.mobile_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
+
+                {# Email and Password #}
                 <div class="mb-3">
                     {{ form.email.label(class="form-label") }}
                     {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Optional") }}
@@ -33,9 +45,11 @@
                 </div>
                 <div class="mb-3">
                     {{ form.password.label(class="form-label") }}
-                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Leave blank for default password (123456)") }}
+                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Leave blank for default password (123456) or to keep current") }} {# Updated placeholder #}
                     {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
+
+                {# Address Fields #}
                 <div class="mb-3">
                     {{ form.village.label(class="form-label") }}<span class="text-danger">*</span>
                     {{ form.village(class="form-control" + (" is-invalid" if form.village.errors else "")) }}
@@ -49,6 +63,8 @@
                     {{ form.landmark.label(class="form-label") }}
                     {{ form.landmark(class="form-control") }}
                 </div>
+
+                {# Jar Details #}
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         {{ form.daily_jars.label(class="form-label") }}<span class="text-danger">*</span>
@@ -61,10 +77,14 @@
                         {% for error in form.price_per_jar.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
+
+                {# Note #}
                 <div class="mb-3">
                     {{ form.note.label(class="form-label") }}
-                    {{ form.note(class="form-control", rows=3, placeholder="Any special instructions or notes for this customer...") }}
+                    {{ form.note(class="form-control", rows=3, placeholder="Any special instructions or notes...") }} {# Updated placeholder #}
                 </div>
+
+                {# Submit Buttons #}
                 <div>
                     {{ form.submit(class="btn btn-primary") }}
                     <a href="{{ url_for('customers.index') }}" class="btn btn-secondary">Cancel</a>

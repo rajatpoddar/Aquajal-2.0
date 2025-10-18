@@ -1,16 +1,32 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Event Booking Confirmed{% endblock %}
+{% block header_title %}Event Delivery Assigned{% endblock %}
+
+{% block content %}
 <p>Hi {{ staff.username }},</p>
-<p>
-    An event booking has been confirmed by the manager and is scheduled for delivery:
-</p>
-<p>
-    <strong>Customer:</strong> {{ booking.customer.name }}<br>
-    <strong>Quantity:</strong> {{ booking.quantity }} jar(s)<br>
-    <strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}<br>
-    <strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}<br>
-    <strong>Amount to Collect:</strong> ₹{{ "%.2f"|format(booking.amount) }}
-    {% if booking.paid_to_manager %}
-        (Already paid to manager)
-    {% endif %}
-</p>
-<p>Please ensure this delivery is completed on the event date.</p>
+<p>An event booking has been confirmed by the manager and is scheduled for delivery:</p>
+
+<div class="details-box">
+    <p><strong>Customer:</strong> {{ booking.customer.name }}</p>
+    <p><strong>Mobile:</strong> {{ booking.customer.mobile_number }}</p>
+    <p><strong>Location:</strong> {{ booking.customer.area }}, {{ booking.customer.village }}</p>
+    <hr>
+    <p><strong>Water Jars:</strong> {{ booking.quantity }}</p>
+    <p><strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}</p>
+    <p><strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}</p>
+    <p><strong>Amount to Collect:</strong> ₹{{ "%.2f"|format(booking.amount) }}
+        {% if booking.paid_to_manager %}
+            <strong>(Already paid to manager)</strong>
+        {% else %}
+             <strong>(Collect this amount upon delivery)</strong>
+        {% endif %}
+    </p>
+</div>
+
+<p>Please ensure this delivery is completed on the event date and mark it as 'Delivered' in your dashboard afterwards.</p>
+<div class="button-container">
+    <a href="{{ url_for('delivery.dashboard', _external=True) }}" class="button">View Delivery Dashboard</a>
+</div>
 <p>Sincerely,<br>The Aquajal Team</p>
+{% endblock %}

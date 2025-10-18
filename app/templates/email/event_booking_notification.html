@@ -1,12 +1,25 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}New Event Booking{% endblock %}
+{% block header_title %}New Event Booking Needs Confirmation{% endblock %}
+
+{% block content %}
 <p>Hi Team,</p>
-<p>
-    A new event booking has been created and requires confirmation:
-</p>
-<p>
-    <strong>Customer:</strong> {{ booking.customer.name }}<br>
-    <strong>Quantity:</strong> {{ booking.quantity }} jar(s)<br>
-    <strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}<br>
-    <strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}
-</p>
-<p>The manager needs to log in to confirm this booking.</p>
+<p>A new event booking has been created and requires confirmation:</p>
+
+<div class="details-box">
+    <p><strong>Customer:</strong> {{ booking.customer.name }}</p>
+    <p><strong>Mobile:</strong> {{ booking.customer.mobile_number }}</p>
+    <p><strong>Location:</strong> {{ booking.customer.area }}, {{ booking.customer.village }}</p>
+    <hr>
+    <p><strong>Water Jars:</strong> {{ booking.quantity }}</p>
+    <p><strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}</p>
+    <p><strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}</p>
+</div>
+
+<p>The manager needs to log in to review stock and confirm this booking.</p>
+<div class="button-container">
+    <a href="{{ url_for('manager.dashboard', _external=True) }}" class="button">Go to Manager Dashboard</a>
+</div>
 <p>Sincerely,<br>The Aquajal Team</p>
+{% endblock %}

@@ -1,17 +1,23 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Your Event Booking is Confirmed!{% endblock %}
+{% block header_title %}Event Booking Confirmed{% endblock %}
+
+{% block content %}
 <p>Dear {{ booking.customer.name }},</p>
-<p>
-    We're pleased to confirm your event booking with <strong>{{ booking.customer.business.name }}</strong>.
-</p>
-<p>
-    <strong>Booking Details:</strong><br>
-    - Water Jars: {{ booking.quantity }}<br>
-    - Dispensers: {{ booking.dispensers_booked or 0 }}<br>
-    - Event Date: {{ booking.event_date.strftime('%d-%b-%Y') }}
-</p>
-<p>
-    <strong>Total Amount:</strong> ₹{{ "%.2f"|format(booking.amount) }}
-</p>
-<p>
-    Thank you for choosing us for your event. We look forward to serving you!
-</p>
+<p>We're pleased to confirm your event booking with <strong>{{ booking.customer.business.name }}</strong>.</p>
+
+<div class="details-box">
+    <p><strong>Water Jars:</strong> {{ booking.quantity }}</p>
+    <p><strong>Dispensers:</strong> {{ booking.dispensers_booked or 0 }}</p>
+    <p><strong>Event Date:</strong> {{ booking.event_date.strftime('%d-%b-%Y') }}</p>
+    <p><strong>Confirmed Amount:</strong> ₹{{ "%.2f"|format(booking.amount) }}</p>
+</div>
+
+<p>Our delivery team will arrive on the scheduled date. Thank you for choosing us for your event!</p>
+<p>You can view your booking details anytime in your dashboard:</p>
+<div class="button-container">
+    <a href="{{ url_for('customer.dashboard', _external=True) }}" class="button">View My Dashboard</a>
+</div>
 <p>Sincerely,<br>The {{ booking.customer.business.name }} Team</p>
+{% endblock %}

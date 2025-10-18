@@ -1,14 +1,22 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}New Order Received{% endblock %}
+{% block header_title %}New Purchase Order{% endblock %}
+
+{% block content %}
 <p>Hi {{ order.supplier.shop_name }},</p>
-<p>
-    You have received a new order from <strong>{{ order.business.name }}</strong>.
-</p>
-<p>
-    <strong>Order Details:</strong><br>
-    - Order ID: #{{ order.id }}<br>
-    - Total Amount: ₹{{ "%.2f"|format(order.total_amount) }}<br>
-    - Order Date: {{ order.order_date.strftime('%d-%b-%Y') }}
-</p>
-<p>
-    Please log in to your supplier dashboard to view the full order details and update the order status.
-</p>
-<p>Sincerely,<br>The Aquajal Team</p>
+<p>You have received a new purchase order from <strong>{{ order.business.name }}</strong>.</p>
+
+<div class="details-box">
+    <p><strong>Order ID:</strong> #{{ order.id }}</p>
+    <p><strong>Order Date:</strong> {{ order.order_date.strftime('%d-%b-%Y %I:%M %p UTC') }}</p>
+    <p><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount) }}</p>
+    <p><strong>Initial Status:</strong> {{ order.status }}</p>
+</div>
+
+<p>Please log in to your supplier dashboard to view the full order details, see the items requested, and update the order status as you process it.</p>
+<div class="button-container">
+    <a href="{{ url_for('supplier.dashboard', _external=True) }}" class="button">Go to Supplier Dashboard</a>
+</div>
+<p>Sincerely,<br>The Aquajal Platform</p>
+{% endblock %}
