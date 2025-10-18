@@ -13,7 +13,7 @@
                     {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
 
-                {# Type Dropdown (NEW) #}
+                {# Type Dropdown #}
                 <div class="mb-3">
                     {{ form.customer_type.label(class="form-label") }}<span class="text-danger">*</span>
                     {{ form.customer_type(class="form-select" + (" is-invalid" if form.customer_type.errors else "")) }}
@@ -25,8 +25,14 @@
                     <div class="col-md-6 mb-3">
                         {{ form.username.label(class="form-label") }}<span class="text-danger">*</span>
                         <div class="input-group">
-                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username") }}
-                            <span class="input-group-text" id="username-status"></span>
+                            {# Add readonly attribute initially #}
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", readonly=True) }}
+                            {# Edit button #}
+                            <button class="btn btn-outline-secondary" type="button" id="edit-username-btn" title="Edit Username">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            {# Status indicator (hidden initially) #}
+                            <span class="input-group-text" id="username-status" style="display: none;"></span>
                             {% for error in form.username.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                         </div>
                     </div>
@@ -105,25 +111,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const nameInput = document.getElementById('name');
     const usernameInput = document.getElementById('username');
     const usernameStatus = document.getElementById('username-status');
+    const editUsernameBtn = document.getElementById('edit-username-btn');
+    const originalUsername = usernameInput.value; // Store the initial username on page load
     let debounceTimer;
 
-    // Function to generate username from name
+    // Function to generate username from name (only if username is empty - mainly for 'add' form)
     function generateUsername() {
-        const nameValue = nameInput.value.toLowerCase().replace(/\s+/g, '');
-        if (nameValue && !usernameInput.value) { // Only fill if username is empty
-            usernameInput.value = nameValue;
-            checkUsername();
+        if (!originalUsername) { // Only generate if it's likely an 'add' form (no initial value)
+            const nameValue = nameInput.value.toLowerCase().replace(/\s+/g, '');
+            if (nameValue && !usernameInput.value) {
+                usernameInput.value = nameValue;
+                checkUsername(); // Check availability immediately after generating
+            }
         }
     }
 
     // Function to check username availability
     function checkUsername() {
-        const username = usernameInput.value;
+        const currentUsernameValue = usernameInput.value;
         usernameStatus.innerHTML = ''; // Clear status
+        usernameStatus.style.display = 'inline-block'; // Show status indicator
 
-        if (username.length < 3) return;
+        // Don't check if the username hasn't changed from the original loaded value
+        if (currentUsernameValue === originalUsername) {
+             usernameStatus.style.display = 'none'; // Hide status if unchanged
+             return;
+        }
 
-        fetch(`{{ url_for('customers.check_username') }}?username=${encodeURIComponent(username)}`)
+        if (currentUsernameValue.length < 3) {
+             usernameStatus.style.display = 'none'; // Hide if too short
+             return;
+        }
+
+        // Fetch availability from the server
+        fetch(`{{ url_for('customers.check_username') }}?username=${encodeURIComponent(currentUsernameValue)}`)
             .then(response => response.json())
             .then(data => {
                 if (data.available) {
@@ -135,16 +156,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    nameInput.addEventListener('blur', generateUsername);
+    if (nameInput) {
+        nameInput.addEventListener('blur', generateUsername);
+    }
+
     usernameInput.addEventListener('keyup', function() {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(checkUsername, 500); // Debounce for 500ms
+        debounceTimer = setTimeout(checkUsername, 500); // Debounce check
     });
 
-    // Initial check if username is pre-filled (on edit form)
-    if(usernameInput.value) {
-        checkUsername();
+    if (editUsernameBtn) {
+        editUsernameBtn.addEventListener('click', function() {
+            usernameInput.readOnly = !usernameInput.readOnly; // Toggle readonly state
+            if (!usernameInput.readOnly) {
+                usernameInput.focus(); // Focus the input when editable
+                usernameStatus.style.display = 'inline-block'; // Show status field when editing starts
+                checkUsername(); // Perform initial check if needed
+            } else {
+                 usernameStatus.style.display = 'none'; // Hide status field when locked
+                 // Optional: Revert to original username if locking again? Decide based on desired UX
+                 // usernameInput.value = originalUsername;
+            }
+            // Change button icon based on state
+            this.innerHTML = usernameInput.readOnly ? '<i class="bi bi-pencil"></i>' : '<i class="bi bi-lock-fill"></i>';
+            this.title = usernameInput.readOnly ? 'Edit Username' : 'Lock Username';
+        });
     }
+
+    // Initial setup on page load (for edit form)
+    if (usernameInput.value) {
+         usernameInput.readOnly = true; // Start locked if value exists
+         editUsernameBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+         usernameStatus.style.display = 'none';
+    } else {
+        usernameInput.readOnly = false; // Start unlocked if no value (add form)
+        editUsernameBtn.innerHTML = '<i class="bi bi-lock-fill"></i>';
+        usernameStatus.style.display = 'inline-block'; // Show status field initially for add form
+    }
+
 });
 </script>
 {% endblock %}
