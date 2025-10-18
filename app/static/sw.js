@@ -1,6 +1,6 @@
 // File: app/static/sw.js
 
-const CACHE_NAME = 'aquajal-cache-v2'; // Increment cache version to force update
+const CACHE_NAME = 'aquajal-cache-v2.1'; // Increment cache version to force update
 const urlsToCache = [
   '/',
   '/index',

@@ -52,8 +52,15 @@
                 {# Address Fields #}
                 <div class="mb-3">
                     {{ form.village.label(class="form-label") }}<span class="text-danger">*</span>
-                    {{ form.village(class="form-control" + (" is-invalid" if form.village.errors else "")) }}
+                    {# Add list attribute pointing to the datalist id #}
+                    {{ form.village(class="form-control" + (" is-invalid" if form.village.errors else ""), list="village-suggestions") }}
                     {% for error in form.village.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    {# Datalist for suggestions #}
+                    <datalist id="village-suggestions">
+                        {% for name in village_names %}
+                            <option value="{{ name }}">
+                        {% endfor %}
+                    </datalist>
                 </div>
                 <div class="mb-3">
                     {{ form.area.label(class="form-label") }}

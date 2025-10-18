@@ -89,7 +89,12 @@
                         {% endif %}
                     </h5>
                     <p class="mb-1"><i class="bi bi-telephone-fill"></i> {{ customer.mobile_number }} | <strong>{{ customer.daily_jars }} Jar(s)/Day</strong></p>
-                    <small><i class="bi bi-geo-alt-fill"></i> {{ customer.area }}, {{ customer.village }}</small>
+                    <small><i class="bi bi-geo-alt-fill"></i>
+                        {% if customer.area %}
+                            {{ customer.area }},
+                        {% endif %}
+                        {{ customer.village }}
+                    </small>
                     {% if customer.note %}
                     <p class="mb-1 mt-1"><i class="bi bi-card-text"></i> <small class="text-muted"><strong>Note:</strong> {{ customer.note }}</small></p>
                     {% endif %}

@@ -9,7 +9,8 @@ from app.email import send_customer_welcome_email
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, FloatField, PasswordField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError, Email
-from sqlalchemy import func, or_
+from sqlalchemy import func, distinct, or_
+
 
 # Import the new decorator
 from app.decorators import manager_required, subscription_required
@@ -111,6 +112,13 @@ def index():
 @subscription_required
 def add_customer():
     form = CustomerForm()
+    # Fetch distinct village names for the current manager's business
+    village_names = [name[0] for name in db.session.query(distinct(Customer.village)).filter(
+        Customer.business_id == current_user.business_id,
+        Customer.village != None,
+        Customer.village != ''
+    ).order_by(Customer.village).all()]
+
     if form.validate_on_submit():
         customer_email = form.email.data if form.email.data else None
         password_to_send = form.password.data if form.password.data else '123456' # Store the password
@@ -147,7 +155,7 @@ def add_customer():
              flash('Default password "123456" has been set for this customer/dealer.', 'info')
 
         return redirect(url_for('customers.index'))
-    return render_template('customers/customer_form.html', form=form, title='Add New Customer/Dealer') # Updated title
+    return render_template('customers/customer_form.html', form=form, title='Add New Customer/Dealer', village_names=village_names)
 
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -156,6 +164,13 @@ def add_customer():
 def edit_customer(id):
     customer = Customer.query.filter_by(id=id, business_id=current_user.business_id).first_or_404()
     form = CustomerForm(original_username=customer.username, original_email=customer.email, obj=customer)
+    # Fetch distinct village names for the current manager's business
+    village_names = [name[0] for name in db.session.query(distinct(Customer.village)).filter(
+        Customer.business_id == current_user.business_id,
+        Customer.village != None,
+        Customer.village != ''
+    ).order_by(Customer.village).all()]
+
     if form.validate_on_submit():
         customer.name = form.name.data
         customer.username = form.username.data
@@ -177,7 +192,7 @@ def edit_customer(id):
         return redirect(url_for('customers.index'))
     # Pre-fill form on GET request
     form.customer_type.data = customer.customer_type
-    return render_template('customers/customer_form.html', form=form, title=f'Edit {customer.customer_type.capitalize()}') # Updated title
+    return render_template('customers/customer_form.html', form=form, title=f'Edit {customer.customer_type.capitalize()}', village_names=village_names)
 
 @bp.route('/delete/<int:id>', methods=['POST'])
 @login_required
