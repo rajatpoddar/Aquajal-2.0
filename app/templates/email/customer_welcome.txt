@@ -1,0 +1,18 @@
+Dear {{ customer.name }},
+
+Welcome to {{ customer.business.name }}!
+
+Your account has been created on our Aquajal platform. You can use it to manage your water jar requests and view your history.
+
+Your login details are:
+Username: {{ customer.username }}
+Password: {{ password }}
+(We recommend changing this password after your first login.)
+
+Login here: {{ login_url }}
+
+If you have any questions, please contact {{ customer.business.name }} directly.
+
+---
+Powered by Aquajal | A Poddar Solutions Product
+{{ url_for('public.index', _external=True) }}

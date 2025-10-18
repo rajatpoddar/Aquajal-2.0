@@ -1,4 +1,4 @@
-from flask import render_template, current_app
+from flask import render_template, current_app, url_for
 from flask_mail import Message
 from app import mail
 from weasyprint import HTML
@@ -133,3 +133,16 @@ def send_new_order_to_supplier_email(order):
                    text_body=f"You have received a new order for a total of Rs. {order.total_amount}. Please log in to your supplier dashboard to view details and confirm.",
                    html_body=render_template('email/new_order_supplier.html', order=order),
                    user_or_customer=supplier_user)
+
+# --- Add New Function for Customer Welcome Email ---
+def send_customer_welcome_email(customer, password):
+    """Sends a welcome email to a newly added customer."""
+    login_url = url_for('auth.login', _external=True)
+    send_email(f'[Aquajal] Welcome to {customer.business.name}!',
+               sender=current_app.config['ADMINS'][0],
+               recipients=[customer.email],
+               text_body=render_template('email/customer_welcome.txt',
+                                         customer=customer, password=password, login_url=login_url),
+               html_body=render_template('email/customer_welcome.html',
+                                         customer=customer, password=password, login_url=login_url),
+               user_or_customer=customer) # Pass customer for potential push notification

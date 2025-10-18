@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.customers import bp
 from app.models import Customer, User # Import User for validation
+from app.email import send_customer_welcome_email
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, FloatField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError, Email
@@ -81,7 +82,8 @@ def add_customer():
     form = CustomerForm()
     if form.validate_on_submit():
         customer_email = form.email.data if form.email.data else None
-        
+        password_to_send = form.password.data if form.password.data else '123456' # Store the password
+
         customer = Customer(
             name=form.name.data,
             username=form.username.data,
@@ -95,15 +97,24 @@ def add_customer():
             price_per_jar=form.price_per_jar.data,
             business_id=current_user.business_id
         )
-        if form.password.data:
-            customer.set_password(form.password.data)
-        else:
-            customer.set_password('123456')
-            flash('Default password "123456" has been set for this customer.', 'info')
+        # Set the password using the stored variable
+        customer.set_password(password_to_send)
 
         db.session.add(customer)
         db.session.commit()
-        flash(f'Customer "{form.name.data}" has been added successfully!', 'success')
+
+        # --- Send Welcome Email if Email Exists ---
+        if customer.email:
+            send_customer_welcome_email(customer, password_to_send)
+            flash(f'Customer "{form.name.data}" added. A welcome email has been sent.', 'success')
+        else:
+             flash(f'Customer "{form.name.data}" has been added successfully!', 'success')
+        # --- End Email Sending ---
+
+        if not form.password.data:
+             flash('Default password "123456" has been set for this customer.', 'info')
+
+
         return redirect(url_for('customers.index'))
     return render_template('customers/customer_form.html', form=form, title='Add New Customer')
 
