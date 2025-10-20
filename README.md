@@ -120,15 +120,15 @@ Deploy Aquajal on your Synology NAS using Docker in just a few steps.
 
 #### 🔗 Connect to NAS via SSH
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   ssh your_nas_username@your_nas_ip_address   `
+ssh your_nas_username@your_nas_ip_address
 
 #### 🛠️ Navigate & Build
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   cd /volume1/docker/aquajal  sudo docker-compose up --build -d   `
+cd /volume1/docker/aquajal  sudo docker-compose up --build -d  
 
 #### 📄 View Logs (Optional)
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   sudo docker-compose logs -f   `
+sudo docker-compose logs -f  
 
 You should see Gunicorn starting. Press Ctrl + C to exit logs.
 
@@ -143,7 +143,7 @@ You should see the **Aquajal login page**.
 
 After deployment, seed the database to create default users.
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   cd /volume1/docker/aquajal  sudo docker-compose exec web flask seed-db   `
+cd /volume1/docker/aquajal  sudo docker-compose exec web flask seed-db
 
 RoleUsernamePasswordAdminadminadminpassManagermanagermanagerpassStaffstaffstaffpass
 
@@ -152,7 +152,7 @@ RoleUsernamePasswordAdminadminadminpassManagermanagermanagerpassStaffstaffstaffp
 
 Set up Aquajal locally for development:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   # Clone the repository  git clone   cd aquajal-app  # Create a virtual environment  python3 -m venv venv  source venv/bin/activate  # Install dependencies  pip install -r requirements.txt  # Initialize database  flask db upgrade  # Seed database (optional)  flask seed-db  # Run the app  flask run   `
+# Clone the repository  git clone   cd aquajal-app  # Create a virtual environment  python3 -m venv venv  source venv/bin/activate  # Install dependencies  pip install -r requirements.txt  # Initialize database  flask db upgrade  # Seed database (optional)  flask seed-db  # Run the app  flask run
 
 App will run at:👉 [**http://127.0.0.1:5000**](http://127.0.0.1:5000/)
 
@@ -163,11 +163,11 @@ App will run at:👉 [**http://127.0.0.1:5000**](http://127.0.0.1:5000/)
 
 Example structure:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   /screenshots   ├── login_page.png   ├── dashboard.png   ├── delivery_logs.png   └── customer_portal.png   `
+  /screenshots   ├── login_page.png   ├── dashboard.png   ├── delivery_logs.png   └── customer_portal.png
 
 ### Example Usage:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   ![Login Page](screenshots/login_page.png)  ![Dashboard](screenshots/dashboard.png)   `
+  ![Login Page](screenshots/login_page.png)  ![Dashboard](screenshots/dashboard.png) 
 
 👨‍💻 Author
 ------------
