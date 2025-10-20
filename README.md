@@ -1,191 +1,193 @@
-# 💧 Aquajal - Water Supply Management System
+Here’s a **cleaned-up, well-organized, and professional version** of your README.md file for **Aquajal – Water Supply Management System**. I’ve:
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-Framework-green.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Status](https://img.shields.io/badge/Status-Active-success.svg)
+*   Improved markdown formatting
+    
+*   Structured sections for better readability
+    
+*   Corrected inconsistent code blocks and misplaced copy buttons
+    
+*   Enhanced clarity and professionalism
+    
 
-**Aquajal** is a comprehensive web application designed to manage a **water jar supply business**.  
-It provides a **multi-user environment** with distinct roles for administrators, managers, staff, and customers — streamlining daily operations from delivery logging to stock management.
+💧 Aquajal - Water Supply Management System
+===========================================
 
----
+**Aquajal** is a comprehensive web application tailored to manage a **water jar supply business**.
 
-## 📚 Table of Contents
-- [Key Features](#-key-features)
-- [Deployment on Synology NAS with Docker](#-deployment-on-synology-nas-with-docker)
-  - [Prerequisites](#-prerequisites)
-  - [Step 1: Prepare the Project on Your NAS](#-step-1-prepare-the-project-on-your-nas)
-  - [Step 2: Create a Persistent Data Directory](#-step-2-create-a-persistent-data-directory)
-  - [Step 3: Build and Run the Docker Container](#-step-3-build-and-run-the-docker-container)
-  - [Step 4: Access Your Application](#-step-4-access-your-application)
-- [Default Login Credentials](#-default-login-credentials)
-- [Local Development Setup (Without Docker)](#-local-development-setup-without-docker)
-- [Screenshots](#-screenshots)
-- [Author](#-author)
-- [License](#-license)
+It supports a **multi-user environment** with roles for administrators, managers, delivery staff, and customers — streamlining operations like delivery logging, stock management, and customer interactions.
 
----
+📚 Table of Contents
+--------------------
 
-## 🚀 Key Features
+*   [🚀 Key Features](https://chatgpt.com/#-key-features)
+    
+*   [🐳 Deployment on Synology NAS with Docker](https://chatgpt.com/#-deployment-on-synology-nas-with-docker)
+    
+    *   [📋 Prerequisites](https://chatgpt.com/#-prerequisites)
+        
+    *   [⚙️ Step 1: Prepare the Project](https://chatgpt.com/#-step-1-prepare-the-project)
+        
+    *   [📁 Step 2: Persistent Data Directory](https://chatgpt.com/#-step-2-persistent-data-directory)
+        
+    *   [🧱 Step 3: Build & Run the Container](https://chatgpt.com/#-step-3-build--run-the-container)
+        
+    *   [🌍 Step 4: Access the Application](https://chatgpt.com/#-step-4-access-the-application)
+        
+*   [🔑 Default Login Credentials](https://chatgpt.com/#-default-login-credentials)
+    
+*   [💻 Local Development Setup (Without Docker)](https://chatgpt.com/#-local-development-setup-without-docker)
+    
+*   [🖼️ Screenshots](https://chatgpt.com/#-screenshots)
+    
+*   [👨‍💻 Author](https://chatgpt.com/#-author)
+    
+*   [📄 License](https://chatgpt.com/#-license)
+    
+
+🚀 Key Features
+---------------
 
 ### 🔐 Role-Based Access Control
-- **Admin:** Manages businesses, users, and system settings.  
-- **Manager:** Oversees staff, manages customers, handles stock, confirms event bookings, and views reports.  
-- **Staff (Delivery):** Logs daily jar deliveries, records expenses, and manages cash balance.  
-- **Customer:** Views delivery history, requests jars, and books jars for events.
 
-### 🏢 Business Management
-- Supports **multiple business locations or plants**, each with its own staff, customers, and pricing.
+*   **Admin:** Manages businesses, users, and system settings
+    
+*   **Manager:** Manages staff, inventory, reports, and customers
+    
+*   **Staff (Delivery):** Logs deliveries, expenses, and cash
+    
+*   **Customer:** Views delivery history, books jars for events
+    
 
-### 📦 Customer & Delivery Logging
-- Staff can easily find customers and log daily deliveries.  
-- Automatically calculates the collected amount per delivery.
+### 🏢 Multi-Business Support
 
-### 🧾 Stock Management
-- Managers can track and update the inventory of water jars and dispensers.
+*   Manage multiple locations/plants with separate staff, pricing, and inventory
+    
+
+### 📦 Customer & Delivery Management
+
+*   Staff can log daily deliveries with auto-calculated collection amounts
+    
+
+### 🧾 Inventory Management
+
+*   Track and update jars and dispensers in stock
+    
 
 ### 💰 Expense Tracking
-- Delivery staff can record daily expenses (like fuel), deducted from their cash balance.
 
-### ⚙️ Automated Wage Calculation
-- Scheduled job automatically calculates and deducts daily wages based on delivery performance.
+*   Log daily delivery-related expenses (e.g. fuel) and auto-deduct from cash
+    
+
+### ⚙️ Wage Calculation
+
+*   Scheduled jobs calculate and deduct wages based on daily performance
+    
 
 ### 🌐 Customer Portal
-- Customers have a dedicated dashboard to manage requests and event bookings.
 
----
+*   Customers can request jars, view history, and manage event bookings
+    
 
-## 🐳 Deployment on Synology NAS with Docker
+🐳 Deployment on Synology NAS with Docker
+-----------------------------------------
 
-This guide will help you deploy **Aquajal** on your **Synology NAS** using **Docker**.
-
----
+Deploy Aquajal on your Synology NAS using Docker in just a few steps.
 
 ### 📋 Prerequisites
 
-- **Synology NAS:** A model that supports Docker  
-- **Docker Package:** Installed from Synology’s *Package Center*  
-- **Project Files:** Includes `Dockerfile`, `docker-compose.yml`, and `requirements.txt`
+*   ✅ Synology NAS with **Docker support**
+    
+*   ✅ Docker installed via **Package Center**
+    
+*   ✅ Project files: Dockerfile, docker-compose.yml, requirements.txt
+    
 
----
+### ⚙️ Step 1: Prepare the Project
 
-### ⚙️ Step 1: Prepare the Project on Your NAS
+1.  Open **File Station** on your Synology NAS
+    
+2.  Create: docker/aquajal/
+    
+3.  Upload project files into this folder
+    
 
-1. Open **File Station** on your Synology NAS.  
-2. Create a new shared folder named `docker`.  
-3. Inside it, create a subfolder named `aquajal`.  
-4. Upload all project files into `docker/aquajal/`.
+### 📁 Step 2: Persistent Data Directory
 
----
+1.  Inside docker/aquajal, create a new folder: data
+    
+    *   Stores the **SQLite database** and file uploads
+        
+2.  The provided docker-compose.yml is already configured to use this directory
+    
 
-### 📁 Step 2: Create a Persistent Data Directory
+### 🧱 Step 3: Build & Run the Container
 
-1. Inside `docker/aquajal`, create a new folder named `data`.  
-   - This folder will store the **SQLite database** and user uploads.  
-2. The existing `docker-compose.yml` is already configured to use this directory.
+#### ✅ Enable SSH on your NAS
 
----
+1.  Go to **Control Panel → Terminal & SNMP**
+    
+2.  Enable **SSH service** → Click **Apply**
+    
 
-### 🧱 Step 3: Build and Run the Docker Container
+#### 🔗 Connect to NAS via SSH
 
-#### Enable SSH on your NAS
-- Go to **Control Panel → Terminal & SNMP**  
-- Check **Enable SSH service** → Click **Apply**
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   ssh your_nas_username@your_nas_ip_address   `
 
-#### Connect via SSH
-```bash
-ssh your_nas_username@your_nas_ip_address
-Navigate to the project directory
-bash
-Copy code
-cd /volume1/docker/aquajal
-Build and start the container
-bash
-Copy code
-sudo docker-compose up --build -d
-Check container logs
-bash
-Copy code
-sudo docker-compose logs -f
-You should see the Gunicorn server starting.
-Press Ctrl + C to exit logs.
+#### 🛠️ Navigate & Build
 
-🌍 Step 4: Access Your Application
-Once running, open your browser and visit:
-👉 http://your_nas_ip_address:2942
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   cd /volume1/docker/aquajal  sudo docker-compose up --build -d   `
 
-You should see the Aquajal login page.
+#### 📄 View Logs (Optional)
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   sudo docker-compose logs -f   `
+
+You should see Gunicorn starting. Press Ctrl + C to exit logs.
+
+### 🌍 Step 4: Access the Application
+
+Visit:👉 **http://your\_nas\_ip\_address:2942**
+
+You should see the **Aquajal login page**.
 
 🔑 Default Login Credentials
+----------------------------
+
 After deployment, seed the database to create default users.
 
-Connect to your NAS again
-bash
-Copy code
-cd /volume1/docker/aquajal
-Run the seed command
-bash
-Copy code
-sudo docker-compose exec web flask seed-db
-Role	Username	Password
-Admin	admin	adminpass
-Manager	manager	managerpass
-Staff	staff	staffpass
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   cd /volume1/docker/aquajal  sudo docker-compose exec web flask seed-db   `
+
+RoleUsernamePasswordAdminadminadminpassManagermanagermanagerpassStaffstaffstaffpass
 
 💻 Local Development Setup (Without Docker)
-Clone the repository
-bash
-Copy code
-git clone <your-repository-url>
-cd aquajal-app
-Create a virtual environment
-bash
-Copy code
-python3 -m venv venv
-source venv/bin/activate
-Install dependencies
-bash
-Copy code
-pip install -r requirements.txt
-Initialize the database
-bash
-Copy code
-flask db upgrade
-Seed the database (optional)
-bash
-Copy code
-flask seed-db
-Run the application
-bash
-Copy code
-flask run
-Your app will be available at 👉 http://127.0.0.1:5000
+-------------------------------------------
+
+Set up Aquajal locally for development:
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   # Clone the repository  git clone   cd aquajal-app  # Create a virtual environment  python3 -m venv venv  source venv/bin/activate  # Install dependencies  pip install -r requirements.txt  # Initialize database  flask db upgrade  # Seed database (optional)  flask seed-db  # Run the app  flask run   `
+
+App will run at:👉 [**http://127.0.0.1:5000**](http://127.0.0.1:5000/)
 
 🖼️ Screenshots
-(Add screenshots of your UI here for better visualization)
+---------------
+
+> Add UI screenshots in the /screenshots/ folder.
 
 Example structure:
 
-bash
-Copy code
-/screenshots
- ├── login_page.png
- ├── dashboard.png
- ├── delivery_logs.png
- └── customer_portal.png
-You can include images like:
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   /screenshots   ├── login_page.png   ├── dashboard.png   ├── delivery_logs.png   └── customer_portal.png   `
 
-markdown
-Copy code
-![Login Page](screenshots/login_page.png)
-![Dashboard](screenshots/dashboard.png)
+### Example Usage:
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   ![Login Page](screenshots/login_page.png)  ![Dashboard](screenshots/dashboard.png)   `
+
 👨‍💻 Author
-Rajat Poddar
-💼 Developer & Maintainer of Aquajal
-📧 Contact Me
-🌐 GitHub Profile
+------------
+
+**Rajat Poddar**💼 Developer & Maintainer of Aquajal📧 _\[Contact Me\]_🌐 [GitHub Profile](https://github.com/yourusername)
 
 📄 License
-This project is licensed under the MIT License — see the LICENSE file for details.
+----------
 
+This project is licensed under the **MIT License**.See the [LICENSE](https://chatgpt.com/LICENSE) file for details.
+
+Let me know if you'd like a version with collapsible sections, badges linked to resources, or a GitHub-friendly table of contents generator.
