@@ -152,18 +152,19 @@ RoleUsernamePasswordAdminadminadminpassManagermanagermanagerpassStaffstaffstaffp
 
 Set up Aquajal locally for development:
 
-### Clone the repository  git clone   
-## cd aquajal-app  
-## Create a virtual environment  
-## python3 -m venv venv  
-## source venv/bin/activate  
-## Install dependencies  pip install -r requirements.txt  
-# Initialize database  
-## flask db upgrade  
-## Seed database (optional)  
-## flask seed-db  
-# Run the app  
-## flask run
+## Clone the repository  git clone   
+- cd aquajal-app  
+### Create a virtual environment  
+- python3 -m venv venv  
+- source venv/bin/activate  
+### Install dependencies  
+- pip install -r requirements.txt  
+### Initialize database  
+- flask db upgrade  
+ Seed database (optional)  
+- flask seed-db  
+### Run the app  
+- flask run
 
 App will run at:👉 [**http://127.0.0.1:5000**](http://127.0.0.1:5000/)
 
