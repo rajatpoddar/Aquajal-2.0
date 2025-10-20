@@ -1,14 +1,3 @@
-Here’s a **cleaned-up, well-organized, and professional version** of your README.md file for **Aquajal – Water Supply Management System**. I’ve:
-
-*   Improved markdown formatting
-    
-*   Structured sections for better readability
-    
-*   Corrected inconsistent code blocks and misplaced copy buttons
-    
-*   Enhanced clarity and professionalism
-    
-
 💧 Aquajal - Water Supply Management System
 ===========================================
 
