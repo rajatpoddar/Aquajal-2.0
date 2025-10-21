@@ -3,12 +3,25 @@
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-3">
     <h2 class="mb-3 mb-md-0">{{ title }}</h2>
-    <a href="{{ url_for('manager.view_cart') }}" class="btn btn-primary">
-        <i class="bi bi-cart-fill"></i> View Cart
-        {% if procurement_cart %}
-        <span class="badge bg-light text-dark ms-1">{{ procurement_cart|length }}</span>
-        {% endif %}
-    </a>
+    
+    <!-- Responsive Button Container -->
+    <div class="container-fluid px-0 ms-md-3" style="max-width: 400px;">
+        <div class="row g-2">
+            <div class="col-6">
+                <a href="{{ url_for('manager.view_cart') }}" class="btn btn-primary w-100">
+                    <i class="bi bi-cart-fill"></i> View Cart
+                    {% if procurement_cart %}
+                    <span class="badge bg-light text-dark ms-1">{{ procurement_cart|length }}</span>
+                    {% endif %}
+                </a>
+            </div>
+            <div class="col-6">
+                <a href="{{ url_for('manager.view_orders') }}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-list-check"></i> View Orders
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% for product_name, items in products_by_name.items() %}
@@ -49,3 +62,4 @@
 <p>No products are currently listed by suppliers.</p>
 {% endfor %}
 {% endblock %}
+

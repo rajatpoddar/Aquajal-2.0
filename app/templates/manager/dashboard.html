@@ -83,65 +83,102 @@
 </div>
 {% endif %}
 
-{# --- DASHBOARD CONTENT --- #}
-<div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-3">
+{# --- DASHBOARD TITLE --- #}
+<div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-4">
     <h2 class="mb-3 mb-md-0">Manager Dashboard</h2>
-    <div class="d-grid gap-2 d-md-block">
-        <a href="{{ url_for('manager.book_event') }}" class="btn btn-info">
-            <i class="bi bi-calendar-plus-fill"></i> Book an Event
+</div>
+
+{# --- QUICK ACTION BUTTONS --- #}
+<div class="row row-cols-3 row-cols-md-6 g-2 mb-4 text-center">
+    <div class="col">
+        <a href="{{ url_for('manager.book_event') }}" class="d-block p-3 rounded-3 text-decoration-none bg-info-subtle text-info-emphasis shadow-sm h-100 d-flex flex-column justify-content-center btn-hover-lift">
+            <i class="bi bi-calendar-plus-fill fs-2 mb-1"></i>
+            <span class="fw-bold">Book Event</span>
         </a>
-        <a href="{{ url_for('manager.browse_products') }}" class="btn btn-success">
-            <i class="bi bi-shop"></i> Procure Supplies
+    </div>
+    <div class="col">
+        <a href="{{ url_for('manager.browse_products') }}" class="d-block p-3 rounded-3 text-decoration-none bg-success-subtle text-success-emphasis shadow-sm h-100 d-flex flex-column justify-content-center btn-hover-lift">
+            <i class="bi bi-shop fs-2 mb-1"></i>
+            <span class="fw-bold">Procure</span>
         </a>
-        <a href="{{ url_for('manager.stock_management') }}" class="btn btn-warning">
-            <i class="bi bi-box-seam"></i> Manage Stock
+    </div>
+     <div class="col">
+        <a href="{{ url_for('customers.add_customer') }}" class="d-block p-3 rounded-3 text-decoration-none bg-primary-subtle text-primary-emphasis shadow-sm h-100 d-flex flex-column justify-content-center btn-hover-lift">
+            <i class="bi bi-person-plus-fill fs-2 mb-1"></i>
+            <span class="fw-bold">Add Customer</span>
         </a>
-        <a href="{{ url_for('manager.settings') }}" class="btn btn-secondary">
-            <i class="bi bi-gear"></i> Settings
+    </div>
+    <div class="col">
+        <a href="{{ url_for('manager.stock_management') }}" class="d-block p-3 rounded-3 text-decoration-none bg-warning-subtle text-warning-emphasis shadow-sm h-100 d-flex flex-column justify-content-center btn-hover-lift">
+            <i class="bi bi-box-seam fs-2 mb-1"></i>
+            <span class="fw-bold">Manage Stocks</span>
         </a>
-        <a href="{{ url_for('manager.reports') }}" class="btn btn-primary">
-            <i class="bi bi-file-earmark-text"></i> Reports
+    </div>
+    <div class="col">
+        <a href="{{ url_for('manager.settings') }}" class="d-block p-3 rounded-3 text-decoration-none bg-secondary-subtle text-secondary-emphasis shadow-sm h-100 d-flex flex-column justify-content-center btn-hover-lift">
+            <i class="bi bi-gear-fill fs-2 mb-1"></i>
+            <span class="fw-bold">Settings</span>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ url_for('manager.reports') }}" class="d-block p-3 rounded-3 text-decoration-none bg-danger-subtle text-danger-emphasis shadow-sm h-100 d-flex flex-column justify-content-center btn-hover-lift">
+            <i class="bi bi-file-earmark-bar-graph-fill fs-2 mb-1"></i>
+            <span class="fw-bold">Reports</span>
         </a>
     </div>
 </div>
 
-
+{# --- Redesigned Summary Cards for Responsive View --- #}
 <div class="row mb-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center text-white bg-primary shadow">
-            <div class="card-body">
-                <h5 class="card-title">Total Cash Held By Staff</h5>
-                <p class="card-text display-4">₹{{ "%.2f"|format(total_staff_balance) }}</p>
+
+    <!-- Total Cash Card -->
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card text-white bg-primary shadow-sm h-100">
+            <div class="card-body d-flex flex-column justify-content-between p-3">
+                <div>
+                    <h6 class="card-title text-uppercase mb-1">Total Cash Held By Staff</h6>
+                    <p class="card-text display-5 mb-2">₹{{ "%.2f"|format(total_staff_balance) }}</p>
+                </div>
+                <a href="#staff-balances" class="btn btn-light fw-bold w-100">
+                    Settle Balances <i class="bi bi-arrow-down-circle ms-1"></i>
+                </a>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center text-white bg-danger shadow">
-            <div class="card-body">
-                <h5 class="card-title">Total Dues from Customers</h5>
-                <p class="card-text display-4">₹{{ "%.2f"|format(total_dues) }}</p>
+
+    <!-- Total Dues Card -->
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card text-white bg-danger shadow-sm h-100">
+            <div class="card-body text-center p-3 d-flex flex-column justify-content-center">
+                <h6 class="card-title text-uppercase mb-1">Total Dues from Customers</h6>
+                <p class="card-text display-5 mb-0">₹{{ "%.2f"|format(total_dues) }}</p>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center text-white bg-info shadow">
-            <div class="card-body">
-                <h5 class="card-title">Available Jar Stock</h5>
-                <p class="card-text display-4">{{ current_user.business.jar_stock if current_user.business else 'N/A' }}</p>
+
+    <!-- Available Jar Stock Card -->
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card text-white bg-info shadow-sm h-100">
+            <div class="card-body text-center p-3 d-flex flex-column justify-content-center">
+                <h6 class="card-title text-uppercase mb-1"><i class="bi bi-droplet-half"></i> Jar Stock</h6>
+                <p class="card-text display-5 mb-0">{{ business.jar_stock if business else 'N/A' }}</p>
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card text-center text-dark bg-light shadow">
-            <div class="card-body">
-                <h5 class="card-title">Available Dispenser Stock</h5>
-                <p class="card-text display-4">{{ current_user.business.dispenser_stock if current_user.business else 'N/A' }}</p>
+
+    <!-- Available Dispenser Stock Card -->
+    <div class="col-12 col-md-6 col-lg-3 mb-3">
+        <div class="card text-dark bg-light shadow-sm h-100">
+            <div class="card-body text-center p-3 d-flex flex-column justify-content-center">
+                <h6 class="card-title text-uppercase mb-1"><i class="bi bi-funnel-fill"></i> Dispenser Stock</h6>
+                <p class="card-text display-5 mb-0">{{ business.dispenser_stock if business else 'N/A' }}</p>
             </div>
         </div>
     </div>
 </div>
 
-<h4 class="mt-4">Individual Staff Balances</h4>
+
+<h4 class="mt-4" id="staff-balances">Individual Staff Balances</h4>
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
@@ -211,3 +248,4 @@
     {% endfor %}
 </div>
 {% endblock %}
+

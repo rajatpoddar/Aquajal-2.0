@@ -142,7 +142,7 @@
                                 <td class="text-center">{{ staff.full_days }}</td>
                                 <td class="text-center">{{ staff.half_days }}</td>
                                 <td class="text-center">{{ staff.absent_days }}</td>
-                                <td class="text-end">₹{{ "%.2f"|format(staff.total_wages) }}</td>
+                                <td class="text-end">{{ staff.total_wages_display }}</td>
                             </tr>
                             {% else %}
                             <tr><td colspan="5" class="text-center">No staff found.</td></tr>
@@ -385,3 +385,4 @@
     </div>
 </div>
 {% endblock %}
+
