@@ -32,7 +32,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     {{ form.role.label(class="form-label") }}<span class="text-danger">*</span> {# Added asterisk #}
-                    {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else "")) }}
+                    {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else ""), id="role") }}
                     {% for error in form.role.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6 mb-3" id="business-id-field">
@@ -61,6 +61,8 @@
                 </div>
             </div>
             {# --- END NEW WAGE FIELDS --- #}
+            
+            {# --- DUPLICATE BLOCK REMOVED --- #}
 
             <div class="mb-3">
                 {{ form.id_proof.label(class="form-label") }}
