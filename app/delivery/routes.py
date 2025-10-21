@@ -1,6 +1,10 @@
 # /water_supply_app/app/delivery/routes.py
 
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import (render_template, flash, redirect, url_for, request, jsonify,
+                   Response, current_app, abort, make_response)
+import qrcode
+import io
+import base64
 from flask_login import login_required, current_user
 from app import db
 from app.delivery import bp
@@ -180,12 +184,70 @@ def book_event():
 
 
 
+@bp.route('/generate_upi_qr/<int:customer_id>/<float:amount>')
+@login_required
+def generate_upi_qr(customer_id, amount):
+    # Ensure staff belongs to a business
+    if not current_user.business_id:
+        return jsonify({'error': 'Staff not associated with a business.'}), 403
+        
+    business = Business.query.get(current_user.business_id)
+    customer = Customer.query.get_or_404(customer_id) # Get customer for name reference
+
+    if not business or business.id != customer.business_id:
+         abort(403) # Staff and customer must be in the same business
+
+    if not business.upi_id:
+        return jsonify({'error': 'Business UPI ID not configured.'}), 400
+
+    if amount <= 0:
+        return jsonify({'error': 'Amount must be greater than zero.'}), 400
+
+    # UPI QR Code String Format (Standard)
+    # upi://pay?pa=<UPI_ID>&pn=<Payee_Name>&am=<Amount>&cu=INR&tn=<Transaction_Note>
+    payee_name = business.name.replace(' ', '%20') # URL Encode spaces
+    transaction_note = f"Payment%20for%20{customer.name}".replace(' ', '%20')
+    upi_string = f"upi://pay?pa={business.upi_id}&pn={payee_name}&am={amount:.2f}&cu=INR&tn={transaction_note}"
+
+    # Generate QR Code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(upi_string)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save image to a byte buffer
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+
+    # Encode as Base64 to embed in HTML
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    data_uri = f"data:image/png;base64,{img_base64}"
+
+    return jsonify({
+        'qr_image_data': data_uri,
+        'upi_string': upi_string, # Optionally return the raw string
+        'amount': amount,
+        'upi_id': business.upi_id
+    })
+
+
 @bp.route('/log_delivery/<int:customer_id>', methods=['POST'])
 @login_required
 def log_delivery(customer_id):
     customer = Customer.query.get_or_404(customer_id)
     user = User.query.get(current_user.id)
-    
+
+    # Security Check: Ensure customer belongs to the staff's business
+    if customer.business_id != user.business_id:
+        abort(403)
+
     try:
         jars_delivered = int(request.form.get('jars_delivered', customer.daily_jars))
         if jars_delivered <= 0:
@@ -195,29 +257,46 @@ def log_delivery(customer_id):
         return redirect(url_for('delivery.dashboard'))
 
     amount = jars_delivered * customer.price_per_jar
-    is_due = request.form.get('is_due')
-    payment_status = 'Due' if is_due else 'Paid'
-    invoice_status = 'Unpaid' if is_due else 'Paid'
-    
+    is_due = request.form.get('is_due') # Checkbox for Cash Due
+    payment_received_online = request.form.get('payment_received_online') == 'true' # Hidden field for QR code payment
+
+    # Determine payment status and method
+    payment_status = 'Due'
+    invoice_status = 'Unpaid'
+    payment_method = 'Due' # Default if is_due is checked
+
+    if payment_received_online: # If paid via QR and manually confirmed
+        payment_status = 'Paid'
+        invoice_status = 'Paid'
+        payment_method = 'Online' # <-- Set payment method
+    elif not is_due: # If cash paid directly (not due)
+        payment_status = 'Paid'
+        invoice_status = 'Paid'
+        payment_method = 'Cash' # <-- Set payment method
+
     log = DailyLog(
         jars_delivered=jars_delivered,
-        amount_collected=amount,
+        amount_collected=amount, # Log the expected amount
         customer_id=customer.id,
         user_id=user.id,
-        payment_status=payment_status
+        payment_status=payment_status,
+        payment_method=payment_method # <-- Store the method
     )
     db.session.add(log)
-    
+
     if user.cash_balance is None:
         user.cash_balance = 0.0
-    
+
     if payment_status == 'Paid':
-        user.cash_balance += amount
-    else:
+        # Only add to cash balance if it was paid in Cash
+        if payment_method == 'Cash':
+             user.cash_balance += amount
+        # Clear due amount logic remains complex, handled separately
+    else: # Status is 'Due'
         if customer.due_amount is None:
             customer.due_amount = 0.0
         customer.due_amount += amount
-    
+
     db.session.commit()
 
     invoice_items = [{
@@ -226,12 +305,13 @@ def log_delivery(customer_id):
         'unit_price': customer.price_per_jar,
         'total': amount
     }]
+    # Pass payment_method info potentially to invoice description or notes if needed? (Optional Enhancement)
     invoice = create_invoice_for_transaction(customer, customer.business, invoice_items, issue_date=log.timestamp.date(), status=invoice_status)
 
-    if invoice:
+    if invoice and payment_status == 'Paid': # Send confirmation only if paid
         send_delivery_confirmation_email(customer, customer.business, jars_delivered, amount, payment_status)
 
-    flash(f'Successfully delivered {jars_delivered} jar(s) to {customer.name}. Status: {payment_status}.')
+    flash(f'Successfully logged delivery of {jars_delivered} jar(s) to {customer.name}. Status: {payment_status} ({payment_method}).') # <-- Added method to flash
     return redirect(url_for('delivery.dashboard'))
 
 @bp.route('/add_expense', methods=['POST'])

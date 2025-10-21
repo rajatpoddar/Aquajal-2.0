@@ -15,13 +15,14 @@ import os
 import calendar
 from werkzeug.utils import secure_filename
 import razorpay
+from operator import attrgetter # Import attrgetter for sorting
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 # Import SelectField for wage_type
 from wtforms import (StringField, PasswordField, FloatField, SubmitField, IntegerField,
                      BooleanField, TextAreaField, RadioField, SelectField)
-from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo, NumberRange, Email
+from wtforms.validators import DataRequired, Optional, Length, ValidationError, EqualTo, NumberRange, Email, Regexp # Import Regexp
 
 # Import the form from the delivery blueprint and new email functions
 from app.delivery.routes import EventBookingByStaffForm
@@ -78,7 +79,14 @@ class BusinessSettingsForm(FlaskForm):
     half_day_jar_count = IntegerField('Jars for Half Day Wage', validators=[DataRequired()])
     low_stock_threshold = IntegerField('Low Stock Alert Threshold (Jars)', validators=[DataRequired(), NumberRange(min=0)], default=20)
     low_stock_threshold_dispenser = IntegerField('Low Stock Alert Threshold (Dispensers)', validators=[DataRequired(), NumberRange(min=0)], default=5)
+    upi_id = StringField('Business UPI ID (Optional)', validators=[ # <-- Add this field
+        Optional(),
+        Length(max=100),
+        # Basic regex for UPI ID format (example@bank), adjust if needed
+        Regexp(r'^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$', message='Invalid UPI ID format.')
+    ])
     submit = SubmitField('Save Settings')
+
 
 class StockForm(FlaskForm):
     jars_added = IntegerField('New Jars to Add', validators=[Optional(), NumberRange(min=0)]) # Allow only positive
@@ -384,7 +392,7 @@ def reports():
         else: # Unknown wage type
              full_days, half_days, absent_days, total_wages = 0, 0, num_days_in_month, 0.0
              wage_info = 'N/A'
-             
+
 
         staff_monthly_summary.append({
             'username': staff.username, 'full_days': full_days, 'half_days': half_days,
@@ -398,19 +406,36 @@ def reports():
     start_utc_day = datetime.combine(report_date, datetime.min.time(), tzinfo=IST).astimezone(ZoneInfo("UTC"))
     end_utc_day = datetime.combine(report_date, datetime.max.time(), tzinfo=IST).astimezone(ZoneInfo("UTC"))
 
+    # Fetch daily logs without specific order here
     daily_sales = db.session.query(DailyLog).join(Customer).filter(
         Customer.business_id == business_id, DailyLog.timestamp.between(start_utc_day, end_utc_day)).all()
     daily_expenses = db.session.query(Expense).join(User).filter(
         User.business_id == business_id, Expense.timestamp.between(start_utc_day, end_utc_day)).all()
     daily_product_sales = db.session.query(ProductSale).filter(
         ProductSale.business_id == business_id, ProductSale.timestamp.between(start_utc_day, end_utc_day)).all()
-
     daily_event_sales = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == business_id,
         EventBooking.status == 'Completed',
         EventBooking.collection_timestamp.between(start_utc_day, end_utc_day)
     ).all()
 
+    # --- Combine and Sort Daily Transactions ---
+    combined_daily_log = []
+    for sale in daily_sales:
+        combined_daily_log.append({'timestamp': sale.timestamp, 'type': 'Jar Sale', 'data': sale})
+    for event in daily_event_sales:
+        # Use collection_timestamp for sorting completed events
+        combined_daily_log.append({'timestamp': event.collection_timestamp, 'type': 'Event Settlement', 'data': event})
+    for sale in daily_product_sales:
+        combined_daily_log.append({'timestamp': sale.timestamp, 'type': 'Product Sale', 'data': sale})
+    for expense in daily_expenses:
+        combined_daily_log.append({'timestamp': expense.timestamp, 'type': 'Expense', 'data': expense})
+
+    # Sort the combined list by timestamp, descending (latest first)
+    combined_daily_log.sort(key=lambda x: x['timestamp'], reverse=True)
+    # --- End Combine and Sort ---
+
+    # Calculate totals (can still do this after fetching)
     total_daily_sales = sum(s.amount_collected for s in daily_sales) + sum(p.total_amount for p in daily_product_sales) + sum(e.final_amount for e in daily_event_sales if e.final_amount)
     total_daily_expenses = sum(e.amount for e in daily_expenses)
 
@@ -436,7 +461,7 @@ def reports():
         else:
              status = "N/A"
              jars_display = "-"
-             
+
         attendance.append({'username': staff.username, 'jars_sold': jars_display, 'status': status})
 
     cash_handover_logs = db.session.query(CashHandover).join(
@@ -461,9 +486,8 @@ def reports():
         staff_monthly_summary=staff_monthly_summary,
         booking_logs=booking_logs,
         total_jars_lost=total_jars_lost,
-        report_date=report_date, daily_sales=daily_sales, daily_expenses=daily_expenses,
-        daily_product_sales=daily_product_sales,
-        daily_event_sales=daily_event_sales,
+        report_date=report_date,
+        combined_daily_log=combined_daily_log, # Pass the combined sorted list
         attendance=attendance,
         total_daily_sales=total_daily_sales, total_daily_expenses=total_daily_expenses,
         cash_handover_logs=cash_handover_logs,
@@ -485,9 +509,13 @@ def settings():
         business.half_day_jar_count = form.half_day_jar_count.data
         business.low_stock_threshold = form.low_stock_threshold.data
         business.low_stock_threshold_dispenser = form.low_stock_threshold_dispenser.data
+        business.upi_id = form.upi_id.data # <-- Save the UPI ID
         db.session.commit()
         flash('Business settings have been updated.')
         return redirect(url_for('manager.dashboard'))
+    # Pre-fill UPI ID on GET request if it wasn't automatically handled by obj=business
+    elif request.method == 'GET':
+        form.upi_id.data = business.upi_id
     return render_template('manager/settings.html', title="Business Settings", form=form)
 
 
@@ -562,10 +590,10 @@ def add_staff():
             user.daily_wage = form.daily_wage.data
         elif form.wage_type.data == 'monthly':
             user.monthly_salary = form.monthly_salary.data
-            
+
         user.set_password(form.password.data)
         db.session.add(user)
-        db.session.commit() 
+        db.session.commit()
 
         if form.id_proof.data:
             f = form.id_proof.data
@@ -586,7 +614,7 @@ def edit_staff(staff_id):
     staff = User.query.get_or_404(staff_id)
     if staff.business_id != current_user.business_id or staff.role != 'staff':
         abort(403)
-        
+
     form = EditStaffByManagerForm(original_username=staff.username, obj=staff)
     if form.validate_on_submit():
         staff.username = form.username.data
@@ -601,20 +629,20 @@ def edit_staff(staff_id):
         elif form.wage_type.data == 'monthly':
             staff.monthly_salary = form.monthly_salary.data
             staff.daily_wage = None # Clear other type
-            
+
         if form.password.data:
             staff.set_password(form.password.data)
-            
+
         if form.id_proof.data:
             if staff.id_proof_filename:
                 try: os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], staff.id_proof_filename))
                 except OSError: pass
-            
+
             f = form.id_proof.data
             filename = secure_filename(f"{staff.id}_{staff.username}_{f.filename}")
             f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             staff.id_proof_filename = filename
-            
+
         db.session.commit()
         flash(f'Staff member {staff.username} has been updated.', 'success')
         return redirect(url_for('manager.staff_list'))
@@ -634,24 +662,24 @@ def confirm_booking(booking_id):
     booking = db.session.query(EventBooking).join(Customer).filter(
         Customer.business_id == current_user.business_id, EventBooking.id == booking_id
     ).first_or_404()
-    
+
     form = EventConfirmationForm(obj=booking)
     if form.validate_on_submit():
         business = Business.query.get(current_user.business_id)
-        
+
         # Use the quantity from the form, not the original booking
         jars_to_book = form.quantity.data
-        
+
         if business.jar_stock < jars_to_book:
             flash(f'Not enough jar stock to confirm. Only {business.jar_stock} jars available.', 'danger')
             return redirect(url_for('manager.dashboard'))
         if business.dispenser_stock < (booking.dispensers_booked or 0):
             flash(f'Not enough dispenser stock to confirm. Only {business.dispenser_stock} dispensers available.', 'danger')
             return redirect(url_for('manager.dashboard'))
-            
+
         business.jar_stock -= jars_to_book
         business.dispenser_stock -= (booking.dispensers_booked or 0)
-        
+
         booking.quantity = jars_to_book  # Update the booking's quantity
         booking.amount = form.amount.data
         booking.paid_to_manager = form.paid_to_manager.data
@@ -664,12 +692,12 @@ def confirm_booking(booking_id):
         staff_users = User.query.filter_by(business_id=current_user.business_id, role='staff').all()
         for staff_member in staff_users:
             send_booking_confirmed_email_to_staff(booking, staff_member)
-            
+
         send_booking_confirmed_email_to_customer(booking)
         # --- END EMAIL ---
 
         return redirect(url_for('manager.dashboard'))
-        
+
     return render_template('manager/confirm_booking.html', title='Confirm Event Booking', form=form, booking=booking)
 
 # --- ACCOUNT MANAGEMENT ROUTE ---
@@ -679,21 +707,21 @@ def confirm_booking(booking_id):
 def account():
     user = User.query.get(current_user.id)
     business = Business.query.get(current_user.business_id)
-    
+
     profile_form = ManagerProfileForm(original_username=user.username, original_email=user.email, obj=user)
     # Pre-fill business details
     if request.method == 'GET':
         profile_form.name.data = business.name if business else ''
         profile_form.owner_name.data = business.owner_name if business else ''
         profile_form.location.data = business.location if business else ''
-    
+
     password_form = ChangePasswordForm()
 
     if profile_form.submit_profile.data and profile_form.validate_on_submit():
         user.username = profile_form.username.data
         user.mobile_number = profile_form.mobile_number.data
         user.email = profile_form.email.data
-        
+
         if business:
             business.name = profile_form.name.data
             business.owner_name = profile_form.owner_name.data
@@ -713,7 +741,7 @@ def account():
         db.session.commit()
         flash('Your profile and business details have been updated.', 'success')
         return redirect(url_for('manager.account'))
-        
+
     if password_form.submit_password.data and password_form.validate_on_submit():
         user.set_password(password_form.password.data)
         db.session.commit()
@@ -739,7 +767,7 @@ def book_event():
 def list_invoices():
     # Redirect to the invoices blueprint
     return redirect(url_for('invoices.list_invoices'))
-    
+
 
 @bp.route('/generate_invoice/<int:customer_id>', methods=['GET', 'POST'])
 @login_required
@@ -775,13 +803,13 @@ def browse_products():
     for product, supplier in products:
         if product.name not in products_by_name:
             products_by_name[product.name] = []
-        
+
         final_price = product.price
         if product.discount_percentage and product.discount_percentage > 0:
             final_price = product.price - (product.price * product.discount_percentage / 100)
-            
+
         products_by_name[product.name].append({
-            'product': product, 
+            'product': product,
             'supplier': supplier,
             'final_price': final_price
         })
@@ -811,7 +839,7 @@ def add_to_cart(product_id):
         # Get supplier ID from the first item in cart
         first_item_id = next(iter(cart))
         supplier_id_in_cart = cart[first_item_id].get('supplier_id')
-    
+
     if supplier_id_in_cart is not None and product.supplier_id != supplier_id_in_cart:
         flash(f'You can only add items from one supplier ({product.supplier.shop_name}) at a time. Clear your cart or complete your previous order first.', 'danger')
         return redirect(request.referrer or url_for('manager.browse_products'))
@@ -820,7 +848,7 @@ def add_to_cart(product_id):
         cart_item['quantity'] += quantity
     else:
         cart[str(product_id)] = {'quantity': quantity, 'supplier_id': product.supplier_id} # Store supplier ID
-    
+
     session['procurement_cart'] = cart
     flash(f'Added {quantity} x {product.name} to your cart.', 'success')
 
@@ -841,7 +869,7 @@ def view_cart():
     total_amount = 0
     supplier_id_in_cart = None
     can_checkout = True # Assume true initially
-    
+
     for product_id, item in cart.items():
         product = SupplierProduct.query.get(product_id)
         if product:
@@ -850,24 +878,24 @@ def view_cart():
                 supplier_id_in_cart = product.supplier_id
             elif supplier_id_in_cart != product.supplier_id:
                 can_checkout = False # Cannot checkout with items from multiple suppliers
-            
+
             final_price = product.price
             if product.discount_percentage and product.discount_percentage > 0:
                 final_price = product.price - (product.price * product.discount_percentage / 100)
-            
+
             subtotal = final_price * item['quantity']
             total_amount += subtotal
-            
+
             cart_items.append({
                 'product': product,
                 'quantity': item['quantity'],
                 'final_price': final_price,
                 'subtotal': subtotal
             })
-            
+
     if not can_checkout and cart_items:
          flash('Your cart contains items from multiple suppliers. Please remove items to proceed with checkout from a single supplier.', 'warning')
-            
+
     return render_template('manager/cart.html', title='Shopping Cart', cart_items=cart_items, total_amount=total_amount, can_checkout=can_checkout)
 
 @bp.route('/procurement/update_cart/<int:product_id>', methods=['POST'])
@@ -885,7 +913,7 @@ def update_cart(product_id):
                 del cart[str(product_id)]
     except (ValueError, KeyError):
         flash('Invalid quantity or product.', 'danger')
-        
+
     session['procurement_cart'] = cart
     return redirect(url_for('manager.view_cart'))
 
@@ -928,11 +956,11 @@ def checkout_cart(): # Renamed from checkout() to avoid conflict
             elif supplier_id_in_cart != product.supplier_id:
                  flash('Cannot check out with items from multiple suppliers in one order.', 'danger')
                  return redirect(url_for('manager.view_cart'))
-            
+
             final_price = product.price
             if product.discount_percentage and product.discount_percentage > 0:
                 final_price = product.price * (1 - product.discount_percentage / 100)
-            
+
             subtotal = final_price * item_data['quantity']
             total_amount += subtotal
             cart_items.append({
@@ -962,7 +990,7 @@ def checkout_cart(): # Renamed from checkout() to avoid conflict
     db.session.add(order)
     # Must commit here to get order.id *before* creating items if items rely on it
     # Let's associate items *before* commit using relationship
-    
+
     for item in cart_items:
         order_item = PurchaseOrderItem(
             # order=order, # Associate with the order object directly
@@ -1027,16 +1055,16 @@ def procurement_cod_checkout_confirm(order_id): # Renamed function
     if order.business_id != current_user.business_id or order.status != 'Pending':
         flash('Invalid order or order already processed.', 'warning')
         return redirect(url_for('manager.view_orders'))
-        
+
     order.status = 'COD - Placed' # Update status for COD
     db.session.commit()
 
     # Clear cart only after successful placement
     session.pop('procurement_cart', None)
-    
+
     # Send notification email to supplier
     send_new_order_to_supplier_email(order)
-    
+
     flash('Your order has been placed successfully (Cash on Delivery)!', 'success')
     return redirect(url_for('manager.view_orders')) # Redirect to order list
 
@@ -1079,7 +1107,7 @@ def procurement_payment_success_confirm(): # Renamed function
         order.razorpay_payment_id = razorpay_payment_id # Store payment ID
         order.status = 'Paid - Online' # Update status
         db.session.commit()
-        
+
         # Clear cart only after successful payment verification
         session.pop('procurement_cart', None)
 
@@ -1125,6 +1153,6 @@ def view_procurement_invoice(order_id):
          flash('Invoice not yet generated for this order.', 'info')
          # Decide where to redirect, maybe back to order list or show order details?
          return redirect(url_for('manager.view_orders'))
-         
+
     manager = User.query.filter_by(business_id=order.business_id, role='manager').first()
     return render_template('procurement/invoice_template.html', order=order, manager=manager)

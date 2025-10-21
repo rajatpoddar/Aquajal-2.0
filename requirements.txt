@@ -20,3 +20,4 @@ WeasyPrint
 Flask-Babel
 Flask-Moment
 pywebpush
+qrcode[pil] # <-- Add this line

@@ -38,6 +38,7 @@ class Business(db.Model):
     half_day_jar_count = db.Column(db.Integer, default=1)
     low_stock_threshold = db.Column(db.Integer, default=20)
     low_stock_threshold_dispenser = db.Column(db.Integer, default=5)
+    upi_id = db.Column(db.String(100), nullable=True)
 
 
     employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
@@ -198,9 +199,15 @@ class DailyLog(db.Model):
     amount_collected = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     payment_status = db.Column(db.String(20), default='Paid') # Paid, Due
+    payment_method = db.Column(db.String(20), default='Cash', nullable=True) # <-- Add: Cash, Online, Due
     origin = db.Column(db.String(20), default='staff_log', server_default='staff_log') # staff_log, customer_request
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    # Add a check constraint for payment_method (optional but good practice)
+    __table_args__ = (
+        CheckConstraint(payment_method.in_(['Cash', 'Online', 'Due', None]), name='ck_dailylog_payment_method'),
+    )
 
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,3 +1,4 @@
+{# File: app/templates/manager/settings.html #}
 {% extends "base.html" %}
 {% block content %}
 <h2>{{ title }}</h2>
@@ -5,6 +6,7 @@
     <div class="card-body">
         <form method="post">
             {{ form.hidden_tag() }}
+            {# Existing Price Fields #}
             <div class="row">
                 <div class="col-md-6 mb-3">
                     {{ form.new_jar_price.label(class="form-label") }}
@@ -16,6 +18,7 @@
                 </div>
             </div>
             <hr>
+            {# Existing Attendance Settings #}
             <h5>Attendance Settings</h5>
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -30,6 +33,7 @@
                 </div>
             </div>
             <hr>
+            {# Existing Stock Alerts #}
             <h5>Stock Alerts</h5>
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -43,6 +47,21 @@
                     <div class="form-text">Get an alert on your dashboard when dispenser stock falls to this level.</div>
                 </div>
             </div>
+            <hr> {# <-- Add a separator #}
+            {# UPI ID Field #}
+            <h5>UPI Payment Settings</h5> {# <-- Add section title #}
+            <div class="mb-3"> {# <-- Add UPI field #}
+                {{ form.upi_id.label(class="form-label") }}
+                {{ form.upi_id(class="form-control", placeholder="e.g., yourbusiness@upi") }}
+                {% if form.upi_id.errors %}
+                    {% for error in form.upi_id.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                {% else %}
+                <div class="form-text">Enter the UPI ID where customers can send payments. Staff can generate a QR code for this ID.</div>
+                {% endif %}
+            </div>
+
             <div>
                 {{ form.submit(class="btn btn-primary") }}
                 <a href="{{ url_for('manager.dashboard') }}" class="btn btn-secondary">Cancel</a>

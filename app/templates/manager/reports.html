@@ -12,7 +12,7 @@
                 <label for="year" class="form-label">Year</label>
                 <select id="year" name="year" class="form-select">
                     {% for y in range(current_year, current_year - 5, -1) %}
-                    <option value="{{ y }}" {% if y == report_year %}selected{% endif %}>{{ y }}</option>
+                    <option value="{{ y }}" {% if y==report_year %}selected{% endif %}>{{ y }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -20,13 +20,14 @@
                 <label for="month" class="form-label">Month</label>
                 <select id="month" name="month" class="form-select">
                     {% for i in range(1, 13) %}
-                    <option value="{{ i }}" {% if i == report_month %}selected{% endif %}>{{ i | month_name }}</option>
+                    <option value="{{ i }}" {% if i==report_month %}selected{% endif %}>{{ i | month_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="col-md-3">
                 <label for="report_date" class="form-label">Specific Date</label>
-                <input type="date" id="report_date" name="report_date" class="form-control" value="{{ report_date.isoformat() }}">
+                <input type="date" id="report_date" name="report_date" class="form-control"
+                    value="{{ report_date.isoformat() }}">
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary w-100">Generate Report</button>
@@ -37,7 +38,8 @@
 
 <ul class="nav nav-tabs" id="reportTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab">
+        <button class="nav-link active" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button"
+            role="tab">
             Monthly Summary
         </button>
     </li>
@@ -47,12 +49,14 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="booking-log-tab" data-bs-toggle="tab" data-bs-target="#booking-log" type="button" role="tab">
+        <button class="nav-link" id="booking-log-tab" data-bs-toggle="tab" data-bs-target="#booking-log" type="button"
+            role="tab">
             Booking Logs
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="cash-handover-log-tab" data-bs-toggle="tab" data-bs-target="#cash-handover-log" type="button" role="tab">
+        <button class="nav-link" id="cash-handover-log-tab" data-bs-toggle="tab" data-bs-target="#cash-handover-log"
+            type="button" role="tab">
             Cash Received Logs
         </button>
     </li>
@@ -70,17 +74,27 @@
             <div class="row mb-4">
                 <div class="col-md-4 mb-3">
                     <div class="card text-white bg-primary shadow">
-                        <div class="card-body"><h5 class="card-title">Total Sales</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_sales) }}</p></div>
+                        <div class="card-body">
+                            <h5 class="card-title">Total Sales</h5>
+                            <p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_sales) }}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <div class="card text-white bg-danger shadow">
-                        <div class="card-body"><h5 class="card-title">Total Expenses</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_expenses) }}</p></div>
+                        <div class="card-body">
+                            <h5 class="card-title">Total Expenses</h5>
+                            <p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_expenses) }}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <div class="card text-white bg-success shadow">
-                        <div class="card-body"><h5 class="card-title">Net Income</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_sales - total_monthly_expenses) }}</p></div>
+                        <div class="card-body">
+                            <h5 class="card-title">Net Income</h5>
+                            <p class="card-text fs-4">₹{{ "%.2f"|format(total_monthly_sales - total_monthly_expenses) }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,7 +105,13 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <table class="table table-sm">
-                                <thead><tr><th>Product</th><th class="text-center">Quantity Sold</th><th class="text-end">Total Amount</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-center">Quantity Sold</th>
+                                        <th class="text-end">Total Amount</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {% for product in monthly_product_summary %}
                                     <tr>
@@ -100,7 +120,9 @@
                                         <td class="text-end">₹{{ "%.2f"|format(product.total_amount) }}</td>
                                     </tr>
                                     {% else %}
-                                    <tr><td colspan="3" class="text-center">No product sales this month.</td></tr>
+                                    <tr>
+                                        <td colspan="3" class="text-center">No product sales this month.</td>
+                                    </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -112,7 +134,13 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
                             <table class="table table-sm">
-                                <thead><tr><th>Customer</th><th class="text-center">Jars Delivered</th><th class="text-end">Amount Paid</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th class="text-center">Jars Delivered</th>
+                                        <th class="text-end">Amount Paid</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {% for customer in customer_summary %}
                                     <tr>
@@ -121,7 +149,9 @@
                                         <td class="text-end">₹{{ "%.2f"|format(customer.total_amount) }}</td>
                                     </tr>
                                     {% else %}
-                                    <tr><td colspan="3" class="text-center">No jar deliveries this month.</td></tr>
+                                    <tr>
+                                        <td colspan="3" class="text-center">No jar deliveries this month.</td>
+                                    </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -134,7 +164,15 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <table class="table table-hover">
-                        <thead><tr><th>Staff</th><th class="text-center">Full Days</th><th class="text-center">Half Days</th><th class="text-center">Absent Days</th><th class="text-end">Total Wages Paid</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Staff</th>
+                                <th class="text-center">Full Days</th>
+                                <th class="text-center">Half Days</th>
+                                <th class="text-center">Absent Days</th>
+                                <th class="text-end">Total Wages Paid</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {% for staff in staff_monthly_summary %}
                             <tr>
@@ -145,7 +183,9 @@
                                 <td class="text-end">{{ staff.total_wages_display }}</td>
                             </tr>
                             {% else %}
-                            <tr><td colspan="5" class="text-center">No staff found.</td></tr>
+                            <tr>
+                                <td colspan="5" class="text-center">No staff found.</td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -156,118 +196,166 @@
 
     <div class="tab-pane fade" id="daily" role="tabpanel">
         <div class="py-4">
-           <h3 class="mb-3">Daily Report for {{ report_date.strftime('%d %B, %Y') }}</h3>
-           <div class="row mb-4">
-            <div class="col-md-4 mb-3"><div class="card text-white bg-primary shadow"><div class="card-body"><h5 class="card-title">Total Sales</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales) }}</p></div></div></div>
-            <div class="col-md-4 mb-3"><div class="card text-white bg-danger shadow"><div class="card-body"><h5 class="card-title">Total Expenses</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_expenses) }}</p></div></div></div>
-            <div class="col-md-4 mb-3"><div class="card text-white bg-success shadow"><div class="card-body"><h5 class="card-title">Net Income</h5><p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales - total_daily_expenses) }}</p></div></div></div>
-        </div>
+            <h3 class="mb-3">Daily Report for {{ report_date.strftime('%d %B, %Y') }}</h3>
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card text-white bg-primary shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Sales</h5>
+                            <p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-white bg-danger shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Expenses</h5>
+                            <p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_expenses) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-white bg-success shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Net Income</h5>
+                            <p class="card-text fs-4">₹{{ "%.2f"|format(total_daily_sales - total_daily_expenses) }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-           <div class="row">
-               <div class="col-lg-8">
+            <div class="row">
+                <div class="col-lg-8">
                     <h5 class="mt-4">Daily Transactions Log</h5>
-                   <div class="card shadow-sm">
-                       <div class="card-body">
-                        <table class="table table-sm table-hover">
-                            <thead><tr><th>Time</th><th>Staff</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
-                            <tbody>
-                                {# Daily Jar Deliveries #}
-                                {% for sale in daily_sales %}
-                                <tr class="table-light">
-                                    <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                    <td>{{ sale.staff.username | default('N/A') }}</td>
-                                    <td>{{ sale.jars_delivered }} jar(s) to {{ sale.customer.name }}</td>
-                                    <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(sale.amount_collected) }}</td>
-                                    <td>
-                                        {% if sale.payment_status == 'Paid' %}
-                                            <span class="badge bg-success">{{ sale.payment_status }}</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">{{ sale.payment_status }}</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                
-                                {# Completed Event Bookings #}
-                                {% for event in daily_event_sales %}
-                                <tr class="table-info">
-                                    <td>{{ (event.collection_timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                    <td>{{ event.collected_by.username | default('N/A') }}</td>
-                                    <td>Event settlement for {{ event.customer.name }}</td>
-                                    <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(event.final_amount) }}</td>
-                                    <td><span class="badge bg-success">Paid</span></td>
-                                </tr>
-                                {% endfor %}
-                                
-                                {# New Product Sales #}
-                                {% for sale in daily_product_sales %}
-                                <tr class="table-success">
-                                    <td>{{ (sale.timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                    <td>{{ sale.staff.username | default('N/A') }}</td>
-                                    <td>Sale: {{ sale.quantity }} {{ sale.product_name }}(s)</td>
-                                    <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(sale.total_amount) }}</td>
-                                    <td><span class="badge bg-success">Paid</span></td>
-                                </tr>
-                                {% endfor %}
-                                
-                                {# Daily Expenses #}
-                                {% for expense in daily_expenses %}
-                                <tr class="table-danger">
-                                    <td>{{ (expense.timestamp | to_ist).strftime('%I:%M %p') }}</td>
-                                    <td>{{ expense.staff.username | default('N/A') }}</td>
-                                    <td>Expense: {{ expense.description }}</td>
-                                    <td class="text-danger fw-bold">- ₹{{ "%.2f"|format(expense.amount) }}</td>
-                                    <td>-</td>
-                                </tr>
-                                {% endfor %}
-                        
-                                {% if not daily_sales and not daily_event_sales and not daily_product_sales and not daily_expenses %}
-                                <tr><td colspan="5" class="text-center">No transactions recorded for this day.</td></tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                       </div>
-                   </div>
-               </div>
-               <div class="col-lg-4">
-                   <h5 class="mt-4">Attendance</h5>
-                   <div class="card shadow-sm mb-4">
-                       <div class="card-body">
-                           <table class="table">
-                               <thead><tr><th>Staff</th><th>Jars Delivered</th><th>Status</th></tr></thead>
-                               <tbody>
-                                   {% for item in attendance %}
-                                   <tr>
-                                       <td>{{ item.username }}</td>
-                                       <td>{{ item.jars_sold }}</td>
-                                       <td>
-                                           {% if item.status == 'Full Day' %}<span class="badge bg-success">{{ item.status }}</span>
-                                           {% elif item.status == 'Half Day' %}<span class="badge bg-warning text-dark">{{ item.status }}</span>
-                                           {% else %}<span class="badge bg-secondary">{{ item.status }}</span>
-                                           {% endif %}
-                                       </td>
-                                   </tr>
-                                   {% endfor %}
-                               </tbody>
-                           </table>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </div>
-   
-   <div class="tab-pane fade" id="booking-log" role="tabpanel">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Staff</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Status & Method</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {# --- Updated Loop --- #}
+                                    {% for entry in combined_daily_log %}
+                                    {% set item = entry.data %} {# Get the actual data object #}
+                                    {# Jar Sale #}
+                                    {% if entry.type == 'Jar Sale' %}
+                                    <tr class="table-light">
+                                        <td>{{ (item.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                        <td>{{ item.staff.username | default('N/A') }}</td>
+                                        <td>{{ item.jars_delivered }} jar(s) to {{ item.customer.name }}</td>
+                                        <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(item.amount_collected) }}
+                                        </td>
+                                        <td>
+                                            {% if item.payment_status == 'Paid' %}<span class="badge bg-success">{{
+                                                item.payment_status }}</span>
+                                            {% else %}<span class="badge bg-danger">{{ item.payment_status }}</span>{%
+                                            endif %}
+                                            {% if item.payment_method and item.payment_method != 'Due' %}
+                                            {% if item.payment_method == 'Online' %}<span
+                                                class="badge bg-info text-dark ms-1"><i class="bi bi-qr-code-scan"></i>
+                                                {{ item.payment_method }}</span>
+                                            {% elif item.payment_method == 'Cash' %}<span
+                                                class="badge bg-secondary ms-1"><i class="bi bi-cash"></i> {{
+                                                item.payment_method }}</span>{% endif %}
+                                            {% elif item.payment_status == 'Paid' %}<span
+                                                class="badge bg-secondary ms-1"><i class="bi bi-cash"></i> Cash</span>{%
+                                            endif %}
+                                        </td>
+                                    </tr>
+                                    {# Event Settlement #}
+                                    {% elif entry.type == 'Event Settlement' %}
+                                    <tr class="table-info">
+                                        <td>{{ (item.collection_timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                        <td>{{ item.collected_by.username | default('N/A') }}</td>
+                                        <td>Event settlement for {{ item.customer.name }}</td>
+                                        <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(item.final_amount) }}</td>
+                                        <td><span class="badge bg-success">Paid</span></td>
+                                    </tr>
+                                    {# Product Sale #}
+                                    {% elif entry.type == 'Product Sale' %}
+                                    <tr class="table-success">
+                                        <td>{{ (item.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                        <td>{{ item.staff.username | default('N/A') }}</td>
+                                        <td>Sale: {{ item.quantity }} {{ item.product_name }}(s)</td>
+                                        <td class="text-success fw-bold">+ ₹{{ "%.2f"|format(item.total_amount) }}</td>
+                                        <td><span class="badge bg-success">Paid</span><span
+                                                class="badge bg-secondary ms-1"><i class="bi bi-cash"></i> Cash</span>
+                                        </td>
+                                    </tr>
+                                    {# Expense #}
+                                    {% elif entry.type == 'Expense' %}
+                                    <tr class="table-danger">
+                                        <td>{{ (item.timestamp | to_ist).strftime('%I:%M %p') }}</td>
+                                        <td>{{ item.staff.username | default('N/A') }}</td>
+                                        <td>Expense: {{ item.description }}</td>
+                                        <td class="text-danger fw-bold">- ₹{{ "%.2f"|format(item.amount) }}</td>
+                                        <td>-</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% else %} {# If combined_daily_log is empty #}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No transactions recorded for this day.</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {# --- End Updated Loop --- #}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="mt-4">Attendance</h5>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff</th>
+                                        <th>Jars Delivered</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in attendance %}
+                                    <tr>
+                                        <td>{{ item.username }}</td>
+                                        <td>{{ item.jars_sold }}</td>
+                                        <td>
+                                            {% if item.status == 'Full Day' %}<span class="badge bg-success">{{
+                                                item.status }}</span>
+                                            {% elif item.status == 'Half Day' %}<span
+                                                class="badge bg-warning text-dark">{{ item.status }}</span>
+                                            {% else %}<span class="badge bg-secondary">{{ item.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="booking-log" role="tabpanel">
         <div class="py-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                 <h3>Event Booking Logs for {{ report_month | month_name }}, {{ report_year }}</h3>
-                 <div class="alert alert-danger mb-0">
-                     <strong>Total Jars Lost:</strong> {{ total_jars_lost }}
-                 </div>
+                <h3>Event Booking Logs for {{ report_month | month_name }}, {{ report_year }}</h3>
+                <div class="alert alert-danger mb-0">
+                    <strong>Total Jars Lost:</strong> {{ total_jars_lost }}
+                </div>
             </div>
             <div class="card shadow-sm">
                 <div class="card-body">
-                     <div class="table-responsive">
+                    <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -288,17 +376,18 @@
                                     <td class="text-center">
                                         {% set lost = booking.quantity - booking.jars_returned %}
                                         {% if lost > 0 %}
-                                            <span class="badge bg-danger">{{ lost }}</span>
+                                        <span class="badge bg-danger">{{ lost }}</span>
                                         {% else %}
-                                            0
+                                        0
                                         {% endif %}
                                     </td>
                                     <td class="text-end">₹{{ "%.2f"|format(booking.final_amount) }}</td>
-                                     <td>{{ booking.collected_by.username if booking.collected_by else 'N/A' }}</td>
+                                    <td>{{ booking.collected_by.username if booking.collected_by else 'N/A' }}</td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center">No completed event bookings found for this period.</td>
+                                    <td colspan="6" class="text-center">No completed event bookings found for this
+                                        period.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -332,7 +421,8 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="3" class="text-center">No cash was received from staff in this period.</td>
+                                    <td colspan="3" class="text-center">No cash was received from staff in this period.
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -342,14 +432,15 @@
             </div>
         </div>
     </div>
-    
+
     <div class="tab-pane fade" id="leads" role="tabpanel">
         <div class="py-4">
             <h3>Leads from New Jar/Dispenser Sales for {{ report_month | month_name }}, {{ report_year }}</h3>
-            <p class="text-muted">These are one-time sales to non-registered customers. You can contact them to convert them into regular customers.</p>
+            <p class="text-muted">These are one-time sales to non-registered customers. You can contact them to convert
+                them into regular customers.</p>
             <div class="card shadow-sm">
                 <div class="card-body">
-                     <div class="table-responsive">
+                    <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -373,7 +464,8 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center">No new leads from product sales in this period.</td>
+                                    <td colspan="6" class="text-center">No new leads from product sales in this period.
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -385,4 +477,3 @@
     </div>
 </div>
 {% endblock %}
-

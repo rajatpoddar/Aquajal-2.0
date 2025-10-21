@@ -187,68 +187,190 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('customer-search-input');
-    const resultsContainer = document.getElementById('customer-results-container');
-    let debounceTimer;
-
-    searchInput.addEventListener('keyup', function() {
-        clearTimeout(debounceTimer);
-        const query = searchInput.value;
-
-        debounceTimer = setTimeout(() => {
-            if (query.length < 2) {
-                resultsContainer.innerHTML = '';
-                return;
-            }
-
-            fetch(`{{ url_for('delivery.search_customers') }}?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    let html = '';
-                    if (data.length > 0) {
-                        data.forEach(customer => {
-                            const price = customer.price_per_jar.toFixed(2);
-                            html += `
-                                <div class="list-group-item">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-5">
-                                            <h5 class="mb-1">${customer.name}</h5>
-                                            <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> ${customer.area}, ${customer.village}</p>
-                                            <small>{{ _('Default:') }} ${customer.daily_jars} {{ _('Jar(s) at') }} ₹${price}</small>
-                                        </div>
-                                        <div class="col-md-7">
-                                            <form action="/log_delivery/${customer.id}" method="post" class="row g-2 align-items-center justify-content-end">
-                                                <div class="col-auto">
-                                                    <label for="jars_delivered-${customer.id}" class="col-form-label">{{ _('Jars:') }}</label>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <input type="number" name="jars_delivered" id="jars_delivered-${customer.id}" class="form-control" value="${customer.daily_jars}" style="width: 80px;">
-                                                </div>
-                                                <div class="col-auto">
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" role="switch" name="is_due" value="true" id="is_due-${customer.id}">
-                                                        <label class="form-check-label" for="is_due-${customer.id}">{{ _('Mark as Due') }}</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-auto">
-                                                     <button type="submit" class="btn btn-success"><i class="bi bi-truck"></i> {{ _('Deliver') }}</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        html = `<div class="alert alert-warning">{{ _('No customers found.') }}</div>`;
-                    }
-                    resultsContainer.innerHTML = html;
-                })
-                .catch(error => console.error('Error:', error));
-        }, 300);
-    });
-});
-</script>
-{% endblock %}
+{# --- QR Code Modal --- #}
+<div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="qrCodeModalLabel">Scan UPI QR Code to Pay</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+           <p>Ask customer to scan the code below using their UPI app.</p>
+           <img id="qrCodeImage" src="" alt="UPI QR Code" class="img-fluid mb-3" style="max-width: 300px;">
+           <p><strong>Amount: ₹<span id="qrAmount"></span></strong><br>
+              <small>UPI ID: <span id="qrUpiId"></span></small></p>
+           <p class="text-danger fw-bold">IMPORTANT: After customer shows successful payment confirmation, click 'Payment Received'.</p>
+           {# Hidden form fields to be populated by JS before submitting #}
+           <input type="hidden" id="qrCustomerId" name="customer_id">
+           <input type="hidden" id="qrJarsDelivered" name="jars_delivered">
+           <input type="hidden" name="payment_received_online" value="true"> {# Indicate online payment #}
+           <button type="button" id="paymentReceivedBtn" class="btn btn-success btn-lg">
+               <i class="bi bi-check-circle-fill"></i> Payment Received & Log Delivery
+           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {# --- End QR Code Modal --- #}
+  
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('customer-search-input');
+      const resultsContainer = document.getElementById('customer-results-container');
+      const qrCodeModal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+      const qrCodeImage = document.getElementById('qrCodeImage');
+      const qrAmountSpan = document.getElementById('qrAmount');
+      const qrUpiIdSpan = document.getElementById('qrUpiId');
+      const paymentReceivedBtn = document.getElementById('paymentReceivedBtn');
+      const qrCustomerIdInput = document.getElementById('qrCustomerId');
+      const qrJarsDeliveredInput = document.getElementById('qrJarsDelivered');
+  
+      let debounceTimer;
+  
+      // --- Existing Search Input Logic ---
+      searchInput.addEventListener('keyup', function() {
+          clearTimeout(debounceTimer);
+          const query = searchInput.value;
+  
+          debounceTimer = setTimeout(() => {
+              if (query.length < 2) {
+                  resultsContainer.innerHTML = '';
+                  return;
+              }
+  
+              fetch(`{{ url_for('delivery.search_customers') }}?q=${encodeURIComponent(query)}`)
+                  .then(response => response.json())
+                  .then(data => {
+                      let html = '';
+                      if (data.length > 0) {
+                          data.forEach(customer => {
+                              const price = customer.price_per_jar.toFixed(2);
+                              const defaultAmount = (customer.daily_jars * customer.price_per_jar).toFixed(2);
+                              html += `
+                                  <div class="list-group-item">
+                                      <div class="row align-items-center">
+                                          <div class="col-md-5">
+                                              <h5 class="mb-1">${customer.name}</h5>
+                                              <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> ${customer.area || ''}, ${customer.village || ''}</p>
+                                              <small>{{ _('Default:') }} ${customer.daily_jars} {{ _('Jar(s) at') }} ₹${price}</small>
+                                          </div>
+                                          <div class="col-md-7">
+                                              {# Form for Cash/Due Delivery #}
+                                              <form action="/log_delivery/${customer.id}" method="post" class="row g-2 align-items-center justify-content-end delivery-log-form" id="form-cash-${customer.id}">
+                                                  <div class="col-auto">
+                                                      <label for="jars_delivered-${customer.id}" class="col-form-label visually-hidden">{{ _('Jars:') }}</label>
+                                                      <input type="number" name="jars_delivered" id="jars_delivered-${customer.id}" class="form-control jars-input" value="${customer.daily_jars}" style="width: 80px;" min="1">
+                                                  </div>
+                                                  <div class="col-auto">
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" type="checkbox" role="switch" name="is_due" value="true" id="is_due-${customer.id}">
+                                                          <label class="form-check-label" for="is_due-${customer.id}">{{ _('Mark as Due') }}</label>
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-auto">
+                                                       <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-truck"></i> {{ _('Deliver') }} (Cash/Due)</button>
+                                                  </div>
+                                                  {# Pay Online Button #}
+                                                  <div class="col-auto">
+                                                      <button type="button" class="btn btn-info btn-sm btn-pay-online"
+                                                              data-customer-id="${customer.id}"
+                                                              data-customer-name="${customer.name}"
+                                                              data-price-per-jar="${customer.price_per_jar}">
+                                                          <i class="bi bi-qr-code"></i> Pay Online
+                                                      </button>
+                                                  </div>
+                                              </form>
+                                              {# Hidden Form specifically for QR Payment Confirmation #}
+                                              <form action="/log_delivery/${customer.id}" method="post" id="form-online-${customer.id}" style="display: none;">
+                                                   <input type="hidden" name="jars_delivered" class="online-jars-input" value="${customer.daily_jars}">
+                                                   <input type="hidden" name="payment_received_online" value="true">
+                                              </form>
+                                          </div>
+                                      </div>
+                                  </div>
+                              `;
+                          });
+                      } else {
+                          html = `<div class="alert alert-warning">{{ _('No customers found.') }}</div>`;
+                      }
+                      resultsContainer.innerHTML = html;
+                      attachPayOnlineListeners(); // Attach listeners after results are loaded
+                  })
+                  .catch(error => console.error('Error:', error));
+          }, 300);
+      });
+  
+      // --- Function to Attach Listeners to Pay Online Buttons ---
+      function attachPayOnlineListeners() {
+          document.querySelectorAll('.btn-pay-online').forEach(button => {
+              button.addEventListener('click', function() {
+                  const customerId = this.dataset.customerId;
+                  const pricePerJar = parseFloat(this.dataset.pricePerJar);
+                  const jarsInput = document.getElementById(`jars_delivered-${customerId}`);
+                  const jars = parseInt(jarsInput.value) || 1; // Get current jar quantity
+                  const amount = (jars * pricePerJar).toFixed(2);
+  
+                  if (amount <= 0) {
+                      alert('Please enter a valid number of jars.');
+                      return;
+                  }
+  
+                  // Show loading state (optional)
+                  qrCodeImage.src = ""; // Clear previous QR
+                  qrAmountSpan.textContent = amount;
+                  qrUpiIdSpan.textContent = 'Loading...';
+                  qrCustomerIdInput.value = customerId; // Store customer ID for confirmation
+                  qrJarsDeliveredInput.value = jars; // Store jar count for confirmation
+  
+                  qrCodeModal.show();
+  
+                  // Fetch QR Code from backend
+                  fetch(`/generate_upi_qr/${customerId}/${amount}`)
+                      .then(response => {
+                          if (!response.ok) {
+                              throw new Error('Failed to generate QR code.');
+                          }
+                          return response.json();
+                      })
+                      .then(data => {
+                          qrCodeImage.src = data.qr_image_data;
+                          qrUpiIdSpan.textContent = data.upi_id;
+                      })
+                      .catch(error => {
+                          console.error('Error fetching QR code:', error);
+                          qrUpiIdSpan.textContent = 'Error loading QR';
+                          alert('Could not generate QR code. Check if UPI ID is set in manager settings.');
+                           qrCodeModal.hide(); // Hide modal on error
+                      });
+              });
+          });
+          // Update hidden online forms when jar input changes
+          document.querySelectorAll('.jars-input').forEach(input => {
+               input.addEventListener('change', function() {
+                   const customerId = this.id.split('-')[1];
+                   const onlineJarsInput = document.querySelector(`#form-online-${customerId} .online-jars-input`);
+                   if(onlineJarsInput) {
+                       onlineJarsInput.value = this.value;
+                   }
+               });
+          });
+      }
+  
+       // --- Listener for Payment Received Button in Modal ---
+       paymentReceivedBtn.addEventListener('click', function() {
+          const customerId = qrCustomerIdInput.value;
+          const onlineForm = document.getElementById(`form-online-${customerId}`);
+          if (onlineForm) {
+              onlineForm.submit(); // Submit the hidden form to log delivery as paid online
+          } else {
+              console.error('Could not find the corresponding online payment form.');
+              alert('Error logging delivery. Please refresh and try again.');
+          }
+          qrCodeModal.hide(); // Hide modal after clicking
+      });
+  
+  });
+  </script>
+  {% endblock %}
