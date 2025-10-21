@@ -31,6 +31,25 @@
                 {{ form.address.label(class="form-label") }}
                 {{ form.address(class="form-control", rows=3) }}
             </div>
+            {# --- NEW WAGE FIELDS --- #}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.wage_type.label(class="form-label") }}
+                    {{ form.wage_type(class="form-select", id="wage_type") }}
+                    {% for error in form.wage_type.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3" id="daily-wage-field">
+                    {{ form.daily_wage.label(class="form-label") }}
+                    {{ form.daily_wage(class="form-control") }}
+                    {% for error in form.daily_wage.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3" id="monthly-salary-field" style="display: none;">
+                    {{ form.monthly_salary.label(class="form-label") }}
+                    {{ form.monthly_salary(class="form-control") }}
+                    {% for error in form.monthly_salary.errors %}<span class="text-danger small">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+            {# --- END NEW WAGE FIELDS --- #}
             <hr>
             <div class="mb-3">
                 {{ form.id_proof.label(class="form-label") }}
@@ -51,4 +70,26 @@
         </form>
     </div>
 </div>
-{% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const wageTypeSelect = document.getElementById('wage_type');
+        const dailyWageField = document.getElementById('daily-wage-field');
+        const monthlySalaryField = document.getElementById('monthly-salary-field');
+    
+        function toggleWageFields() {
+            if (wageTypeSelect.value === 'daily') {
+                dailyWageField.style.display = 'block';
+                monthlySalaryField.style.display = 'none';
+            } else {
+                dailyWageField.style.display = 'none';
+                monthlySalaryField.style.display = 'block';
+            }
+        }
+    
+        wageTypeSelect.addEventListener('change', toggleWageFields);
+        // Initial call based on current staff data
+        toggleWageFields();
+    });
+    </script>
+    {% endblock %}

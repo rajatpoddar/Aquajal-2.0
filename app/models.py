@@ -34,12 +34,12 @@ class Business(db.Model):
     new_dispenser_price = db.Column(db.Float, default=150.0)
     jar_stock = db.Column(db.Integer, default=0)
     dispenser_stock = db.Column(db.Integer, default=0)
-    full_day_jar_count = db.Column(db.Integer, default=50) 
-    half_day_jar_count = db.Column(db.Integer, default=1) 
+    full_day_jar_count = db.Column(db.Integer, default=50)
+    half_day_jar_count = db.Column(db.Integer, default=1)
     low_stock_threshold = db.Column(db.Integer, default=20)
     low_stock_threshold_dispenser = db.Column(db.Integer, default=5)
 
-    
+
     employees = db.relationship('User', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     customers = db.relationship('Customer', backref='business', lazy='dynamic', cascade="all, delete-orphan")
     product_sales = db.relationship('ProductSale', backref='business', lazy='dynamic', cascade="all, delete-orphan")
@@ -58,13 +58,17 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256))
     role = db.Column(db.String(10), index=True, default='staff') # Roles: staff, manager, admin, supplier
-    daily_wage = db.Column(db.Float, nullable=True)
+    # Wage Information
+    wage_type = db.Column(db.String(10), default='daily', nullable=False) # 'daily' or 'monthly'
+    daily_wage = db.Column(db.Float, nullable=True) # Used if wage_type is 'daily'
+    monthly_salary = db.Column(db.Float, nullable=True) # Used if wage_type is 'monthly'
+    # ---
     cash_balance = db.Column(db.Float, default=0.0)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=True)
     mobile_number = db.Column(db.String(15), nullable=True, unique=True)
     address = db.Column(db.String(200), nullable=True)
     id_proof_filename = db.Column(db.String(100), nullable=True)
-    
+
     logs = db.relationship('DailyLog', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
     expenses = db.relationship('Expense', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
     handovers = db.relationship('CashHandover', foreign_keys='CashHandover.user_id', backref='staff', lazy='dynamic', cascade="all, delete-orphan")
@@ -72,11 +76,14 @@ class User(UserMixin, db.Model):
     supplier_profile = db.relationship('SupplierProfile', back_populates='user', uselist=False, cascade="all, delete-orphan")
     subscriptions = db.relationship('PushSubscription', backref='user', lazy='dynamic', cascade="all, delete-orphan")
 
+    __table_args__ = (
+        CheckConstraint(wage_type.in_(['daily', 'monthly']), name='ck_user_wage_type'),
+    )
 
     def get_id(self): return f'user-{self.id}'
     def set_password(self, password): self.password_hash = generate_password_hash(password)
     def check_password(self, password): return check_password_hash(self.password_hash, password)
-    
+
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
@@ -98,7 +105,7 @@ class SupplierProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     shop_name = db.Column(db.String(120), nullable=False)
     address = db.Column(db.String(250), nullable=True)
-    
+
     user = db.relationship('User', back_populates='supplier_profile')
     products = db.relationship('SupplierProduct', backref='supplier', lazy='dynamic', cascade="all, delete-orphan")
     purchase_orders = db.relationship('PurchaseOrder', backref='supplier', lazy='dynamic', cascade="all, delete-orphan")
@@ -112,7 +119,7 @@ class SupplierProduct(db.Model):
     discount_percentage = db.Column(db.Integer, default=0)
     category = db.Column(db.String(50), nullable=True) # e.g., Jars, Dispensers, Chemicals, etc.
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier_profile.id'), nullable=False)
-    
+
 class PurchaseOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'), nullable=False)
@@ -143,9 +150,14 @@ class Customer(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True, nullable=True)
     password_hash = db.Column(db.String(256))
     role = db.Column(db.String(10), default='customer')
-    village = db.Column(db.String(100))
-    area = db.Column(db.String(100))
+    
+    # --- UPDATED/NEW ADDRESS FIELDS ---
+    house_number = db.Column(db.String(100), nullable=True) # NEW
+    area = db.Column(db.String(100)) # Renamed from 'Area / Street'
     landmark = db.Column(db.String(200))
+    village = db.Column(db.String(100)) # Renamed from 'City / Village'
+    # ---
+    
     note = db.Column(db.String(300), nullable=True)
     daily_jars = db.Column(db.Integer, default=1)
     price_per_jar = db.Column(db.Float, nullable=False, default=20.0)
@@ -161,7 +173,7 @@ class Customer(UserMixin, db.Model):
     
     __table_args__ = (
         db.UniqueConstraint('mobile_number', 'business_id', name='uq_customer_mobile_business'),
-        CheckConstraint(customer_type.in_(['customer', 'dealer']), name='ck_customer_type_values') # <-- Optional: Add constraint
+        CheckConstraint(customer_type.in_(['customer', 'dealer']), name='ck_customer_type_values')
     )
 
     def get_id(self): return f'customer-{self.id}'

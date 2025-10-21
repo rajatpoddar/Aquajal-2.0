@@ -16,7 +16,7 @@
                     <tr>
                         <th>{{ _('Username') }}</th>
                         <th>{{ _('Mobile') }}</th>
-                        <th>{{ _('Daily Wage') }}</th>
+                        <th>Wage Info</th> {# Changed Header #}
                         <th class="text-end">{{ _('Actions') }}</th>
                     </tr>
                 </thead>
@@ -25,9 +25,11 @@
                     <tr>
                         <td>{{ staff.username }}</td>
                         <td>{{ staff.mobile_number or _('N/A') }}</td>
-                        <td>
-                            {% if staff.daily_wage %}
-                                ₹{{ "%.2f"|format(staff.daily_wage) }}
+                        <td> {# Updated Wage Info Display #}
+                            {% if staff.wage_type == 'daily' and staff.daily_wage %}
+                                ₹{{ "%.2f"|format(staff.daily_wage) }} / Day
+                            {% elif staff.wage_type == 'monthly' and staff.monthly_salary %}
+                                ₹{{ "%.2f"|format(staff.monthly_salary) }} / Month
                             {% else %}
                                 {{ _('Not Set') }}
                             {% endif %}

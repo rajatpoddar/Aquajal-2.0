@@ -6,11 +6,22 @@
         <div class="card-body">
             <form action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
-                {# Customer Name #}
-                <div class="mb-3">
-                    {{ form.name.label(class="form-label") }}<span class="text-danger">*</span>
-                    {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
-                    {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                
+                <h5 class="mb-3 border-bottom pb-2">Core Details</h5>
+                
+                {# Customer Name and Mobile #}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.name.label(class="form-label") }}<span class="text-danger">*</span>
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name") }}
+                        {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.mobile_number.label(class="form-label") }}<span class="text-danger">*</span>
+                        {{ form.mobile_number(class="form-control" + (" is-invalid" if form.mobile_number.errors else "")) }}
+                        {% for error in form.mobile_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                        <div class="form-text">This will be used for login and notifications.</div>
+                    </div>
                 </div>
 
                 {# Type Dropdown #}
@@ -20,46 +31,33 @@
                     {% for error in form.customer_type.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
 
-                {# Username and Mobile #}
+                <h5 class="mt-4 mb-3 border-bottom pb-2">Delivery Address</h5>
+
+                {# Address Fields - New Simplified Layout #}
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        {{ form.username.label(class="form-label") }}<span class="text-danger">*</span>
-                        <div class="input-group">
-                            {# Add readonly attribute initially #}
-                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", readonly=True) }}
-                            {# Edit button #}
-                            <button class="btn btn-outline-secondary" type="button" id="edit-username-btn" title="Edit Username">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            {# Status indicator (hidden initially) #}
-                            <span class="input-group-text" id="username-status" style="display: none;"></span>
-                            {% for error in form.username.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
-                        </div>
+                        {{ form.house_number.label(class="form-label") }}
+                        {{ form.house_number(class="form-control" + (" is-invalid" if form.house_number.errors else ""), placeholder="e.g., House #123, Flat 2B") }}
+                        {% for error in form.house_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        {{ form.mobile_number.label(class="form-label") }}<span class="text-danger">*</span>
-                        {{ form.mobile_number(class="form-control" + (" is-invalid" if form.mobile_number.errors else "")) }}
-                        {% for error in form.mobile_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                         {# Removed the <span class="text-danger">*</span> from here #}
+                         {{ form.area.label(class="form-label") }}
+                        {{ form.area(class="form-control" + (" is-invalid" if form.area.errors else ""), placeholder="e.g., Gandhi Nagar, Sector 4") }}
+                         {% for error in form.area.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
-                {# Email and Password #}
                 <div class="mb-3">
-                    {{ form.email.label(class="form-label") }}
-                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Optional") }}
-                    {% for error in form.email.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
-                </div>
-                <div class="mb-3">
-                    {{ form.password.label(class="form-label") }}
-                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Leave blank for default password (123456) or to keep current") }} {# Updated placeholder #}
-                    {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    {{ form.landmark.label(class="form-label") }}
+                    {{ form.landmark(class="form-control" + (" is-invalid" if form.landmark.errors else ""), placeholder="e.g., Near City Hospital") }}
+                    {% for error in form.landmark.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                 </div>
 
-                {# Address Fields #}
                 <div class="mb-3">
                     {{ form.village.label(class="form-label") }}<span class="text-danger">*</span>
                     {# Add list attribute pointing to the datalist id #}
-                    {{ form.village(class="form-control" + (" is-invalid" if form.village.errors else ""), list="village-suggestions") }}
+                    {{ form.village(class="form-control" + (" is-invalid" if form.village.errors else ""), list="village-suggestions", placeholder="e.g., Mumbai, Deoghar") }}
                     {% for error in form.village.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     {# Datalist for suggestions #}
                     <datalist id="village-suggestions">
@@ -68,14 +66,8 @@
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="mb-3">
-                    {{ form.area.label(class="form-label") }}
-                    {{ form.area(class="form-control") }}
-                </div>
-                <div class="mb-3">
-                    {{ form.landmark.label(class="form-label") }}
-                    {{ form.landmark(class="form-control") }}
-                </div>
+
+                <h5 class="mt-4 mb-3 border-bottom pb-2">Service & Account Details</h5>
 
                 {# Jar Details #}
                 <div class="row">
@@ -90,11 +82,25 @@
                         {% for error in form.price_per_jar.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
+                
+                {# Email and Password #}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="Optional - for receipts") }}
+                        {% for error in form.email.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Default: 123456 (if blank)") }}
+                        {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
 
                 {# Note #}
                 <div class="mb-3">
                     {{ form.note.label(class="form-label") }}
-                    {{ form.note(class="form-control", rows=3, placeholder="Any special instructions or notes...") }} {# Updated placeholder #}
+                    {{ form.note(class="form-control", rows=3, placeholder="Any special instructions or notes...") }}
                 </div>
 
                 {# Submit Buttons #}
@@ -105,95 +111,6 @@
             </form>
         </div>
     </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const nameInput = document.getElementById('name');
-    const usernameInput = document.getElementById('username');
-    const usernameStatus = document.getElementById('username-status');
-    const editUsernameBtn = document.getElementById('edit-username-btn');
-    const originalUsername = usernameInput.value; // Store the initial username on page load
-    let debounceTimer;
-
-    // Function to generate username from name (only if username is empty - mainly for 'add' form)
-    function generateUsername() {
-        if (!originalUsername) { // Only generate if it's likely an 'add' form (no initial value)
-            const nameValue = nameInput.value.toLowerCase().replace(/\s+/g, '');
-            if (nameValue && !usernameInput.value) {
-                usernameInput.value = nameValue;
-                checkUsername(); // Check availability immediately after generating
-            }
-        }
-    }
-
-    // Function to check username availability
-    function checkUsername() {
-        const currentUsernameValue = usernameInput.value;
-        usernameStatus.innerHTML = ''; // Clear status
-        usernameStatus.style.display = 'inline-block'; // Show status indicator
-
-        // Don't check if the username hasn't changed from the original loaded value
-        if (currentUsernameValue === originalUsername) {
-             usernameStatus.style.display = 'none'; // Hide status if unchanged
-             return;
-        }
-
-        if (currentUsernameValue.length < 3) {
-             usernameStatus.style.display = 'none'; // Hide if too short
-             return;
-        }
-
-        // Fetch availability from the server
-        fetch(`{{ url_for('customers.check_username') }}?username=${encodeURIComponent(currentUsernameValue)}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.available) {
-                    usernameStatus.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
-                } else {
-                    usernameStatus.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
-                }
-            });
-    }
-
-    // Event listeners
-    if (nameInput) {
-        nameInput.addEventListener('blur', generateUsername);
-    }
-
-    usernameInput.addEventListener('keyup', function() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(checkUsername, 500); // Debounce check
-    });
-
-    if (editUsernameBtn) {
-        editUsernameBtn.addEventListener('click', function() {
-            usernameInput.readOnly = !usernameInput.readOnly; // Toggle readonly state
-            if (!usernameInput.readOnly) {
-                usernameInput.focus(); // Focus the input when editable
-                usernameStatus.style.display = 'inline-block'; // Show status field when editing starts
-                checkUsername(); // Perform initial check if needed
-            } else {
-                 usernameStatus.style.display = 'none'; // Hide status field when locked
-                 // Optional: Revert to original username if locking again? Decide based on desired UX
-                 // usernameInput.value = originalUsername;
-            }
-            // Change button icon based on state
-            this.innerHTML = usernameInput.readOnly ? '<i class="bi bi-pencil"></i>' : '<i class="bi bi-lock-fill"></i>';
-            this.title = usernameInput.readOnly ? 'Edit Username' : 'Lock Username';
-        });
-    }
-
-    // Initial setup on page load (for edit form)
-    if (usernameInput.value) {
-         usernameInput.readOnly = true; // Start locked if value exists
-         editUsernameBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-         usernameStatus.style.display = 'none';
-    } else {
-        usernameInput.readOnly = false; // Start unlocked if no value (add form)
-        editUsernameBtn.innerHTML = '<i class="bi bi-lock-fill"></i>';
-        usernameStatus.style.display = 'inline-block'; // Show status field initially for add form
-    }
-
-});
-</script>
+    
+{# All JavaScript related to username checking has been removed #}
 {% endblock %}

@@ -42,11 +42,25 @@
                 </div>
             </div>
 
-            <div class="mb-3" id="daily-wage-field">
-                {{ form.daily_wage.label(class="form-label") }} {# Mandatory based on role via JS #}
-                {{ form.daily_wage(class="form-control" + (" is-invalid" if form.daily_wage.errors else "")) }}
-                {% for error in form.daily_wage.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+            {# --- NEW WAGE FIELDS --- #}
+            <div class="row" id="wage-fields-row"> {# Wrap in a row div for better control #}
+                <div class="col-md-6 mb-3">
+                    {{ form.wage_type.label(class="form-label") }}
+                    {{ form.wage_type(class="form-select", id="wage_type") }}
+                    {% for error in form.wage_type.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3" id="daily-wage-field">
+                    {{ form.daily_wage.label(class="form-label") }} {# Mandatory based on role via JS #}
+                    {{ form.daily_wage(class="form-control" + (" is-invalid" if form.daily_wage.errors else "")) }}
+                    {% for error in form.daily_wage.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6 mb-3" id="monthly-salary-field" style="display: none;">
+                    {{ form.monthly_salary.label(class="form-label") }} {# Mandatory based on role via JS #}
+                    {{ form.monthly_salary(class="form-control" + (" is-invalid" if form.monthly_salary.errors else "")) }}
+                    {% for error in form.monthly_salary.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
             </div>
+            {# --- END NEW WAGE FIELDS --- #}
 
             <div class="mb-3">
                 {{ form.id_proof.label(class="form-label") }}
@@ -92,23 +106,45 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const roleSelect = document.getElementById('role');
-    const wageField = document.getElementById('daily-wage-field');
-    const businessField = document.getElementById('business-id-field');
-    const shopNameField = document.getElementById('shop-name-field');
-
-    function toggleFields() {
-        const selectedRole = roleSelect.value;
-        
-        wageField.style.display = (selectedRole === 'staff') ? 'block' : 'none';
-        businessField.style.display = (selectedRole === 'staff' || selectedRole === 'manager') ? 'block' : 'none';
-        shopNameField.style.display = (selectedRole === 'supplier') ? 'block' : 'none';
-    }
-
-    roleSelect.addEventListener('change', toggleFields);
-    // Run on page load
-    toggleFields();
-});
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('role');
+        const wageFieldsRow = document.getElementById('wage-fields-row'); // Target the row div
+        const wageTypeSelect = document.getElementById('wage_type'); // Added wage type selector
+        const dailyWageField = document.getElementById('daily-wage-field');
+        const monthlySalaryField = document.getElementById('monthly-salary-field');
+        const businessField = document.getElementById('business-id-field');
+        const shopNameField = document.getElementById('shop-name-field');
+    
+        function toggleFields() {
+            const selectedRole = roleSelect.value;
+            
+            // Show/hide entire wage section based on role
+            wageFieldsRow.style.display = (selectedRole === 'staff') ? 'flex' : 'none'; // Use flex for row display
+    
+            // Show/hide specific wage input based on wage_type (only if staff)
+            if (selectedRole === 'staff') {
+                if (wageTypeSelect.value === 'daily') {
+                    dailyWageField.style.display = 'block';
+                    monthlySalaryField.style.display = 'none';
+                } else { // monthly
+                    dailyWageField.style.display = 'none';
+                    monthlySalaryField.style.display = 'block';
+                }
+            } else {
+                // Hide both if not staff
+                dailyWageField.style.display = 'none';
+                monthlySalaryField.style.display = 'none';
+            }
+    
+            // Existing logic
+            businessField.style.display = (selectedRole === 'staff' || selectedRole === 'manager') ? 'block' : 'none';
+            shopNameField.style.display = (selectedRole === 'supplier') ? 'block' : 'none';
+        }
+    
+        roleSelect.addEventListener('change', toggleFields);
+        wageTypeSelect.addEventListener('change', toggleFields); // Also toggle when wage type changes
+        // Run on page load
+        toggleFields();
+    });
+    </script>
 {% endblock %}

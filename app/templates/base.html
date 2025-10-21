@@ -48,6 +48,12 @@
             --bs-tertiary-bg: #1e1e1e;
             --bs-border-color: #495057;
         }
+        /* Simple button press effect */
+        .btn:active {
+            transform: scale(0.98);
+            opacity: 0.85;
+            transition: transform 0.05s ease-out, opacity 0.05s ease-out;
+        }
         [data-bs-theme="dark"] body { background-color: var(--bs-body-bg); color: var(--bs-body-color); }
         [data-bs-theme="dark"] .card, [data-bs-theme="dark"] .list-group-item { background-color: var(--bs-tertiary-bg); }
         [data-bs-theme="dark"] .dropdown-menu { --bs-dropdown-bg: var(--bs-tertiary-bg); --bs-dropdown-link-color: var(--bs-body-color); --bs-dropdown-link-hover-bg: #2c3136; }

@@ -7,14 +7,15 @@ from app.admin import bp
 from app.models import User, Business, SubscriptionPlan, Coupon, Customer, SupplierProfile
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+# Import SelectField
 from wtforms import (StringField, PasswordField, SubmitField, FloatField, SelectField,
                      IntegerField, BooleanField, DateField, TextAreaField, SelectMultipleField)
 from wtforms.validators import DataRequired, Length, EqualTo, Optional, ValidationError, NumberRange, Email
 from wtforms.widgets import ListWidget, CheckboxInput
-from wtforms.fields import DateField as WTDateField
+from wtforms.fields import DateField as WTDateField # Use specific DateField import
 from flask_babel import _, lazy_gettext as _l
 from app.email import send_email
-from sqlalchemy import func  # <-- THIS WAS THE MISSING IMPORT
+from sqlalchemy import func
 
 from functools import wraps
 import os
@@ -147,7 +148,11 @@ class UserForm(FlaskForm):
     address = TextAreaField(_l('Address'), validators=[Optional(), Length(max=200)])
     role = SelectField(_l('Role'), choices=[('staff', 'Staff'), ('manager', 'Manager'), ('supplier', 'Supplier')], validators=[DataRequired()])
     business_id = SelectField(_l('Assign to Business (for Staff/Manager)'), coerce=int, validators=[Optional()])
-    daily_wage = FloatField(_l('Daily Wage (₹) (for Staff only)'), validators=[Optional()])
+    # New Wage Fields
+    wage_type = SelectField(_l('Wage Type (for Staff only)'), choices=[('daily', 'Daily Wage'), ('monthly', 'Monthly Salary')], default='daily', validators=[Optional()])
+    daily_wage = FloatField(_l('Daily Wage (₹)'), validators=[Optional(), NumberRange(min=0)])
+    monthly_salary = FloatField(_l('Monthly Salary (₹)'), validators=[Optional(), NumberRange(min=0)])
+    # ---
     password = PasswordField(_l('Password (leave blank for default: 123456)'), validators=[Optional(), Length(min=6)])
     password2 = PasswordField(_l('Repeat Password'), validators=[Optional(), EqualTo('password', message='Passwords must match if entered.')])
     id_proof = FileField(_l('ID Proof Image (JPG, PNG)'), validators=[
@@ -161,9 +166,23 @@ class UserForm(FlaskForm):
         self.business_id.choices = [(0, 'N/A')] + [(b.id, b.name) for b in Business.query.order_by('name').all()]
 
     def validate_username(self, username):
-        user = User.query.filter(func.lower(User.username) == username.data.lower()).first()
-        if user is not None:
-            raise ValidationError(_('Please use a different username.'))
+        if User.query.filter(func.lower(User.username) == username.data.lower()).first() or \
+           Customer.query.filter(func.lower(Customer.username) == username.data.lower()).first():
+            raise ValidationError(_('This username is already taken.'))
+
+    def validate(self, **kwargs):
+        if not super().validate(**kwargs):
+            return False
+        # Validate wage/salary based on type ONLY if role is staff
+        if self.role.data == 'staff':
+            if self.wage_type.data == 'daily' and not self.daily_wage.data:
+                self.daily_wage.errors.append('Daily wage is required for staff.')
+                return False
+            if self.wage_type.data == 'monthly' and not self.monthly_salary.data:
+                self.monthly_salary.errors.append('Monthly salary is required for staff.')
+                return False
+        return True
+
 
 class EditUserForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired(), Length(min=3, max=64)])
@@ -172,7 +191,11 @@ class EditUserForm(FlaskForm):
     address = TextAreaField(_l('Address'), validators=[Optional(), Length(max=200)])
     role = SelectField(_l('Role'), choices=[('staff', 'Staff'), ('manager', 'Manager'), ('supplier', 'Supplier')], validators=[DataRequired()])
     business_id = SelectField(_l('Assign to Business (for Staff/Manager)'), coerce=int, validators=[Optional()])
-    daily_wage = FloatField(_l('Daily Wage (₹) (for Staff only)'), validators=[Optional()])
+    # New Wage Fields
+    wage_type = SelectField(_l('Wage Type (for Staff only)'), choices=[('daily', 'Daily Wage'), ('monthly', 'Monthly Salary')], default='daily', validators=[Optional()])
+    daily_wage = FloatField(_l('Daily Wage (₹)'), validators=[Optional(), NumberRange(min=0)])
+    monthly_salary = FloatField(_l('Monthly Salary (₹)'), validators=[Optional(), NumberRange(min=0)])
+    # ---
     password = PasswordField(_l('New Password (leave blank to keep current)'), validators=[Optional(), Length(min=6)])
     id_proof = FileField(_l('ID Proof Image (JPG, PNG)'), validators=[
         Optional(),
@@ -197,6 +220,19 @@ class EditUserForm(FlaskForm):
             user = User.query.filter_by(mobile_number=mobile_number.data).first()
             if user is not None:
                 raise ValidationError(_('This mobile number is already registered.'))
+
+    def validate(self, **kwargs):
+        if not super().validate(**kwargs):
+            return False
+        # Validate wage/salary based on type ONLY if role is staff
+        if self.role.data == 'staff':
+            if self.wage_type.data == 'daily' and not self.daily_wage.data:
+                self.daily_wage.errors.append('Daily wage is required for staff.')
+                return False
+            if self.wage_type.data == 'monthly' and not self.monthly_salary.data:
+                self.monthly_salary.errors.append('Monthly salary is required for staff.')
+                return False
+        return True
 
 
 # --- Routes ---
@@ -245,8 +281,9 @@ def profile():
         db.session.commit()
         flash(_('Your profile has been updated.'), 'success')
         
-        if current_user.username != form.username.data:
-             login_user(current_user)
+        # Re-login if username changed to update session? (Might not be strictly necessary)
+        # if current_user.username != form.username.data:
+        #      login_user(current_user)
         return redirect(url_for('admin.profile'))
     return render_template('admin/profile_form.html', title=_("My Profile"), form=form)
 
@@ -265,6 +302,7 @@ def add_business():
             new_jar_price=form.new_jar_price.data,
             new_dispenser_price=form.new_dispenser_price.data
             )
+        # Default trial period is set in the model
         db.session.add(business)
         db.session.commit()
         flash(_('Business "%(name)s" created successfully.', name=business.name))
@@ -289,40 +327,49 @@ def edit_business(id):
         business.new_dispenser_price = form.new_dispenser_price.data
         db.session.commit()
         flash(_('Business "%(name)s" details have been updated.', name=business.name), 'success')
-        return redirect(url_for('admin.edit_business', id=id))
+        return redirect(url_for('admin.edit_business', id=id)) # Redirect back to same page
 
     # Handle Subscription Update
     if sub_form.submit_subscription.data and sub_form.validate():
         plan_id = sub_form.subscription_plan_id.data
-        ends_at = sub_form.subscription_ends_at.data
+        ends_at_date = sub_form.subscription_ends_at.data # This is a date object
 
         if plan_id > 0: # A plan is selected (0 is 'No Plan')
+            plan = SubscriptionPlan.query.get(plan_id)
+            if not plan:
+                flash('Selected plan not found.', 'danger')
+                return redirect(url_for('admin.edit_business', id=id))
+
             business.subscription_plan_id = plan_id
             business.subscription_status = 'active'
-            if ends_at:
-                business.subscription_ends_at = datetime.combine(ends_at, datetime.min.time())
+            business.trial_ends_at = None # Clear trial end date
+
+            if ends_at_date:
+                # Combine date with max time to ensure it includes the whole day
+                business.subscription_ends_at = datetime.combine(ends_at_date, datetime.max.time())
             else:
-                plan = SubscriptionPlan.query.get(plan_id)
-                if plan:
-                    start_date = datetime.utcnow()
-                    if business.subscription_ends_at and business.subscription_ends_at > start_date:
-                        start_date = business.subscription_ends_at
-                    business.subscription_ends_at = start_date + timedelta(days=plan.duration_days)
-                else:
-                    flash('Selected plan not found.', 'danger')
-                    return redirect(url_for('admin.edit_business', id=id))
+                # Auto-calculate based on plan duration
+                start_date = datetime.utcnow()
+                # If already active, extend from the current end date
+                if business.subscription_ends_at and business.subscription_ends_at > start_date:
+                    start_date = business.subscription_ends_at
+                business.subscription_ends_at = start_date + timedelta(days=plan.duration_days)
+
             flash(_('Subscription updated for "%(name)s".', name=business.name), 'success')
-        else: # No plan is selected (value 0)
+        else: # No plan is selected (value 0) - Set to expired
             business.subscription_plan_id = None
             business.subscription_status = 'expired'
             business.subscription_ends_at = None
+            business.trial_ends_at = None # Also clear trial date if setting to expired
             flash(_('Subscription removed for "%(name)s". Status set to expired.', name=business.name), 'warning')
 
         db.session.commit()
-        return redirect(url_for('admin.edit_business', id=id))
+        return redirect(url_for('admin.edit_business', id=id)) # Redirect back
 
-    if business.subscription_ends_at:
+    # Pre-fill subscription end date in the form for GET request
+    if request.method == 'GET' and business.subscription_ends_at:
         sub_form.subscription_ends_at.data = business.subscription_ends_at.date()
+
 
     return render_template('admin/business_form.html', form=form, sub_form=sub_form, business=business, title=_("Edit Business"))
 
@@ -351,22 +398,35 @@ def add_user():
             mobile_number=form.mobile_number.data,
             address=form.address.data
         )
-        if form.role.data in ['staff', 'manager'] and form.business_id.data > 0:
-            user.business_id = form.business_id.data
-        elif form.role.data in ['staff', 'manager']:
-             flash('Staff/Manager must be assigned to a business.', 'warning')
-             return render_template('admin/user_form.html', form=form, title=_("Add New User"), user=None)
-
-
+        # Assign business only if role is staff or manager and a valid business is selected
+        if form.role.data in ['staff', 'manager']:
+             if form.business_id.data and form.business_id.data > 0:
+                 user.business_id = form.business_id.data
+             else:
+                 flash('Staff/Manager must be assigned to a business.', 'warning')
+                 return render_template('admin/user_form.html', form=form, title=_("Add New User"), user=None)
+        else:
+             user.business_id = None # Ensure supplier doesn't get business ID
+        
+        # Handle wage type for staff
         if form.role.data == 'staff':
-            user.daily_wage = form.daily_wage.data
+            user.wage_type = form.wage_type.data
+            if form.wage_type.data == 'daily':
+                user.daily_wage = form.daily_wage.data
+            elif form.wage_type.data == 'monthly':
+                user.monthly_salary = form.monthly_salary.data
+        else:
+             user.wage_type = 'daily' # Default for non-staff (though not used)
+             user.daily_wage = None
+             user.monthly_salary = None
 
+        
         password_to_set = form.password.data if form.password.data else '123456'
         user.set_password(password_to_set)
 
         db.session.add(user)
         try:
-            db.session.commit()
+            db.session.commit() # Commit first to get user ID
 
             if form.id_proof.data:
                 f = form.id_proof.data
@@ -374,16 +434,21 @@ def add_user():
                 filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 f.save(filepath)
                 user.id_proof_filename = filename
-                db.session.commit()
+                # No need to commit again immediately unless necessary, will commit with supplier profile if needed
 
+            # Create Supplier Profile if role is supplier
             if form.role.data == 'supplier':
                 supplier_profile = SupplierProfile(
                     user_id=user.id,
                     shop_name=form.shop_name.data if form.shop_name.data else f"{user.username}'s Shop",
-                    address=form.address.data
+                    address=form.address.data # Use address from main form
                 )
                 db.session.add(supplier_profile)
-                db.session.commit()
+                db.session.commit() # Commit supplier profile
+            
+            elif user.id_proof_filename:
+                db.session.commit() # Commit ID proof filename if added
+            
 
             flash(_('User "%(username)s" has been created.', username=user.username))
             if not form.password.data:
@@ -393,9 +458,10 @@ def add_user():
 
         except Exception as e:
             db.session.rollback()
-            flash(f'Error creating user: {e}', 'danger')
+            current_app.logger.error(f"Error adding user: {e}")
+            flash(f'Error creating user: {str(e)}', 'danger')
 
-
+            
     return render_template('admin/user_form.html', form=form, title=_("Add New User"), user=None)
 
 
@@ -405,51 +471,74 @@ def add_user():
 def edit_user(id):
     user = User.query.get_or_404(id)
     if user.role == 'admin':
-        abort(403)
+        abort(403) # Prevent editing the admin user through this route
     form = EditUserForm(original_username=user.username, original_mobile_number=user.mobile_number, obj=user)
 
     if form.validate_on_submit():
         user.username = form.username.data
         user.mobile_number = form.mobile_number.data
         user.address = form.address.data
-        original_role = user.role
+        original_role = user.role # Store original role
         user.role = form.role.data
 
+        # Assign business only if role is staff or manager and a valid business is selected
         if user.role in ['staff', 'manager']:
-            user.business_id = form.business_id.data if form.business_id.data != 0 else None
-            if not user.business_id:
-                 flash('Staff/Manager must be assigned to a business.', 'warning')
-                 return render_template('admin/user_form.html', form=form, user=user, title=_("Edit User"))
+            if form.business_id.data and form.business_id.data > 0:
+                user.business_id = form.business_id.data
+            else:
+                flash('Staff/Manager must be assigned to a business.', 'warning')
+                # Pre-fill form again before rendering
+                if user.role == 'supplier' and user.supplier_profile: form.shop_name.data = user.supplier_profile.shop_name
+                if user.role == 'staff': form.wage_type.data = user.wage_type
+                return render_template('admin/user_form.html', form=form, user=user, title=_("Edit User"))
         else:
-            user.business_id = None
-
+             user.business_id = None # Ensure supplier doesn't get business ID
+        
+        # Handle wage type for staff
         if user.role == 'staff':
-            user.daily_wage = form.daily_wage.data
+            user.wage_type = form.wage_type.data
+            if form.wage_type.data == 'daily':
+                user.daily_wage = form.daily_wage.data
+                user.monthly_salary = None # Clear other type
+            elif form.wage_type.data == 'monthly':
+                user.monthly_salary = form.monthly_salary.data
+                user.daily_wage = None # Clear other type
         else:
-            user.daily_wage = None
+             # Clear wage info if role is changed from staff
+             user.wage_type = 'daily' # Default
+             user.daily_wage = None
+             user.monthly_salary = None
 
+        
         if form.password.data:
             user.set_password(form.password.data)
 
         if form.id_proof.data:
+            # Delete old file if it exists
             if user.id_proof_filename:
                 try:
                     os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], user.id_proof_filename))
                 except OSError:
-                    pass
+                    pass # Ignore if file doesn't exist
+            # Save new file
             f = form.id_proof.data
             filename = secure_filename(f"{user.id}_{user.username}_{f.filename}")
             f.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             user.id_proof_filename = filename
 
+        # Handle Supplier Profile
         if user.role == 'supplier':
-            supplier_profile = user.supplier_profile or SupplierProfile(user_id=user.id)
-            supplier_profile.shop_name = form.shop_name.data if form.shop_name.data else f"{user.username}'s Shop"
-            supplier_profile.address = form.address.data
-            if not user.supplier_profile:
+            supplier_profile = user.supplier_profile
+            if not supplier_profile: # Create if changing role TO supplier
+                supplier_profile = SupplierProfile(user_id=user.id)
                 db.session.add(supplier_profile)
+            supplier_profile.shop_name = form.shop_name.data if form.shop_name.data else f"{user.username}'s Shop"
+            supplier_profile.address = user.address # Sync address
         elif original_role == 'supplier' and user.supplier_profile:
+             # If changing role FROM supplier, consider deleting profile?
+             # db.session.delete(user.supplier_profile) # Optional: uncomment to delete profile on role change
              pass
+
 
         try:
             db.session.commit()
@@ -457,15 +546,20 @@ def edit_user(id):
             return redirect(url_for('admin.dashboard'))
         except Exception as e:
             db.session.rollback()
-            flash(f'Error updating user: {e}', 'danger')
+            current_app.logger.error(f"Error updating user: {e}")
+            flash(f'Error updating user: {str(e)}', 'danger')
 
+    # Pre-fill form on GET request
     if request.method == 'GET':
         form.role.data = user.role
         form.business_id.data = user.business_id or 0
-        form.daily_wage.data = user.daily_wage
-        form.address.data = user.address
+        form.address.data = user.address # Ensure address is pre-filled
         if user.role == 'supplier' and user.supplier_profile:
             form.shop_name.data = user.supplier_profile.shop_name
+        if user.role == 'staff':
+             form.wage_type.data = user.wage_type
+             form.daily_wage.data = user.daily_wage
+             form.monthly_salary.data = user.monthly_salary
 
     return render_template('admin/user_form.html', form=form, user=user, title=_("Edit User"))
 
@@ -480,18 +574,21 @@ def delete_user(id):
         return redirect(url_for('admin.dashboard'))
     username_deleted = user.username
     try:
+        # Delete associated ID proof file
         if user.id_proof_filename:
              try:
                  os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], user.id_proof_filename))
              except OSError:
-                 pass
+                 pass # Ignore if file doesn't exist
         
+        # Delete the user (cascades should handle related data like supplier profile)
         db.session.delete(user)
         db.session.commit()
         flash(_('User "%(username)s" has been deleted.', username=username_deleted))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error deleting user: {e}', 'danger')
+        current_app.logger.error(f"Error deleting user: {e}")
+        flash(f'Error deleting user: {str(e)}', 'danger')
     return redirect(url_for('admin.dashboard'))
 
 
@@ -563,10 +660,10 @@ def list_coupons():
 def add_coupon():
     form = CouponForm()
     if form.validate_on_submit():
-        expiry = form.expiry_date.data
+        expiry_date = form.expiry_date.data
         coupon = Coupon(code=form.code.data.upper(), discount_percentage=form.discount_percentage.data,
                         is_active=form.is_active.data,
-                        expiry_date=datetime.combine(expiry, datetime.min.time()) if expiry else None)
+                        expiry_date=datetime.combine(expiry_date, datetime.min.time()) if expiry_date else None)
         db.session.add(coupon)
         db.session.commit()
         flash(_('New coupon has been created.'), 'success')
@@ -583,11 +680,12 @@ def edit_coupon(id):
         coupon.code = form.code.data.upper()
         coupon.discount_percentage = form.discount_percentage.data
         coupon.is_active = form.is_active.data
-        expiry = form.expiry_date.data
-        coupon.expiry_date = datetime.combine(expiry, datetime.min.time()) if expiry else None
+        expiry_date = form.expiry_date.data
+        coupon.expiry_date = datetime.combine(expiry_date, datetime.min.time()) if expiry_date else None
         db.session.commit()
         flash(_('Coupon has been updated.'), 'success')
         return redirect(url_for('admin.list_coupons'))
+    # Pre-fill date field correctly on GET request
     if request.method == 'GET' and coupon.expiry_date:
         form.expiry_date.data = coupon.expiry_date.date()
     return render_template('admin/coupon_form.html', form=form, title=_("Edit Coupon"))
@@ -611,11 +709,13 @@ def delete_business(id):
     business = Business.query.get_or_404(id)
     business_name_deleted = business.name
     try:
+        # Cascading deletes should handle related users, customers, etc. defined in models.py
         db.session.delete(business)
         db.session.commit()
         flash(_('Business "%(name)s" and all of its associated data have been permanently deleted.', name=business_name_deleted), 'success')
     except Exception as e:
         db.session.rollback()
+        current_app.logger.error(f"Error deleting business {id}: {e}")
         flash(_('Error deleting business: %(error)s', error=str(e)), 'danger')
     return redirect(url_for('admin.dashboard'))
 
@@ -636,7 +736,8 @@ def send_custom_email():
         recipient_type = form.recipient_type.data
         subject = form.subject.data
         body_html = form.body.data
-        text_body = "Please view this email in an HTML-compatible client."
+        # Basic text body, replace with a better plain text conversion if needed
+        text_body = "Please enable HTML to view this email correctly."
 
         # Collect email addresses based on selection
         if recipient_type == 'all_managers':
@@ -660,26 +761,38 @@ def send_custom_email():
         valid_recipients = list(recipients_set)
 
         if not valid_recipients:
-            flash('No valid recipients found based on your selection. Ensure selected users/customers have email addresses.', 'warning')
+            flash('No valid recipients found based on your selection. Ensure selected users/customers have email addresses or valid emails were entered manually.', 'warning')
         else:
             try:
-                # Basic HTML wrapping for content provided by admin
+                # Render the body within the standard email template
                 wrapped_html_body = render_template('email/custom_admin_email_wrapper.html', email_body_content=body_html, subject=subject)
 
-                # Consider using a background task queue (like Celery) for sending many emails
-                # For simplicity here, sending sequentially:
+                # Send emails individually (consider background task for large lists)
+                send_count = 0
+                fail_count = 0
                 for email_addr in valid_recipients:
-                    send_email(
-                        subject=subject,
-                        sender=current_app.config['ADMINS'][0],
-                        recipients=[email_addr],
-                        text_body=text_body, # Generate a better text version if possible
-                        html_body=wrapped_html_body
-                    )
-                flash(f'Email sent successfully to {len(valid_recipients)} recipient(s).', 'success')
+                    try:
+                       send_email(
+                           subject=subject,
+                           sender=current_app.config['ADMINS'][0],
+                           recipients=[email_addr],
+                           text_body=text_body,
+                           html_body=wrapped_html_body
+                       )
+                       send_count += 1
+                    except Exception as mail_exc:
+                         current_app.logger.error(f"Failed to send email to {email_addr}: {mail_exc}")
+                         fail_count += 1
+                
+                if send_count > 0:
+                     flash(f'Email sent successfully to {send_count} recipient(s).', 'success')
+                if fail_count > 0:
+                     flash(f'Failed to send email to {fail_count} recipient(s). Check logs for details.', 'danger')
+
                 return redirect(url_for('admin.dashboard'))
+
             except Exception as e:
-                current_app.logger.error(f"Email sending failed: {e}") # Log the error
-                flash(f'An error occurred while sending emails: {str(e)}', 'danger')
+                current_app.logger.error(f"Email sending process failed: {e}")
+                flash(f'An error occurred during the email sending process: {str(e)}', 'danger')
 
     return render_template('admin/send_email.html', title='Send Custom Email', form=form)
