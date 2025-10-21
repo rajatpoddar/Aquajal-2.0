@@ -112,8 +112,12 @@
         const roleSelect = document.getElementById('role');
         const wageFieldsRow = document.getElementById('wage-fields-row'); // Target the row div
         const wageTypeSelect = document.getElementById('wage_type'); // Added wage type selector
+        
+        // --- IMPORTANT: Query the fields *inside* the row for accuracy ---
         const dailyWageField = document.getElementById('daily-wage-field');
         const monthlySalaryField = document.getElementById('monthly-salary-field');
+        // ---
+        
         const businessField = document.getElementById('business-id-field');
         const shopNameField = document.getElementById('shop-name-field');
     
