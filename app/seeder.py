@@ -39,7 +39,7 @@ def seed_db_command():
     if not Business.query.first():
         print("No businesses found. Creating default business, manager, and staff...")
 
-        b1 = Business(name='Main Plant', new_jar_price=150, new_dispenser_price=1500)
+        b1 = Business(name='Main Plant', new_jar_price=150, new_dispenser_price=150)
         db.session.add(b1)
         db.session.commit()
 

@@ -274,7 +274,7 @@ def profile():
     )
     if form.validate_on_submit():
         current_user.username = form.username.data
-        current_user.mobile_number = form.mobile_number.data
+        current_user.mobile_number = form.mobile_number.data if form.mobile_number.data else None # <-- FIX APPLIED
         current_user.email = form.email.data
         if form.password.data:
             current_user.set_password(form.password.data)
@@ -395,7 +395,8 @@ def add_user():
         user = User(
             username=form.username.data,
             role=form.role.data,
-            mobile_number=form.mobile_number.data,
+            # --- FIX #1: Convert empty string to None ---
+            mobile_number=form.mobile_number.data if form.mobile_number.data else None,
             address=form.address.data
         )
         # Assign business only if role is staff or manager and a valid business is selected
@@ -476,7 +477,8 @@ def edit_user(id):
 
     if form.validate_on_submit():
         user.username = form.username.data
-        user.mobile_number = form.mobile_number.data
+        # --- FIX #2: Convert empty string to None ---
+        user.mobile_number = form.mobile_number.data if form.mobile_number.data else None
         user.address = form.address.data
         original_role = user.role # Store original role
         user.role = form.role.data
