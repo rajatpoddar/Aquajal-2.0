@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import render_template, flash, redirect, url_for, request, session, send_from_directory, current_app
 from flask_login import login_user, current_user
 from app import db
 from app.public import bp
@@ -151,3 +151,15 @@ def set_language(language=None):
     if language in current_app.config['LANGUAGES']:
         session['language'] = language
     return redirect(request.referrer or url_for('public.index'))
+
+# --- NEW ROUTES FOR SITEMAP AND ROBOTS.TXT ---
+
+@bp.route('/sitemap.xml')
+def sitemap():
+    """Serves the sitemap.xml file from the static directory."""
+    return send_from_directory(current_app.static_folder, 'sitemap.xml')
+
+@bp.route('/robots.txt')
+def robots_txt():
+    """Serves the robots.txt file from the static directory."""
+    return send_from_directory(current_app.static_folder, 'robots.txt')
