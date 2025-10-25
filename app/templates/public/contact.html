@@ -4,23 +4,35 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <h1 class="display-4 text-center mb-4">Contact Us</h1>
-            <p class="lead text-center">We'd love to hear from you! Whether you have a question about features, pricing, or anything else, our team is ready to answer all your questions.</p>
+            {# --- Optimized H1 & Lead --- #}
+            <h1 class="display-4 text-center mb-4">{{ _('Contact Aquajal Support') }}</h1>
+            <p class="lead text-center">{{ _('Have questions about using Aquajal for your water supply business? Whether it\'s about features for RO suppliers, pricing, setup, or anything else, our team is ready to help.') }}</p>
 
             <div class="card shadow-sm mt-5">
                 <div class="card-body">
-                    <h4 class="card-title text-center">Get in Touch</h4>
+                    <h2 class="card-title text-center h4">{{ _('Get in Touch') }}</h2> {# Changed to H2 #}
                     <div class="row text-center mt-4">
-                        <div class="col-md-6">
-                            <h5><i class="bi bi-envelope-fill"></i> Email</h5>
-                            <p><a href="mailto:support@aquajal.com">aquajalbusiness@gmail.com</a></p>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <h5><i class="bi bi-envelope-fill text-primary"></i> {{ _('Email Support') }}</h5>
+                            <p><a href="mailto:aquajalbusiness@gmail.com">aquajalbusiness@gmail.com</a></p>
                         </div>
-                        <div class="col-md-6">
-                            <h5><i class="bi bi-telephone-fill"></i> Phone</h5>
-                            <p>+91 8233338857</p>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <h5><i class="bi bi-telephone-fill text-success"></i> {{ _('Phone Support') }}</h5>
+                            <p><a href="tel:+918233338857">+91 8233338857</a></p> {# Made phone number clickable #}
+                        </div>
+                         {# --- Added WhatsApp Section --- #}
+                        <div class="col-md-4">
+                            <h5><i class="bi bi-whatsapp text-success"></i> {{ _('Join WhatsApp Group') }}</h5>
+                            <p><a href="https://chat.whatsapp.com/HWl3L1nrfTZ4RHnexlB5Oz?mode=wwt" target="_blank" rel="noopener noreferrer">{{ _('Click to Join Community') }}</a></p> {# Added WhatsApp link #}
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {# --- Optional: Added Address Section --- #}
+            <div class="text-center mt-4">
+                 <h5><i class="bi bi-geo-alt-fill text-secondary"></i> {{ _('Our Location') }}</h5>
+                 <p>Deoghar, Jharkhand, India</p>
             </div>
         </div>
     </div>

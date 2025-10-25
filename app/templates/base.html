@@ -7,9 +7,9 @@
 
     <title>{{ title }} - Aquajal</title>
     <meta name="description"
-        content="{{ _('The all-in-one solution for managing your water jar supply business. Streamline deliveries, track inventory, and manage staff with ease.') }}">
+        content="{{ _('Aquajal: Complete SaaS software for RO water jar suppliers & distributors in India. Automate sales, manage delivery staff, track inventory, handle digital bookings, generate invoices & monitor performance effortlessly. Start your free trial today!') }}">
     <meta property="og:title" content="Aquajal - Water Supply Management">
-    <meta property="og:description" content="{{ _('The all-in-one solution for managing your water jar supply business.') }}">
+    <meta property="og:description" content="{{ _('Aquajal is India\'s modern, web-based SaaS solution designed specifically to streamline operations for RO water jar suppliers and distributors.') }}">
     <meta property="og:image" content="{{ url_for('static', filename='images/logo-512.png', _external=True) }}">
     <meta property="og:url" content="{{ url_for('public.index', _external=True) }}">
     <meta property="og:type" content="website">
@@ -17,7 +17,7 @@
     <meta name="author" content="Rajat Poddar, Poddar Solutions">
     <meta name="copyright" content="Copyright © 2025 Poddar Solutions. All Rights Reserved.">
     <meta name="keywords"
-        content="water supply management, jar delivery software, aquajal, poddar solutions, inventory management, delivery tracking">
+        content="water supply management, water jar delivery software, ro water business management, aquajal, poddar solutions, inventory management, delivery tracking, water delivery app india">
 
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -38,16 +38,35 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+    {# --- UPDATED: Import BOTH Roboto (body) and Oswald (brand) --- #}
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
 
     <style>
         html { scroll-behavior: smooth; }
+        
+        {# --- UPDATED: Set Roboto as the DEFAULT font --- #}
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            font-weight: 400; /* Use the regular weight by default */
+        }
+        
+        /* Make headers and strong tags slightly bolder */
+        h1, h2, h3, h4, h5, h6, strong, .fw-bold {
+            font-weight: 500; /* Use medium weight */
+        }
+
         [data-bs-theme="dark"] {
             --bs-body-bg: #121212;
             --bs-body-color: #e9e9e9;
             --bs-tertiary-bg: #1e1e1e;
             --bs-border-color: #495057;
+            --bs-dark-subtle: #1a1a1a; /* Cleaner dark background */
         }
+        .bg-dark-subtle {
+             background-color: var(--bs-dark-subtle) !important;
+        }
+
         /* Simple button press effect */
         .btn:active {
             transform: scale(0.98);
@@ -68,7 +87,8 @@
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('public.index') }}">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Aquajal Logo" style="height: 30px;"
                     class="d-inline-block align-text-top me-2">
-                <span style="font-family: 'Oswald', sans-serif; font-size: 1.5rem;">AQUAJAL</span>
+                {# --- UPDATED: Set App Name font to Oswald --- #}
+                <span style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.5rem;">AQUAJAL</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -191,26 +211,27 @@
             <div class="row text-center text-md-start">
                 <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold text-primary">Aquajal</h5>
-                    <p>{{ _('The complete solution for managing your water supply business efficiently and effectively.') }}</p>
+                    <p>{{ _('The complete SaaS software solution for managing your RO water supply business efficiently in India.') }}</p>
                 </div>
                 <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold text-primary">{{ _('Quick Links') }}</h5>
-                    <p><a href="{{ url_for('public.about') }}" class="text-white" style="text-decoration: none;">{{ _('About Us') }}</a></p>
-                    <p><a href="{{ url_for('public.how_to_use') }}" class="text-white" style="text-decoration: none;">{{ _('How to Use') }}</a></p>
-                    <p><a href="{{ url_for('public.index') }}#faqAccordion" class="text-white" style="text-decoration: none;">{{ _('FAQ') }}</a></p>
+                    <p><a href="{{ url_for('public.about') }}" class="text-white text-decoration-none">{{ _('About Us') }}</a></p>
+                    <p><a href="{{ url_for('public.how_to_use') }}" class="text-white text-decoration-none">{{ _('How to Use') }}</a></p>
+                    <p><a href="{{ url_for('public.index') }}#faqAccordion" class="text-white text-decoration-none">{{ _('FAQ') }}</a></p>
                 </div>
                 <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
                     <h5 class="text-uppercase mb-4 fw-bold text-primary">{{ _('Contact') }}</h5>
                     <p><i class="bi bi-geo-alt-fill me-3"></i>Deoghar, Jharkhand, India</p>
-                    <p><i class="bi bi-envelope-fill me-3"></i>aquajalbusiness@gmail.com</p>
-                    <p><i class="bi bi-telephone-fill me-3"></i>+91 8233338857</p>
+                    <p><i class="bi bi-envelope-fill me-3"></i><a href="mailto:aquajalbusiness@gmail.com" class="text-white text-decoration-none">aquajalbusiness@gmail.com</a></p>
+                    <p><i class="bi bi-telephone-fill me-3"></i><a href="tel:+918233338857" class="text-white text-decoration-none">+91 8233338857</a></p>
+                    <p><i class="bi bi-whatsapp me-3"></i><a href="https://chat.whatsapp.com/HWl3L1nrfTZ4RHnexlB5Oz?mode=wwt" target="_blank" rel="noopener noreferrer" class="text-white text-decoration-none">{{ _('Join WhatsApp Group') }}</a></p>
                 </div>
             </div>
             <hr class="mb-4">
             <div class="row align-items-center">
                 <div class="col-md-7 col-lg-8">
-                    <p> &copy; 2025 Copyright:
-                        <a href="{{ url_for('public.index') }}" class="text-white" style="text-decoration: none;"><strong>Aquajal.com</strong></a>
+                    <p> &copy; {% block year %}{{ now.year }}{% endblock %} Copyright:
+                        <a href="{{ url_for('public.index') }}" class="text-white text-decoration-none"><strong>Aquajal.com</strong></a> | A Poddar Solutions Product
                     </p>
                 </div>
             </div>
@@ -257,4 +278,3 @@
 </body>
 
 </html>
-

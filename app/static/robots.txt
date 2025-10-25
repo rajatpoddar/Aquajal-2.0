@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /how-to-use
+Allow: /register
+Allow: /static/ # Allow CSS, JS, Images
+
+# Disallow login, user dashboards, and internal API routes
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /manager/
+Disallow: /customer/
+Disallow: /delivery/
+Disallow: /billing/
+Disallow: /supplier/
+Disallow: /sales/
+Disallow: /invoices/
+Disallow: /notifications/
+Disallow: /api/ # Assuming API routes might start with /api
+
+Sitemap: https://www.aquajal.com/sitemap.xml
