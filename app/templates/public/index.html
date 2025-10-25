@@ -2,38 +2,37 @@
 
 {% block content %}
 {# --- Hero Section --- #}
-{# --- Adjusted padding and alignment for better desktop view --- #}
-<div class="container col-xxl-10 px-4 py-5"> {# Increased container width slightly for large screens #}
-    <div class="row flex-lg-row-reverse align-items-center g-5 py-lg-5"> {# Increased gap and vertical padding on large screens #}
-        <div class="col-10 col-sm-8 col-lg-6 mx-auto" data-aos="fade-left"> {# Centered image column on smaller screens, standard on large #}
+<div class="container col-xxl-10 px-4 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-lg-5">
+        <div class="col-10 col-sm-8 col-lg-6 mx-auto" data-aos="fade-left">
             <img src="{{ url_for('static', filename='images/hero-image.webp') }}" class="d-block mx-lg-auto img-fluid rounded shadow-lg" alt="Water Delivery Truck managing water jar supply" width="700" height="500" loading="lazy" style="transition: transform 0.3s ease;">
         </div>
-        {# --- Text alignment adjusted for large screens --- #}
-        <div class="col-lg-6 text-center text-lg-start" data-aos="fade-right"> {# Center text on small/medium, left-align on large #}
+        <div class="col-lg-6 text-center text-lg-start" data-aos="fade-right">
             <h1 class="display-4 fw-bold lh-1 mb-3 text-primary">{{ _('India\'s First All-in-One Water Business Management App') }}</h1>
             <p class="lead mb-4">{{ _('Aquajal: Complete SaaS software for RO water jar suppliers & distributors in India. Automate sales, manage delivery staff, track inventory, handle digital bookings, generate invoices & monitor performance effortlessly.') }}</p>
 
-            {# --- Adjusted margin below subheading --- #}
-            <h2 class="h5 text-muted mb-4">{{ _('Key Software Benefits for Your Water Supply Business:') }}</h2> {# Increased bottom margin #}
-            {# --- Feature list slightly smaller font for balance --- #}
-            <ul class="list-unstyled mb-4 fs-6"> {# Reduced font size slightly #}
+            <h2 class="h5 text-muted mb-4">{{ _('Key Software Benefits for Your Water Supply Business:') }}</h2>
+            <ul class="list-unstyled mb-4 fs-6">
                 <li class="mb-2"><i class="bi bi-cloud-check-fill text-success me-2"></i><strong>{{ _('Cloud-Based SaaS Platform:') }}</strong> {{ _('Manage your entire water distribution business online. Start with a 40-day free trial and choose flexible subscription plans.') }}</li>
                 <li class="mb-2"><i class="bi bi-receipt-cutoff text-info me-2"></i><strong>{{ _('Automated Invoicing:') }}</strong> {{ _('Generate, download, and email PDF invoices instantly for daily deliveries, monthly billing, or event bookings.') }}</li>
                 <li class="mb-2"><i class="bi bi-graph-up-arrow text-warning me-2"></i><strong>{{ _('Advanced Business Reporting:') }}</strong> {{ _('Get daily/monthly insights on sales, expenses, staff attendance & performance crucial for RO water suppliers.') }}</li>
                 <li class="mb-2"><i class="bi bi-people-fill text-secondary me-2"></i><strong>{{ _('Dedicated User Portals:') }}</strong> {{ _('Empower customers with self-service booking & history view; enable staff to log deliveries & expenses easily via mobile app.') }}</li>
             </ul>
 
-             {# --- Adjusted button alignment for large screens --- #}
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center justify-content-lg-start"> {# Center buttons on small/medium, left-align on large #}
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center justify-content-lg-start">
                 <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-lg px-4 me-md-2"><i class="bi bi-rocket-takeoff-fill me-2"></i>{{ _('Start Your 40-Day Free Trial') }}</a>
                 <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">{{ _('Login') }}</a>
+                {# --- NEW INSTALL BUTTON --- #}
+                <button id="install-pwa-btn" class="btn btn-success btn-lg px-4" style="display: none;">
+                    <i class="bi bi-download me-2"></i>Install App
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-{# --- Features Section (Updated Background & Text) --- #}
-<div class="container px-4 py-5 bg-dark-subtle rounded shadow-sm" id="features"> {# <-- CHANGED BACKGROUND CLASS #}
+{# --- Features Section --- #}
+<div class="container px-4 py-5 bg-dark-subtle rounded shadow-sm" id="features">
     <h2 class="pb-2 border-bottom text-center display-6 mb-5" data-aos="fade-up">{{ _('Modern Water Jar Management Software Built for Growth in India') }}</h2>
     <div class="row g-4 py-3 row-cols-1 row-cols-md-2 row-cols-lg-4">
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="100">
@@ -41,7 +40,6 @@
                 <i class="bi bi-receipt-cutoff"></i>
             </div>
             <h3 class="fs-4">{{ _('Professional Water Business Invoicing') }}</h3>
-            {# --- REWRITTEN TEXT --- #}
             <p>{{ _('Automatically create invoices for daily, monthly, or event bookings. Email professional PDFs to all clients, from residential homes to offices and schools.') }}</p>
         </div>
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="200">
@@ -49,7 +47,6 @@
                 <i class="bi bi-credit-card-fill"></i>
             </div>
             <h3 class="fs-4">{{ _('Easy Subscription Management') }}</h3>
-             {# --- REWRITTEN TEXT --- #}
             <p>{{ _('Provide flexible subscription plans with a 40-day free trial. Securely accept online payments via Razorpay to manage recurring revenue for your business.') }}</p>
         </div>
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="300">
@@ -57,7 +54,6 @@
                 <i class="bi bi-graph-up-arrow"></i>
             </div>
             <h3 class="fs-4">{{ _('Insightful Business Reports') }}</h3>
-             {# --- REWRITTEN TEXT --- #}
             <p>{{ _('Make data-driven decisions with reports on sales, staff performance, and customer dues. Get insights to find new leads and optimize your water supply service.') }}</p>
         </div>
         <div class="feature col text-center" data-aos="fade-up" data-aos-delay="400">
@@ -65,13 +61,12 @@
                 <i class="bi bi-box-seam-fill"></i>
             </div>
             <h3 class="fs-4">{{ _('Smart Stock & Procurement') }}</h3>
-             {# --- REWRITTEN TEXT --- #}
             <p>{{ _('Track your jar and dispenser inventory in real-time. Stock auto-deducts for sales, and managers can directly procure new supplies from vendors in one panel.') }}</p>
         </div>
     </div>
 </div>
 
-{# --- Pricing Section (Keep as is) --- #}
+{# --- Pricing Section --- #}
 <div class="container py-5" data-aos="fade-up" id="pricing">
     <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
         <h2 class="display-4 fw-normal">{{ _('Aquajal Pricing Plans for Water Suppliers') }}</h2>
@@ -114,7 +109,7 @@
     </div>
 </div>
 
-{# --- FAQ Section (Keep as is) --- #}
+{# --- FAQ Section --- #}
 <div class="container my-5" id="faqAccordion" data-aos="fade-up">
     <h2 class="text-center mb-4 display-6">{{ _('Frequently Asked Questions about Aquajal') }}</h2>
     <div class="accordion accordion-flush">
